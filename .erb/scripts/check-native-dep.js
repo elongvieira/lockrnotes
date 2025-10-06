@@ -42,9 +42,7 @@ ${chalk.whiteBright.bgGreen.bold(
   'cd ./release/app && npm install your-package',
 )}
  Read more about native dependencies at:
-${chalk.bold(
-  'https://electron-react-boilerplate.js.org/docs/adding-dependencies/#module-structure',
-)}
+${chalk.bold('https://lockrnotes.com')}
  `);
       process.exit(1);
     }
