@@ -1,15 +1,7 @@
 ---
 name: Feature request
-about: You want something added to the boilerplate. 🎉
+about: Suggest an idea to improve Lockr Notes 🎉
 labels: 'enhancement'
 ---
 
-<!---
-❗️❗️ Also, please consider donating (https://opencollective.com/electron-react-boilerplate-594) ❗️❗️
-
-Donations will ensure the following:
-
-🔨 Long term maintenance of the project
-🛣 Progress on the roadmap
-🐛 Quick responses to bug reports and help requests
- -->
+<!--- Describe the problem this feature would solve and any alternatives considered. -->

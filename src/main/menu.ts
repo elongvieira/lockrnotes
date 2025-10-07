@@ -53,33 +53,15 @@ export default class MenuBuilder {
   }
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
-    const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Electron',
+    // File (only Close)
+    const subMenuFile: MenuItemConstructorOptions = {
+      label: 'File',
       submenu: [
         {
-          label: 'About ElectronReact',
-          selector: 'orderFrontStandardAboutPanel:',
-        },
-        { type: 'separator' },
-        { label: 'Services', submenu: [] },
-        { type: 'separator' },
-        {
-          label: 'Hide ElectronReact',
-          accelerator: 'Command+H',
-          selector: 'hide:',
-        },
-        {
-          label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
-          selector: 'hideOtherApplications:',
-        },
-        { label: 'Show All', selector: 'unhideAllApplications:' },
-        { type: 'separator' },
-        {
-          label: 'Quit',
-          accelerator: 'Command+Q',
+          label: 'Close',
+          accelerator: 'Command+W',
           click: () => {
-            app.quit();
+            this.mainWindow.close();
           },
         },
       ],
@@ -100,8 +82,9 @@ export default class MenuBuilder {
         },
       ],
     };
-    const subMenuViewDev: MenuItemConstructorOptions = {
-      label: 'View',
+    // Developer (only in development)
+    const subMenuDeveloperDev: MenuItemConstructorOptions = {
+      label: 'Developer',
       submenu: [
         {
           label: 'Reload',
@@ -126,164 +109,115 @@ export default class MenuBuilder {
         },
       ],
     };
-    const subMenuViewProd: MenuItemConstructorOptions = {
-      label: 'View',
-      submenu: [
-        {
-          label: 'Toggle Full Screen',
-          accelerator: 'Ctrl+Command+F',
-          click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-          },
-        },
-      ],
-    };
-    const subMenuWindow: DarwinMenuItemConstructorOptions = {
-      label: 'Window',
-      submenu: [
-        {
-          label: 'Minimize',
-          accelerator: 'Command+M',
-          selector: 'performMiniaturize:',
-        },
-        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
-        { type: 'separator' },
-        { label: 'Bring All to Front', selector: 'arrangeInFront:' },
-      ],
-    };
     const subMenuHelp: MenuItemConstructorOptions = {
       label: 'Help',
       submenu: [
         {
-          label: 'Learn More',
+          label: 'About Lockr Notes',
           click() {
-            shell.openExternal('https://electronjs.org');
-          },
-        },
-        {
-          label: 'Documentation',
-          click() {
-            shell.openExternal(
-              'https://github.com/electron/electron/tree/main/docs#readme',
-            );
-          },
-        },
-        {
-          label: 'Community Discussions',
-          click() {
-            shell.openExternal('https://www.electronjs.org/community');
-          },
-        },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
+            shell.openExternal('https://lockrnotes.com');
           },
         },
       ],
     };
 
-    const subMenuView =
+    const inDev =
       process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-        ? subMenuViewDev
-        : subMenuViewProd;
+      process.env.DEBUG_PROD === 'true';
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    // Order: File, Edit, Help, Developer (Developer only in development)
+    const darwinTemplate: MenuItemConstructorOptions[] = [
+      subMenuFile,
+      subMenuEdit,
+      subMenuHelp,
+    ];
+
+    if (inDev) {
+      darwinTemplate.push(subMenuDeveloperDev);
+    }
+
+    return darwinTemplate;
   }
 
   buildDefaultTemplate() {
-    const templateDefault = [
-      {
-        label: '&File',
-        submenu: [
-          {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
+    const inDev =
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEBUG_PROD === 'true';
+
+    const subMenuFile: MenuItemConstructorOptions = {
+      label: '&File',
+      submenu: [
+        {
+          label: '&Close',
+          accelerator: 'Ctrl+W',
+          click: () => {
+            this.mainWindow.close();
           },
-          {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
-            click: () => {
-              this.mainWindow.close();
-            },
+        },
+      ],
+    };
+
+    const subMenuEdit: MenuItemConstructorOptions = {
+      label: '&Edit',
+      submenu: [
+        { role: 'undo', label: 'Undo' },
+        { role: 'redo', label: 'Redo' },
+        { type: 'separator' },
+        { role: 'cut', label: 'Cut' },
+        { role: 'copy', label: 'Copy' },
+        { role: 'paste', label: 'Paste' },
+        { role: 'selectAll', label: 'Select All' },
+      ],
+    };
+
+    const subMenuHelp: MenuItemConstructorOptions = {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'About Lockr Notes',
+          click() {
+            shell.openExternal('https://lockrnotes.com');
           },
-        ],
-      },
-      {
-        label: '&View',
-        submenu:
-          process.env.NODE_ENV === 'development' ||
-          process.env.DEBUG_PROD === 'true'
-            ? [
-                {
-                  label: '&Reload',
-                  accelerator: 'Ctrl+R',
-                  click: () => {
-                    this.mainWindow.webContents.reload();
-                  },
-                },
-                {
-                  label: 'Toggle &Full Screen',
-                  accelerator: 'F11',
-                  click: () => {
-                    this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen(),
-                    );
-                  },
-                },
-                {
-                  label: 'Toggle &Developer Tools',
-                  accelerator: 'Alt+Ctrl+I',
-                  click: () => {
-                    this.mainWindow.webContents.toggleDevTools();
-                  },
-                },
-              ]
-            : [
-                {
-                  label: 'Toggle &Full Screen',
-                  accelerator: 'F11',
-                  click: () => {
-                    this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen(),
-                    );
-                  },
-                },
-              ],
-      },
-      {
-        label: 'Help',
-        submenu: [
-          {
-            label: 'Learn More',
-            click() {
-              shell.openExternal('https://electronjs.org');
-            },
+        },
+      ],
+    };
+
+    const subMenuDeveloper: MenuItemConstructorOptions = {
+      label: 'Developer',
+      submenu: [
+        {
+          label: 'Reload',
+          accelerator: 'Ctrl+R',
+          click: () => {
+            this.mainWindow.webContents.reload();
           },
-          {
-            label: 'Documentation',
-            click() {
-              shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme',
-              );
-            },
+        },
+        {
+          label: 'Toggle Full Screen',
+          accelerator: 'F11',
+          click: () => {
+            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
           },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
+        },
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: 'Alt+Ctrl+I',
+          click: () => {
+            this.mainWindow.webContents.toggleDevTools();
           },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
-            },
-          },
-        ],
-      },
+        },
+      ],
+    };
+
+    const templateDefault: MenuItemConstructorOptions[] = [
+      subMenuFile,
+      subMenuEdit,
+      subMenuHelp,
     ];
+
+    if (inDev) {
+      templateDefault.push(subMenuDeveloper);
+    }
 
     return templateDefault;
   }

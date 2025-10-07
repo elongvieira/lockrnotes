@@ -1,6 +1,10 @@
-The MIT License (MIT)
+Copyright (c) 2025 Elon Gomes Vieira
 
-Copyright (c) 2015-present Electron React Boilerplate
+Este projeto é baseado em Electron React Boilerplate
+(https://github.com/electron-react-boilerplate/electron-react-boilerplate)
+Copyright (c) 2015-present Electron React Boilerplate contributors
+
+O código original e as modificações deste projeto são licenciados sob a Licença MIT:
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
