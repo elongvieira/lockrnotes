@@ -1,19 +1,12 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-
-function Hello() {
-  return (
-    <div>
-      <h1>Lockr Notes</h1>
-    </div>
-  );
-}
+import Main from './pages/Main';
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<Main />} />
       </Routes>
     </Router>
   );

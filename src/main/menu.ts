@@ -1,5 +1,4 @@
 import {
-  app,
   Menu,
   shell,
   BrowserWindow,
