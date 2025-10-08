@@ -1,3 +1,7 @@
+:root{
+  --primary-color: #2B6CB0;
+  --secondary-color: #2C5282;
+}
 
 body {
   position: relative;
@@ -5,9 +9,9 @@ body {
   height: 100vh;
   background: linear-gradient(
     200.96deg,
-    #2B6CB0 -29.09%,
-    #2C5282 110.91%
-  );  
+    var(--primary-color) 2.11%,
+    var(--secondary-color) 98.28%
+  );
   font-family: sans-serif;
   overflow-y: hidden;
   display: flex;
