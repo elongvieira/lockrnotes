@@ -1,59 +1,43 @@
 import React from 'react';
 import theme from '../theme';
 import logoPath from '../../../assets/logo_lock_a.png';
+import styles from './Sidebar.module.css';
 
 export default function Sidebar() {
   return (
     <aside
+      className={styles.sidebar}
       style={{
-        width: 320,
-        padding: 16,
         borderRight: `1px solid ${theme.colors.sidebarBg}`,
         background: theme.colors.sidebarBg,
-        boxSizing: 'border-box',
       }}
     >
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img
-              src={logoPath}
-              alt="Lockr Notes"
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 8,
-                objectFit: 'cover',
-              }}
-            />
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.logoContainer}>
+            <img src={logoPath} alt="Lockr Notes" className={styles.logo} />
           </div>
-          <div style={{ marginLeft: 12 }}>
-            <h3 style={{ margin: 0, color: theme.colors.text }}>Lockr Notes</h3>
+          <div className={styles.titleContainer}>
+            <h3 className={styles.title} style={{ color: theme.colors.text }}>
+              Lockr Notes
+            </h3>
             <small style={{ color: theme.colors.muted }}>minhas notas</small>
           </div>
         </div>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div className={styles.searchContainer}>
         <input
           placeholder="Pesquisar notas..."
-          style={{
-            width: '100%',
-            padding: '8px 10px',
-            borderRadius: 6,
-            border: '1px solid #ddd',
-            boxSizing: 'border-box',
-          }}
+          className={styles.searchInput}
         />
       </div>
 
       <div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className={styles.buttonsContainer}>
           <button
+            className={styles.button}
             style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: 6,
               border: `1px solid ${theme.colors.sidebarBg}`,
               background: theme.colors.background,
             }}
@@ -62,10 +46,8 @@ export default function Sidebar() {
             Local
           </button>
           <button
+            className={styles.button}
             style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: 6,
               border: `1px solid ${theme.colors.sidebarBg}`,
               background: theme.colors.background,
             }}
