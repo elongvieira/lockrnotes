@@ -4,8 +4,8 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
+import logo from '../../../assets/logo_a.png';
 
 export default function AppMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -19,7 +19,7 @@ export default function AppMenu() {
   };
 
   return (
-    <AppBar position="static" color="transparent" elevation={0}>
+    <AppBar position="static" color="primary" elevation={0}>
       <Toolbar>
         <IconButton
           edge="start"
@@ -30,9 +30,13 @@ export default function AppMenu() {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Lockr Notes
-        </Typography>
+        <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+          <img
+            src={logo}
+            alt="Lockr Notes"
+            style={{ height: 28, objectFit: 'contain' }}
+          />
+        </div>
 
         <Menu
           id="app-menu"
