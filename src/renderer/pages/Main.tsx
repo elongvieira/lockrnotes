@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AppMenu from '../components/AppMenu';
 
 export default function Main() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -65,130 +66,133 @@ export default function Main() {
   };
 
   return (
-    <div className="app-container">
-      {/* Sidebar with notes list */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <img
-            src="../../assets/logo_a.png"
-            alt="LockrNotes"
-            className="app-logo"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleNewNote}
-          >
-            <span className="icon">+</span>
-            New Note
-          </button>
-        </div>
-
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search notes..."
-            className="search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="notes-list">
-          {sampleNotes.map((note, index) => (
-            <div
-              key={note.id}
-              className={`note-item ${index === 0 ? 'active' : ''}`}
-              role="button"
-              tabIndex={0}
-              onClick={() => handleNoteClick(note)}
-              onKeyDown={(e) => handleKeyDown(e, note)}
-            >
-              <div className="note-item-title">{note.title}</div>
-              <div className="note-item-preview">{note.preview}</div>
-              <div className="note-item-date">{note.date}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Main editing area */}
-      <div className="main-content">
-        <div className="editor-header">
-          <input
-            type="text"
-            placeholder="Note title..."
-            className="note-title-input"
-            value={noteTitle}
-            onChange={(e) => setNoteTitle(e.target.value)}
-          />
-          <div className="editor-actions">
-            <button
-              type="button"
-              className="btn btn-success"
-              onClick={handleSave}
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={handleDelete}
-              style={{
-                display: noteTitle || noteContent ? 'inline-flex' : 'none',
+    <>
+      <AppMenu />
+      <div className="app-container">
+        {/* Sidebar with notes list */}
+        <div className="sidebar">
+          <div className="sidebar-header">
+            <img
+              src="../../assets/logo_a.png"
+              alt="LockrNotes"
+              className="app-logo"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
               }}
+            />
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleNewNote}
             >
-              Delete
+              <span className="icon">+</span>
+              New Note
             </button>
+          </div>
+
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search notes..."
+              className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="notes-list">
+            {sampleNotes.map((note, index) => (
+              <div
+                key={note.id}
+                className={`note-item ${index === 0 ? 'active' : ''}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleNoteClick(note)}
+                onKeyDown={(e) => handleKeyDown(e, note)}
+              >
+                <div className="note-item-title">{note.title}</div>
+                <div className="note-item-preview">{note.preview}</div>
+                <div className="note-item-date">{note.date}</div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="editor-container">
-          <textarea
-            placeholder="Start writing your note here..."
-            className="note-editor"
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-          />
-        </div>
-
-        <div className="status-bar">
-          <span>Ready</span>
-          <span>{wordCount} words</span>
-        </div>
-      </div>
-
-      {/* Delete confirmation modal */}
-      {showDeleteModal && (
-        <div className="modal show">
-          <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>
-              Are you sure you want to delete this note? This action cannot be
-              undone.
-            </p>
-            <div className="modal-actions">
+        {/* Main editing area */}
+        <div className="main-content">
+          <div className="editor-header">
+            <input
+              type="text"
+              placeholder="Note title..."
+              className="note-title-input"
+              value={noteTitle}
+              onChange={(e) => setNoteTitle(e.target.value)}
+            />
+            <div className="editor-actions">
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={handleSave}
+              >
+                Save
+              </button>
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={confirmDelete}
+                onClick={handleDelete}
+                style={{
+                  display: noteTitle || noteContent ? 'inline-flex' : 'none',
+                }}
               >
                 Delete
               </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={cancelDelete}
-              >
-                Cancel
-              </button>
             </div>
           </div>
+
+          <div className="editor-container">
+            <textarea
+              placeholder="Start writing your note here..."
+              className="note-editor"
+              value={noteContent}
+              onChange={(e) => setNoteContent(e.target.value)}
+            />
+          </div>
+
+          <div className="status-bar">
+            <span>Ready</span>
+            <span>{wordCount} words</span>
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Delete confirmation modal */}
+        {showDeleteModal && (
+          <div className="modal show">
+            <div className="modal-content">
+              <h3>Confirm Deletion</h3>
+              <p>
+                Are you sure you want to delete this note? This action cannot be
+                undone.
+              </p>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={confirmDelete}
+                >
+                  Delete
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={cancelDelete}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
