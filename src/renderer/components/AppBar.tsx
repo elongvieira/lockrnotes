@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -9,10 +10,25 @@ import logo from '../../../assets/logo_a.png';
 import './AppBar.css';
 
 export default function AppBar() {
+  const { t, i18n } = useTranslation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleLangOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setLangAnchor(event.currentTarget);
+  };
+
+  const handleLangClose = () => {
+    setLangAnchor(null);
+  };
+
+  const changeLanguage = async (lng: string) => {
+    await i18n.changeLanguage(lng);
+    handleLangClose();
   };
 
   const handleMenuClose = () => {
@@ -61,6 +77,26 @@ export default function AppBar() {
         <div className="appbar-drag" />
 
         <div className="appbar-actions">
+          <button
+            type="button"
+            className="lang-btn"
+            onClick={handleLangOpen}
+            aria-label="language"
+          >
+            {i18n.language || 'pt-BR'}
+          </button>
+          <Menu
+            id="lang-menu"
+            anchorEl={langAnchor}
+            open={Boolean(langAnchor)}
+            onClose={handleLangClose}
+            keepMounted
+          >
+            <MenuItem onClick={() => changeLanguage('pt-BR')}>
+              Português (BR)
+            </MenuItem>
+            <MenuItem onClick={() => changeLanguage('en')}>English</MenuItem>
+          </Menu>
           <button type="button" className="window-btn" onClick={handleMinimize}>
             —
           </button>
@@ -87,15 +123,15 @@ export default function AppBar() {
           onClose={handleMenuClose}
           keepMounted
         >
-          <MenuItem onClick={handleMenuClose}>New Note</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Save</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{t('menu.new')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{t('menu.save')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{t('menu.delete')}</MenuItem>
           <MenuItem
             onClick={() => {
               handleMenuClose();
             }}
           >
-            Exit
+            {t('menu.exit')}
           </MenuItem>
         </Menu>
       </Toolbar>

@@ -112,6 +112,9 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0"
+    ,
+    "i18next": "^23.0.0",
+    "react-i18next": "^13.0.0"
   },
   "devDependencies": {
     "@electron/rebuild": "^3.7.1",

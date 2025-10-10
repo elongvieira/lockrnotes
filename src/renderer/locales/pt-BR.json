@@ -1,0 +1,11 @@
+{
+  "app": {
+    "title": "Lockr Notes"
+  },
+  "menu": {
+    "new": "Nova nota",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "exit": "Sair"
+  }
+}

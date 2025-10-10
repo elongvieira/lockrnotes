@@ -54,3 +54,17 @@
 .appbar .window-btn.close:hover {
   background: rgba(231, 76, 60, 0.18);
 }
+
+.appbar .lang-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.appbar .lang-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
