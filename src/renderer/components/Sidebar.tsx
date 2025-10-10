@@ -1,93 +1,109 @@
 import React, { useState } from 'react';
+import '../theme.css';
 import './Sidebar.css';
+import Box from '@mui/material/Box';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import IconButton from '@mui/material/IconButton';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { useTranslation } from 'react-i18next';
 
 export default function Sidebar() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslation();
+  const [value, setValue] = useState<number>(0);
 
-  // Sample notes data for demonstration
-  const sampleNotes = [
-    {
-      id: 1,
-      title: 'Welcome to LockrNotes',
-      preview: 'This is your first note. Start writing to create new notes...',
-      date: '2024-10-08',
-      content:
-        'Welcome to LockrNotes! This is a secure note-taking application.',
-    },
-    {
-      id: 2,
-      title: 'Meeting Notes',
-      preview: "Important discussion points from today's meeting...",
-      date: '2024-10-07',
-      content: 'Meeting notes content here...',
-    },
-  ];
-
-  const handleNewNote = () => {
-    // setNoteTitle('');
-    // setNoteContent('');
-  };
-
-  const handleNoteClick = (note: any) => {
-    // setNoteTitle(note.title);
-    // setNoteContent(note.content);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent, note: any) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handleNoteClick(note);
-    }
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
   };
 
   return (
-    <aside>
-      {/* Sidebar with notes list */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <img
-            src="../../assets/logo_a.png"
-            alt="LockrNotes"
-            className="app-logo"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleNewNote}
+    <aside className="sidebar">
+      <div className="tabs-area">
+        <Box sx={{ width: '100%' }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label={t('sidebar.tabs.aria') ?? 'Sidebar Tabs'}
+            variant="fullWidth"
           >
-            <span className="icon">+</span>
-            New Note
-          </button>
-        </div>
+            <Tab
+              label={t('sidebar.tabs.local')}
+              id="tab-local"
+              aria-controls="tabpanel-local"
+            />
+            <Tab
+              label={t('sidebar.tabs.remote')}
+              id="tab-remote"
+              aria-controls="tabpanel-remote"
+              disabled
+            />
+          </Tabs>
+        </Box>
+      </div>
 
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search notes..."
-            className="search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="notes-list">
-          {sampleNotes.map((note, index) => (
-            <div
-              key={note.id}
-              className={`note-item ${index === 0 ? 'active' : ''}`}
-              role="button"
-              tabIndex={0}
-              onClick={() => handleNoteClick(note)}
-              onKeyDown={(e) => handleKeyDown(e, note)}
-            >
-              <div className="note-item-title">{note.title}</div>
-              <div className="note-item-preview">{note.preview}</div>
-              <div className="note-item-date">{note.date}</div>
+      <div
+        role="tabpanel"
+        hidden={value !== 0}
+        id="tabpanel-local"
+        aria-labelledby="tab-local"
+        style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+      >
+        <div className="files-card">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '12px',
+            }}
+          >
+            <h4>{t('sidebar.tabs.files')}</h4>
+            <div className="header-actions">
+              <IconButton
+                size="small"
+                title={t('sidebar.actions.createFolder') || 'Create folder'}
+              >
+                <CreateNewFolderIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                title={t('sidebar.actions.createFile') || 'Create file'}
+              >
+                <NoteAddIcon fontSize="small" />
+              </IconButton>
             </div>
-          ))}
+          </div>
+          <div className="tree-container">
+            <SimpleTreeView
+              aria-label={t('sidebar.tree.aria') ?? 'notes tree'}
+              sx={{
+                flex: 1,
+                overflow: 'auto',
+                '& .MuiTreeItem-content': {
+                  borderRadius: '4px',
+                },
+              }}
+            >
+              <TreeItem itemId="1" label={t('sidebar.tree.root') || 'Notes'}>
+                <TreeItem itemId="2" label="Personal" />
+                <TreeItem itemId="3" label="Work" />
+                <TreeItem itemId="4" label="Ideas" />
+              </TreeItem>
+            </SimpleTreeView>
+          </div>
         </div>
+      </div>
+
+      <div
+        role="tabpanel"
+        hidden={value !== 1}
+        id="tabpanel-remote"
+        aria-labelledby="tab-remote"
+      >
+        {/* Remote tab content (disabled) */}
       </div>
     </aside>
   );

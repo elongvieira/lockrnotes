@@ -1,94 +1,151 @@
+/* Import theme variables */
+@import '../theme.css';
+
 .sidebar {
-  width: 300px;
-  background-color: #000000;
-  color: white;
+  width: var(--sidebar-width);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #3498db;
-  padding: 16px;
+  padding: 0;
   box-sizing: border-box;
-  height: 100%;
-  overflow: auto;
+  height: 100vh;
+  max-height: 100vh; /* Ensure it doesn't exceed viewport height */
+  border-right: 1px solid var(--border-primary);
+  overflow: hidden;
 }
 
-/* Sidebar specific adjustments (some shared variables come from App.css originally) */
-.sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid #3498db;
+.tabs-area {
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
+  box-shadow: 0 2px 8px var(--shadow-light);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0; /* Prevent tabs from shrinking */
+  border: 1px solid var(--border-primary);
 }
 
-.app-logo {
-  height: 40px;
-  width: auto;
-  margin-bottom: 15px;
-  object-fit: contain;
-  display: block;
-  filter: brightness(1.1);
+.MuiTabs-root {
+  min-height: var(--tab-height);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
 }
 
-.search-container {
-  padding: 15px 0 15px 0;
-}
-
-.search-input {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #1a1a1a;
-  color: white;
-  font-size: 14px;
-}
-
-.search-input::placeholder {
-  color: #bdc3c7;
-}
-
-.search-input:focus {
-  outline: none;
-  background-color: #2a2a2a;
-  border: 1px solid #3498db;
-}
-
-.notes-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px 0;
-}
-
-.note-item {
-  padding: 15px 20px;
-  cursor: pointer;
-  border-bottom: 1px solid #1a1a1a;
-  transition: background-color 0.2s ease;
-}
-
-.note-item:hover {
-  background-color: #1a1a1a;
-}
-
-.note-item.active {
-  background-color: #3498db;
-}
-
-.note-item-title {
+.MuiTab-root {
+  min-height: var(--tab-height);
   font-weight: 500;
-  margin-bottom: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-transform: none;
+  font-size: 0.875rem;
+  color: var(--text-secondary) !important;
+  transition: all 0.2s ease;
 }
 
-.note-item-preview {
-  font-size: 12px;
-  color: #bdc3c7;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.MuiTab-root.Mui-selected {
+  background-color: transparent;
+  color: var(--text-primary) !important;
+  font-weight: 600;
 }
 
-.note-item-date {
-  font-size: 11px;
-  color: #95a5a6;
-  margin-top: 5px;
+.MuiTab-root.Mui-disabled {
+  background-color: var(--disabled-bg);
+  color: var(--text-disabled) !important;
+}
+
+.MuiTabs-indicator {
+  background: linear-gradient(
+    90deg,
+    var(--primary-blue),
+    var(--primary-blue-dark)
+  ) !important;
+  height: 3px !important;
+  border-radius: 3px 3px 0 0;
+}
+
+.MuiTab-root:hover:not(.Mui-disabled) {
+  background-color: var(--hover-bg);
+  color: var(--text-primary) !important;
+}
+
+.files-card {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+  padding: var(--spacing-sm);
+  margin: 0 var(--spacing-sm) var(--spacing-lg) var(--spacing-sm);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  backdrop-filter: blur(10px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; /* Important for flex children to shrink */
+  max-height: calc(
+    100vh - 120px
+  ); /* Prevent overflow, accounting for tabs and margins */
+  border: 1px solid var(--border-primary);
+}
+
+.files-card h4 {
+  color: var(--text-heading);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.header-actions .MuiIconButton-root {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  background-color: var(--primary-blue-medium);
+  color: var(--primary-blue);
+  transition: all 0.2s ease;
+}
+
+.header-actions .MuiIconButton-root:hover {
+  background-color: var(--primary-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--shadow-primary);
+}
+
+.tree-container {
+  flex: 1;
+  overflow: auto;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-secondary);
+  background-color: var(--bg-tree-container);
+  min-height: 0; /* Important for flex children to shrink */
+  margin-bottom: var(--spacing-xs); /* Small margin to show rounded corners */
+}
+
+.MuiTreeView-root {
+  padding: var(--spacing-sm) !important;
+  background-color: transparent !important;
+  overflow: auto !important;
+}
+
+.MuiTreeItem-root {
+  color: var(--text-primary) !important;
+}
+
+.MuiTreeItem-content {
+  padding: var(--spacing-xs) var(--spacing-sm) !important;
+  border-radius: var(--border-radius-sm) !important;
+  transition: all 0.15s ease !important;
+}
+
+.MuiTreeItem-content:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.MuiTreeItem-content.Mui-selected {
+  background-color: var(--selected-bg) !important;
+  color: var(--primary-blue) !important;
+  font-weight: 500 !important;
+}
+
+.MuiTreeItem-label {
+  font-size: 0.875rem !important;
+  padding-left: var(--spacing-xs) !important;
 }

@@ -8,4 +8,23 @@
     "delete": "Excluir",
     "exit": "Sair"
   }
+  ,"sidebar":{
+    "tabs":{
+      "aria":"Abas da barra lateral",
+      "local":"Local",
+      "files":"Arquivos",
+      "remote":"Remoto"
+    },
+    "local":{
+      "content":"Esta é a área de notas locais. Selecione ou crie uma nota para começar a editar."
+    },
+    "tree":{
+      "aria":"Árvore de notas",
+      "root":"Notas"
+    },
+    "actions":{
+      "createFolder":"Criar pasta",
+      "createFile":"Criar arquivo"
+    }
+  }
 }

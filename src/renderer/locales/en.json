@@ -8,4 +8,23 @@
     "delete": "Delete",
     "exit": "Exit"
   }
+  ,"sidebar":{
+    "tabs":{
+      "aria":"Sidebar Tabs",
+      "local":"Local",
+      "files":"Files",
+      "remote":"Remote"
+    },
+    "local":{
+      "content":"This is the local notes area. Select or create a note to start editing."
+    },
+    "tree":{
+      "aria":"Notes tree",
+      "root":"Notes"
+    },
+    "actions":{
+      "createFolder":"Create folder",
+      "createFile":"Create file"
+    }
+  }
 }
