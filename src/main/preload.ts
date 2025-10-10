@@ -22,6 +22,18 @@ const electronHandler = {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
   },
+  // Window controls exposed for a frameless window
+  window: {
+    minimize() {
+      return ipcRenderer.invoke('window-minimize');
+    },
+    close() {
+      return ipcRenderer.invoke('window-close');
+    },
+    async toggleMaximize() {
+      return ipcRenderer.invoke('window-toggle-maximize');
+    },
+  },
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);

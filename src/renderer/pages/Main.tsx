@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AppMenu from '../components/AppMenu';
+import AppBar from '../components/AppBar';
 
 export default function Main() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -67,7 +67,7 @@ export default function Main() {
 
   return (
     <>
-      <AppMenu />
+      <AppBar />
       <div className="app-container">
         {/* Sidebar with notes list */}
         <div className="sidebar">

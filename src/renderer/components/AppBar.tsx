@@ -1,13 +1,14 @@
 import React from 'react';
-import AppBar from '@mui/material/AppBar';
+import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
 import logo from '../../../assets/logo_a.png';
+import './AppBar.css';
 
-export default function AppMenu() {
+export default function AppBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -18,8 +19,25 @@ export default function AppMenu() {
     setAnchorEl(null);
   };
 
+  const handleMinimize = () => {
+    window.electron?.window?.minimize();
+  };
+
+  const handleToggleMaximize = async () => {
+    await window.electron?.window?.toggleMaximize();
+  };
+
+  const handleClose = () => {
+    window.electron?.window?.close();
+  };
+
   return (
-    <AppBar position="static" color="primary" elevation={0}>
+    <MuiAppBar
+      position="static"
+      color="primary"
+      elevation={0}
+      className="appbar"
+    >
       <Toolbar>
         <IconButton
           edge="start"
@@ -30,12 +48,36 @@ export default function AppMenu() {
         >
           <MenuIcon />
         </IconButton>
-        <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+
+        <div className="appbar-left">
           <img
             src={logo}
             alt="Lockr Notes"
             style={{ height: 28, objectFit: 'contain' }}
           />
+        </div>
+
+        {/* central drag area */}
+        <div className="appbar-drag" />
+
+        <div className="appbar-actions">
+          <button type="button" className="window-btn" onClick={handleMinimize}>
+            —
+          </button>
+          <button
+            type="button"
+            className="window-btn"
+            onClick={handleToggleMaximize}
+          >
+            ☐
+          </button>
+          <button
+            type="button"
+            className="window-btn close"
+            onClick={handleClose}
+          >
+            X
+          </button>
         </div>
 
         <Menu
@@ -51,13 +93,12 @@ export default function AppMenu() {
           <MenuItem
             onClick={() => {
               handleMenuClose();
-              // Send a sync or use ipcRenderer to trigger native exit if desired
             }}
           >
             Exit
           </MenuItem>
         </Menu>
       </Toolbar>
-    </AppBar>
+    </MuiAppBar>
   );
 }

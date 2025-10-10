@@ -78,6 +78,10 @@ const createWindow = async () => {
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
+    // Make the window frameless so we can render a custom title bar in the renderer
+    // Keep traffic light/titlebar behaviour on macOS by using titleBarStyle
+    frame: false,
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' } : {}),
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
@@ -103,6 +107,24 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  // Window control IPC handlers (from renderer TitleBar)
+  ipcMain.handle('window-minimize', () => {
+    if (!mainWindow) return;
+    mainWindow.minimize();
+  });
+
+  ipcMain.handle('window-close', () => {
+    if (!mainWindow) return;
+    mainWindow.close();
+  });
+
+  ipcMain.handle('window-toggle-maximize', () => {
+    if (!mainWindow) return;
+    if (mainWindow.isMaximized()) mainWindow.unmaximize();
+    else mainWindow.maximize();
+    return mainWindow.isMaximized();
   });
 
   // Open urls in the user's browser
