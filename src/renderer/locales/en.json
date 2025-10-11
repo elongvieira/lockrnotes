@@ -20,11 +20,17 @@
     },
     "tree":{
       "aria":"Notes tree",
-      "root":"Notes"
+      "root":"Notes",
+      "loading":"Loading...",
+      "empty":"No files found"
     },
     "actions":{
       "createFolder":"Create folder",
       "createFile":"Create file"
+    },
+    "prompts":{
+      "folderName":"Enter folder name:",
+      "fileName":"Enter file name (with extension):"
     }
   }
 }

@@ -20,11 +20,17 @@
     },
     "tree":{
       "aria":"Árvore de notas",
-      "root":"Notas"
+      "root":"Notas",
+      "loading":"Carregando...",
+      "empty":"Nenhum arquivo encontrado"
     },
     "actions":{
       "createFolder":"Criar pasta",
       "createFile":"Criar arquivo"
+    },
+    "prompts":{
+      "folderName":"Digite o nome da pasta:",
+      "fileName":"Digite o nome do arquivo (com extensão):"
     }
   }
 }

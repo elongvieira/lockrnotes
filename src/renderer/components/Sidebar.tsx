@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../theme.css';
 import './Sidebar.css';
 import Box from '@mui/material/Box';
@@ -10,14 +10,113 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
+import { fileSystemService } from '../services/fileSystemService';
+import { FileSystemItem } from '../types/filesystem';
 
 export default function Sidebar() {
   const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
+  const [directoryItems, setDirectoryItems] = useState<FileSystemItem[]>([]);
+  const [currentPath, setCurrentPath] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const loadDirectory = async (path?: string) => {
+    setLoading(true);
+    try {
+      const targetPath = path || fileSystemService.getDefaultNotesDirectory();
+      setCurrentPath(targetPath);
+
+      // Try to create default directory if it doesn't exist
+      if (!path) {
+        await fileSystemService.createDirectory(targetPath);
+      }
+
+      const items = await fileSystemService.readDirectory(targetPath, {
+        includeHidden: false,
+        extensions: ['.md', '.txt', '.json'], // Common note formats
+      });
+
+      setDirectoryItems(items);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load directory:', error);
+      // Fallback to empty array if directory doesn't exist or can't be read
+      setDirectoryItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateFolder = async () => {
+    if (!currentPath) return;
+
+    // eslint-disable-next-line no-alert
+    const folderName = prompt(
+      t('sidebar.prompts.folderName') || 'Enter folder name:',
+    );
+    if (folderName) {
+      const newPath = `${currentPath}/${folderName}`;
+      const success = await fileSystemService.createDirectory(newPath);
+      if (success) {
+        await loadDirectory(currentPath); // Refresh the tree
+      }
+    }
+  };
+
+  const handleCreateFile = async () => {
+    if (!currentPath) return;
+
+    // eslint-disable-next-line no-alert
+    const fileName = prompt(
+      t('sidebar.prompts.fileName') || 'Enter file name (with extension):',
+    );
+    if (fileName) {
+      const newPath = `${currentPath}/${fileName}`;
+      const success = await fileSystemService.createFile(newPath, '');
+      if (success) {
+        await loadDirectory(currentPath); // Refresh the tree
+      }
+    }
+  };
+
+  const renderTreeItems = (items: FileSystemItem[]): React.ReactNode => {
+    return items.map((item) => (
+      <TreeItem key={item.id} itemId={item.id} label={item.name}>
+        {item.children && renderTreeItems(item.children)}
+      </TreeItem>
+    ));
+  };
+
+  const renderTreeContent = () => {
+    if (loading) {
+      return (
+        <TreeItem
+          itemId="loading"
+          label={t('sidebar.tree.loading') || 'Loading...'}
+        />
+      );
+    }
+
+    if (directoryItems.length > 0) {
+      return renderTreeItems(directoryItems);
+    }
+
+    return (
+      <TreeItem
+        itemId="empty"
+        label={t('sidebar.tree.empty') || 'No files found'}
+      />
+    );
+  };
+
+  // Load default directory on component mount
+  useEffect(() => {
+    loadDirectory();
+  }, []);
 
   return (
     <aside className="sidebar">
@@ -65,12 +164,14 @@ export default function Sidebar() {
               <IconButton
                 size="small"
                 title={t('sidebar.actions.createFolder') || 'Create folder'}
+                onClick={handleCreateFolder}
               >
                 <CreateNewFolderIcon fontSize="small" />
               </IconButton>
               <IconButton
                 size="small"
                 title={t('sidebar.actions.createFile') || 'Create file'}
+                onClick={handleCreateFile}
               >
                 <NoteAddIcon fontSize="small" />
               </IconButton>
@@ -87,11 +188,7 @@ export default function Sidebar() {
                 },
               }}
             >
-              <TreeItem itemId="1" label={t('sidebar.tree.root') || 'Notes'}>
-                <TreeItem itemId="2" label="Personal" />
-                <TreeItem itemId="3" label="Work" />
-                <TreeItem itemId="4" label="Ideas" />
-              </TreeItem>
+              {renderTreeContent()}
             </SimpleTreeView>
           </div>
         </div>
