@@ -25,6 +25,12 @@ export default function Sidebar() {
   };
 
   const loadDirectory = async (path?: string) => {
+    if (!window.electron?.filesystem) {
+      setDirectoryItems([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const targetPath = path || fileSystemService.getDefaultNotesDirectory();
@@ -180,6 +186,9 @@ export default function Sidebar() {
           <div className="tree-container">
             <SimpleTreeView
               aria-label={t('sidebar.tree.aria') ?? 'notes tree'}
+              multiSelect
+              defaultExpandedItems={[]}
+              defaultSelectedItems={[]}
               sx={{
                 flex: 1,
                 overflow: 'auto',
