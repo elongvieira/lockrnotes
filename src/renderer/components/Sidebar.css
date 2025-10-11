@@ -18,7 +18,7 @@
 .tabs-area {
   background: var(--bg-tertiary);
   border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-  margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
+  margin: 0 var(--spacing-sm) 0 var(--spacing-sm);
   box-shadow: 0 2px 8px var(--shadow-light);
   backdrop-filter: blur(10px);
   flex-shrink: 0; /* Prevent tabs from shrinking */
