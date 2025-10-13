@@ -1,6 +1,70 @@
 import { ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
+import { readConfigFile } from '../config';
+
+/**
+ * Recursively read directory contents
+ */
+async function readDirectoryRecursive(
+  dirPath: string,
+  options?: any,
+): Promise<any[]> {
+  try {
+    const items = await fs.promises.readdir(dirPath, {
+      withFileTypes: true,
+    });
+    const result = [];
+
+    for (const item of items) {
+      const itemPath = path.join(dirPath, item.name);
+      const stats = await fs.promises.stat(itemPath);
+
+      // Skip hidden files if not requested
+      if (!options?.includeHidden && item.name.startsWith('.')) {
+        continue;
+      }
+
+      const isDirectory = item.isDirectory();
+      const fileItem: any = {
+        id: itemPath,
+        name: item.name,
+        path: itemPath,
+        type: isDirectory ? 'directory' : 'file',
+        extension: item.isFile() ? path.extname(item.name) : undefined,
+        size: item.isFile() ? stats.size : undefined,
+        lastModified: stats.mtime,
+        children: undefined,
+      };
+
+      // Filter by extensions if specified (only for files)
+      if (options?.extensions && item.isFile()) {
+        const ext = path.extname(item.name).toLowerCase();
+        if (!options.extensions.includes(ext)) {
+          continue;
+        }
+      }
+
+      // Recursively read subdirectories
+      if (isDirectory) {
+        try {
+          fileItem.children = await readDirectoryRecursive(itemPath, options);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(`Failed to read subdirectory ${itemPath}:`, err);
+          fileItem.children = [];
+        }
+      }
+
+      result.push(fileItem);
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    throw error;
+  }
+}
 
 /**
  * Setup filesystem IPC handlers
@@ -10,48 +74,7 @@ export function setupFilesystemHandlers() {
   ipcMain.handle(
     'fs-read-directory',
     async (event, dirPath: string, options?: any) => {
-      try {
-        const items = await fs.promises.readdir(dirPath, {
-          withFileTypes: true,
-        });
-        const result = [];
-
-        for (const item of items) {
-          const itemPath = path.join(dirPath, item.name);
-          const stats = await fs.promises.stat(itemPath);
-
-          // Skip hidden files if not requested
-          if (!options?.includeHidden && item.name.startsWith('.')) {
-            continue;
-          }
-
-          const fileItem = {
-            id: itemPath,
-            name: item.name,
-            path: itemPath,
-            type: item.isDirectory() ? 'directory' : 'file',
-            extension: item.isFile() ? path.extname(item.name) : undefined,
-            size: item.isFile() ? stats.size : undefined,
-            lastModified: stats.mtime,
-            children: undefined, // We'll implement recursive loading separately if needed
-          };
-
-          // Filter by extensions if specified
-          if (options?.extensions && item.isFile()) {
-            const ext = path.extname(item.name).toLowerCase();
-            if (!options.extensions.includes(ext)) {
-              continue;
-            }
-          }
-
-          result.push(fileItem);
-        }
-
-        return result;
-      } catch (error) {
-        console.error('Error reading directory:', error);
-        throw error;
-      }
+      return readDirectoryRecursive(dirPath, options);
     },
   );
 
@@ -130,4 +153,15 @@ export function setupFilesystemHandlers() {
       }
     },
   );
+
+  // Read config file
+  ipcMain.handle('fs-read-config', async () => {
+    try {
+      const config = await readConfigFile();
+      return config;
+    } catch (error) {
+      console.error('Error reading config:', error);
+      return null;
+    }
+  });
 }

@@ -26,11 +26,65 @@
     },
     "actions":{
       "createFolder":"Create folder",
-      "createFile":"Create file"
+      "createFile":"Create file",
+      "refresh":"Refresh"
     },
     "prompts":{
       "folderName":"Enter folder name:",
       "fileName":"Enter file name (with extension):"
+    }
+  },
+  "dialog": {
+    "folder": {
+      "title": "Create New Folder",
+      "placeholder": "Folder name",
+      "errors": {
+        "empty": "Folder name cannot be empty",
+        "invalidChars": "Folder name contains invalid characters",
+        "tooLong": "Folder name is too long (maximum 255 characters)",
+        "reservedName": "This is a reserved system name",
+        "startsWithDot": "Folder name cannot start with a dot"
+      }
+    },
+    "file": {
+      "title": "Create New File",
+      "filename": "File name",
+      "typeTitle": "File Type",
+      "previewTitle": "Preview",
+      "encryptOption": "Encrypt file",
+      "managedEncryption": "Managed by program",
+      "manualEncryption": "Manual key",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "passwordWarning": "Write down the password in a safe place. The file cannot be recovered without it.",
+      "types": {
+        "text": {
+          "name": "Text",
+          "description": "Simple text file for notes and documents.",
+          "preview": "📝 Lorem ipsum dolor sit amet...\n\nParagraph 2 with more text."
+        },
+        "keyvalue": {
+          "name": "Key/Values",
+          "description": "Structured data in key-value format.",
+          "preview": "name: System name\nuser: user123\npassword: ••••••••"
+        }
+      },
+      "errors": {
+        "emptyName": "File name is required",
+        "invalidChars": "File name contains invalid characters",
+        "tooLong": "File name is too long (maximum 255 characters)",
+        "reservedName": "This is a reserved system name",
+        "startsWithDot": "File name cannot start with a dot",
+        "emptyPassword": "Password is required",
+        "weakPassword": "Password must be at least 6 characters",
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooLong": "Password is too long (maximum 128 characters)",
+        "passwordSpecialChars": "Password must contain at least one special character"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "create": "Create"
     }
   }
 }

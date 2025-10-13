@@ -149,3 +149,14 @@
   font-size: 0.875rem !important;
   padding-left: var(--spacing-xs) !important;
 }
+
+.MuiTreeItem-group {
+  margin-left: 0 !important;
+  padding-left: 24px !important;
+  border-left: 1px solid var(--border-secondary);
+  margin-top: 4px !important;
+}
+
+.MuiTreeItem-content .MuiTreeItem-iconContainer {
+  margin-right: 4px !important;
+}

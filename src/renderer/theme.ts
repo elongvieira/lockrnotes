@@ -27,5 +27,5 @@ const theme = createTheme({
   },
 });
 
-export const colors = tokens.colors;
+export const { colors } = tokens;
 export default theme;

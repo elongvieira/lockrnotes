@@ -34,4 +34,8 @@ export const filesystemApi = {
   renameItem(oldPath: string, newPath: string): Promise<boolean> {
     return ipcRenderer.invoke('fs-rename-item', oldPath, newPath);
   },
+
+  readConfig(): Promise<any | null> {
+    return ipcRenderer.invoke('fs-read-config');
+  },
 };

@@ -108,6 +108,18 @@ class FileSystemServiceImpl implements FileSystemService {
         : undefined,
     }));
   }
+
+  /**
+   * Read the application config
+   */
+  async readConfig(): Promise<any | null> {
+    try {
+      return await this.fs.readConfig();
+    } catch (error) {
+      console.error('Failed to read config:', error);
+      return null;
+    }
+  }
 }
 
 // Export singleton instance

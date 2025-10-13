@@ -26,11 +26,65 @@
     },
     "actions":{
       "createFolder":"Criar pasta",
-      "createFile":"Criar arquivo"
+      "createFile":"Criar arquivo",
+      "refresh":"Atualizar"
     },
     "prompts":{
       "folderName":"Digite o nome da pasta:",
       "fileName":"Digite o nome do arquivo (com extensão):"
+    }
+  },
+  "dialog": {
+    "folder": {
+      "title": "Criar Nova Pasta",
+      "placeholder": "Nome da pasta",
+      "errors": {
+        "empty": "Nome da pasta não pode estar vazio",
+        "invalidChars": "Nome da pasta contém caracteres inválidos",
+        "tooLong": "Nome da pasta é muito longo (máximo 255 caracteres)",
+        "reservedName": "Este é um nome reservado do sistema",
+        "startsWithDot": "Nome da pasta não pode começar com ponto"
+      }
+    },
+    "file": {
+      "title": "Criar Novo Arquivo",
+      "filename": "Nome do arquivo",
+      "typeTitle": "Tipo de Arquivo",
+      "previewTitle": "Exemplo",
+      "encryptOption": "Criptografar arquivo",
+      "managedEncryption": "Gerenciado pelo programa",
+      "manualEncryption": "Chave manual",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "passwordWarning": "Anote a senha em local seguro. Não será possível recuperar o arquivo sem ela.",
+      "types": {
+        "text": {
+          "name": "Texto",
+          "description": "Arquivo de texto simples para anotações e documentos.",
+          "preview": "📝 Lorem ipsum dolor sit amet...\n\nParagrafo 2 com mais texto."
+        },
+        "keyvalue": {
+          "name": "Chave/Valores",
+          "description": "Dados estruturados em formato chave-valor.",
+          "preview": "nome: Sistema XYZ\nusuário: user123\nsenha: ••••••••"
+        }
+      },
+      "errors": {
+        "emptyName": "Nome do arquivo é obrigatório",
+        "invalidChars": "Nome contém caracteres inválidos",
+        "tooLong": "Nome do arquivo é muito longo (máximo 255 caracteres)",
+        "reservedName": "Este é um nome reservado do sistema",
+        "startsWithDot": "Nome do arquivo não pode começar com ponto",
+        "emptyPassword": "Senha é obrigatória",
+        "weakPassword": "Senha deve ter pelo menos 6 caracteres",
+        "passwordMismatch": "Senhas não coincidem",
+        "passwordTooLong": "Senha é muito longa (máximo 128 caracteres)",
+        "passwordSpecialChars": "Senha deve conter pelo menos um caractere especial"
+      }
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "create": "Criar"
     }
   }
 }

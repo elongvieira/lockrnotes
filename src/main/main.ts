@@ -10,8 +10,10 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
+import fs from 'fs';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { ensureConfigFile } from './config';
 import { resolveHtmlPath } from './util';
 import { setupIpcHandlers } from './ipc';
 
@@ -133,7 +135,8 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    createWindow();
+    // Ensure config file exists in the working directory before creating UI
+    ensureConfigFile().then(() => createWindow());
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
