@@ -194,6 +194,7 @@
       "package.json"
     ],
     "mac": {
+      "icon": "assets/icon.icns",
       "notarize": false,
       "target": {
         "target": "default",
@@ -223,11 +224,13 @@
       ]
     },
     "win": {
+      "icon": "assets/icons/icon-512x512.png",
       "target": [
         "nsis"
       ]
     },
     "linux": {
+      "icon": "assets/icons/icon-512x512.png",
       "target": [
         "AppImage"
       ],
