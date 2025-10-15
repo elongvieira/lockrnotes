@@ -2,6 +2,7 @@
 /* eslint no-unused-vars: off */
 import { contextBridge } from 'electron';
 import { filesystemApi, windowApi } from './preload/index';
+import './preload/encryptionApi';
 
 const electronHandler = {
   // Window controls exposed for a frameless window

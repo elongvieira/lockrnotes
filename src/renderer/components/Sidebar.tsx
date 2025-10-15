@@ -55,7 +55,7 @@ export default function Sidebar() {
 
       const items = await fileSystemService.readDirectory(targetPath, {
         includeHidden: false,
-        extensions: ['.md', '.txt', '.json'], // Common note formats
+        extensions: ['.md', '.txt', '.json', '.ltxt', '.ljson', '.lenc'], // Common note formats + encrypted
       });
 
       setDirectoryItems(items);
@@ -111,12 +111,6 @@ export default function Sidebar() {
   const handleFileDialogConfirm = async (fileData: FileCreationData) => {
     const targetPath = targetFolderPath || currentPath;
     if (!targetPath) return;
-
-    // Skip encrypted files for now
-    if (fileData.encrypted) {
-      // TODO: Implement encryption logic
-      return;
-    }
 
     try {
       const success = await fileCreationService.createFile(

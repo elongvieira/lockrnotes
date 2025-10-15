@@ -81,23 +81,45 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
         throw new Error('Invalid target path or filename');
       }
 
-      // Skip encrypted files for now
-      if (fileData.encrypted) {
-        throw new Error('Encrypted files not yet implemented');
-      }
-
       // Get template for file type
       const template = this.templates[fileData.type];
       if (!template) {
         throw new Error(`Unsupported file type: ${fileData.type}`);
       }
 
-      // Prepare filename
+      // Prepare filename and content
       const cleanFilename = this.sanitizeFilename(fileData.filename);
-      const filename = `${cleanFilename}${template.extension}`;
+      const originalExtension = template.extension;
+      let filename = `${cleanFilename}${originalExtension}`;
+      let content = template.generateContent(cleanFilename);
 
-      // Generate content
-      const content = template.generateContent(cleanFilename);
+      // Handle managed encryption
+      if (fileData.encrypted && fileData.encryptionType === 'managed') {
+        try {
+          const filePath = `${targetPath}/${filename}`;
+
+          // Criptografa o conteúdo
+          const encryptedData = await window.encryptionAPI.encryptContent(
+            content,
+            filePath,
+            originalExtension,
+          );
+
+          // Altera extensão baseada no tipo original
+          const encryptedExtension =
+            this.getEncryptedExtension(originalExtension);
+          filename = `${cleanFilename}${encryptedExtension}`;
+
+          // Conteúdo vira JSON com dados criptografados
+          content = JSON.stringify(encryptedData, null, 2);
+        } catch (error) {
+          console.error('Encryption failed:', error);
+          throw new Error('Failed to encrypt file');
+        }
+      } else if (fileData.encrypted && fileData.encryptionType === 'manual') {
+        // TODO: Implementar criptografia manual com senha do usuário
+        throw new Error('Manual encryption not yet implemented');
+      }
 
       // Create file path
       const filePath = `${targetPath}/${filename}`;
@@ -114,6 +136,20 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       // eslint-disable-next-line no-console
       console.error('Error in FileCreationService.createFile:', error);
       return false;
+    }
+  }
+
+  /**
+   * Gets the encrypted extension based on original extension
+   */
+  private getEncryptedExtension(originalExtension: string): string {
+    switch (originalExtension) {
+      case '.txt':
+        return '.ltxt'; // Lockr Text
+      case '.json':
+        return '.ljson'; // Lockr JSON
+      default:
+        return '.lenc'; // Lockr Encrypted
     }
   }
 
@@ -160,10 +196,10 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
   }
 
   /**
-   * Validates if encryption is supported (for future implementation)
+   * Validates if encryption is supported
    */
   isEncryptionSupported(): boolean {
-    return false; // TODO: Implement encryption
+    return true; // Agora suportamos criptografia gerenciada!
   }
 
   /**
