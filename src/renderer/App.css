@@ -18,7 +18,8 @@ body {
 /* Container principal (layout) */
 .app-container {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 32px); /* Reserve space for status bar */
+  margin-bottom: 32px; /* Height of status bar */
 }
 
 /* Generic button and icon utilities (kept global) */
