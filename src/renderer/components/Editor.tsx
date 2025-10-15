@@ -1,145 +1,164 @@
 import React, { useState } from 'react';
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Card from '@mui/material/Card';
 import './Editor.css';
 
+interface FileTab {
+  id: string;
+  filename: string;
+  content: string;
+  isDirty: boolean;
+  isEncrypted: boolean;
+  originalExtension?: string;
+  filePath: string;
+}
+
 export default function Editor() {
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [noteTitle, setNoteTitle] = useState('');
-  const [noteContent, setNoteContent] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [tabs, setTabs] = useState<FileTab[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
 
-  // Sample notes data for demonstration
-  const sampleNotes = [
-    {
-      id: 1,
-      title: 'Welcome to LockrNotes',
-      preview: 'This is your first note. Start writing to create new notes...',
-      date: '2024-10-08',
-      content:
-        'Welcome to LockrNotes! This is a secure note-taking application.',
-    },
-    {
-      id: 2,
-      title: 'Meeting Notes',
-      preview: "Important discussion points from today's meeting...",
-      date: '2024-10-07',
-      content: 'Meeting notes content here...',
-    },
-  ];
+  // Função para abrir um novo arquivo em uma aba
+  const openFile = (
+    filePath: string,
+    filename: string,
+    originalExtension?: string,
+    content = '',
+    isEncrypted = false,
+  ) => {
+    const fileId = `file-${Date.now()}-${Math.random()}`;
+    const newTab: FileTab = {
+      id: fileId,
+      filename,
+      content,
+      isDirty: false,
+      isEncrypted,
+      originalExtension,
+      filePath,
+    };
 
-  const wordCount = noteContent
-    .split(/\s+/)
-    .filter((word) => word.length > 0).length;
-
-  const handleNewNote = () => {
-    setNoteTitle('');
-    setNoteContent('');
+    setTabs((prev) => [...prev, newTab]);
+    setActiveTab(fileId);
   };
 
-  const handleSave = () => {
-    // Save functionality would be implemented here
-    // console.log('Saving note:', { title: noteTitle, content: noteContent });
-  };
-
-  const handleDelete = () => {
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = () => {
-    setNoteTitle('');
-    setNoteContent('');
-    setShowDeleteModal(false);
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-  };
-
-  const handleNoteClick = (note: any) => {
-    setNoteTitle(note.title);
-    setNoteContent(note.content);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent, note: any) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handleNoteClick(note);
+  // Função para fechar uma aba
+  const closeTab = (tabId: string, event?: React.MouseEvent) => {
+    if (event) {
+      event.stopPropagation();
     }
+
+    setTabs((prev) => {
+      const newTabs = prev.filter((tab) => tab.id !== tabId);
+
+      // Se fechou a aba ativa, seleciona outra
+      if (activeTab === tabId && newTabs.length > 0) {
+        const tabIndex = prev.findIndex((tab) => tab.id === tabId);
+        const nextActiveIndex = tabIndex > 0 ? tabIndex - 1 : 0;
+        setActiveTab(newTabs[nextActiveIndex]?.id || null);
+      } else if (newTabs.length === 0) {
+        setActiveTab(null);
+      }
+
+      return newTabs;
+    });
+  };
+
+  // Função para atualizar o conteúdo de uma aba
+  const updateTabContent = (tabId: string, content: string) => {
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === tabId ? { ...tab, content, isDirty: true } : tab,
+      ),
+    );
+  };
+
+  // Obter aba ativa
+  const currentTab = tabs.find((tab) => tab.id === activeTab);
+
+  // Função para criar uma nova aba em branco
+  const createNewTab = () => {
+    openFile('', 'Untitled');
   };
 
   return (
-    <>
-      {/* Main editing area */}
-      <div className="main-content">
-        <div className="editor-header">
-          <input
-            type="text"
-            placeholder="Note title..."
-            className="note-title-input"
-            value={noteTitle}
-            onChange={(e) => setNoteTitle(e.target.value)}
-          />
-          <div className="editor-actions">
-            <button
-              type="button"
-              className="btn btn-success"
-              onClick={handleSave}
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={handleDelete}
-              style={{
-                display: noteTitle || noteContent ? 'inline-flex' : 'none',
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-
-        <div className="editor-container">
-          <textarea
-            placeholder="Start writing your note here..."
-            className="note-editor"
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-          />
-        </div>
-
-        <div className="status-bar">
-          <span>Ready</span>
-          <span>{wordCount} words</span>
-        </div>
-      </div>
-      {/* Delete confirmation modal */}
-      {showDeleteModal && (
-        <div className="modal show">
-          <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>
-              Are you sure you want to delete this note? This action cannot be
-              undone.
-            </p>
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={confirmDelete}
-              >
-                Delete
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={cancelDelete}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+    <Box className="editor-container">
+      {/* Área das tabs */}
+      {tabs.length > 0 && (
+        <Box className="editor-tabs-container">
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            variant="scrollable"
+            scrollButtons="auto"
+            className="editor-tabs"
+          >
+            {tabs.map((tab) => (
+              <Tab
+                key={tab.id}
+                label={
+                  <Box className="tab-label-box">
+                    <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                      {tab.isDirty ? '● ' : ''}
+                      {tab.filename || 'Untitled'}
+                      {tab.isEncrypted && ' 🔒'}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => closeTab(tab.id, e)}
+                      className="tab-close-btn"
+                    >
+                      <CloseIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Box>
+                }
+                value={tab.id}
+              />
+            ))}
+          </Tabs>
+        </Box>
       )}
-    </>
+
+      {/* Área de conteúdo */}
+      {currentTab ? (
+        <Card className="editor-card" elevation={2}>
+          {/* Container do editor */}
+          <Box className="editor-content">
+            <TextField
+              multiline
+              fullWidth
+              placeholder="Digite seu conteúdo aqui..."
+              value={currentTab.content}
+              onChange={(e) => updateTabContent(currentTab.id, e.target.value)}
+              variant="outlined"
+              className="editor-textfield"
+            />
+          </Box>
+        </Card>
+      ) : (
+        // Tela de boas-vindas quando não há abas abertas
+        <Box className="editor-welcome">
+          <Typography variant="h5" className="editor-welcome-title">
+            LockrNotes Editor
+          </Typography>
+          <Typography variant="body1" className="editor-welcome-text">
+            Clique em um arquivo na barra lateral para abri-lo em uma nova aba,
+            ou crie uma nova aba para começar a escrever.
+          </Typography>
+          <IconButton
+            onClick={createNewTab}
+            size="large"
+            className="editor-welcome-btn"
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+      )}
+    </Box>
   );
 }
