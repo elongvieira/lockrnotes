@@ -330,14 +330,7 @@ export default function Sidebar() {
         style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
       >
         <div className="files-card">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '12px',
-            }}
-          >
+          <div className="files-card-header">
             <h4>{t('sidebar.tabs.files')}</h4>
             <div className="header-actions">
               <IconButton
