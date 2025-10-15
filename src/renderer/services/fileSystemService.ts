@@ -88,12 +88,36 @@ class FileSystemServiceImpl implements FileSystemService {
   }
 
   /**
-   * Get default notes directory based on OS
+   * Get default notes directory based on config or OS fallback
+   * Reads `config.defaultPath` via readConfig() when available and appends `notes` folder.
    */
-  getDefaultNotesDirectory(): string {
-    // You can customize this based on your app's needs
-    const userHome = process.env.HOME || process.env.USERPROFILE || '';
-    return `${userHome}/Documents/LockrNotes`;
+  async getDefaultNotesDirectory(): Promise<string> {
+    let config: any = null;
+    try {
+      config = await this.readConfig();
+    } catch (err) {
+      // ignore - will fallback
+    }
+
+    const configDefaultPath = config?.defaultPath;
+
+    let baseDefault = '';
+    if (configDefaultPath && configDefaultPath.trim() !== '') {
+      baseDefault = configDefaultPath;
+    } else if (process.platform === 'win32') {
+      baseDefault = process.env.USERPROFILE || '.\\';
+    } else {
+      baseDefault = process.env.HOME || './';
+    }
+
+    const appendNotes = (base: string) => {
+      if (base.endsWith('\\') || base.endsWith('/')) {
+        return `${base}notes`;
+      }
+      return `${base}${base.includes('\\') ? '\\\\' : '/'}notes`;
+    };
+
+    return appendNotes(baseDefault);
   }
 
   /**

@@ -45,7 +45,13 @@ export default function Sidebar() {
 
     setLoading(true);
     try {
-      const targetPath = path || fileSystemService.getDefaultNotesDirectory();
+      let targetPath: string;
+      if (path && path.length > 0) {
+        targetPath = path;
+      } else {
+        // getDefaultNotesDirectory is async now
+        targetPath = await fileSystemService.getDefaultNotesDirectory();
+      }
       setCurrentPath(targetPath);
 
       // Try to create default directory if it doesn't exist
@@ -259,28 +265,7 @@ export default function Sidebar() {
   useEffect(() => {
     const initializeDirectory = async () => {
       try {
-        // Try to load defaultPath from config
-        const config = await fileSystemService.readConfig();
-        const configDefaultPath = config?.defaultPath;
-
-        // If config defaultPath is empty, use same default logic as config.ts
-        let baseDefault = '';
-        if (configDefaultPath && configDefaultPath.trim() !== '') {
-          baseDefault = configDefaultPath;
-        } else {
-          baseDefault = process.platform === 'win32' ? '.\\' : './';
-        }
-
-        // Helper to append 'notes' folder safely
-        const appendNotes = (base: string) => {
-          if (base.endsWith('\\') || base.endsWith('/')) {
-            return `${base}notes`;
-          }
-          // handle Windows backslash single char
-          return `${base}${base.includes('\\') ? '\\\\' : '/'}notes`;
-        };
-
-        const notesPath = appendNotes(baseDefault);
+        const notesPath = await fileSystemService.getDefaultNotesDirectory();
 
         // Ensure the notes directory exists
         await fileSystemService.createDirectory(notesPath);
@@ -289,7 +274,7 @@ export default function Sidebar() {
         loadDirectory(notesPath);
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Failed to load config, using default directory:', error);
+        console.error('Failed to load default directory:', error);
         loadDirectory();
       }
     };
