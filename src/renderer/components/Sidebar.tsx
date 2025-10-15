@@ -24,7 +24,7 @@ import FileCreationDialog from './FileCreationDialog';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function Sidebar() {
-  const { setRefreshSidebar } = useAppContext();
+  const { setRefreshSidebar, showNotification } = useAppContext();
   const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
   const [directoryItems, setDirectoryItems] = useState<FileSystemItem[]>([]);
@@ -89,10 +89,19 @@ export default function Sidebar() {
     const targetPath = targetFolderPath || currentPath;
     if (!targetPath) return;
 
-    const newPath = `${targetPath}/${folderName}`;
-    const success = await fileSystemService.createDirectory(newPath);
-    if (success) {
-      await loadDirectory(currentPath); // Refresh the tree
+    try {
+      const newPath = `${targetPath}/${folderName}`;
+      const success = await fileSystemService.createDirectory(newPath);
+      if (success) {
+        await loadDirectory(currentPath); // Refresh the tree
+        showNotification(t('notifications.folderCreated'), 'success');
+      } else {
+        showNotification(t('notifications.folderCreationError'), 'error');
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error creating folder:', error);
+      showNotification(t('notifications.folderCreationError'), 'error');
     }
     setTargetFolderPath(''); // Clear the target path
   };
@@ -127,10 +136,14 @@ export default function Sidebar() {
       );
       if (success) {
         await loadDirectory(currentPath); // Refresh the tree
+        showNotification(t('notifications.fileCreated'), 'success');
+      } else {
+        showNotification(t('notifications.fileCreationError'), 'error');
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error creating file:', error);
+      showNotification(t('notifications.fileCreationError'), 'error');
     }
 
     setTargetFolderPath(''); // Clear the target path

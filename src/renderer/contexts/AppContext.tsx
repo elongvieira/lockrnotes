@@ -36,6 +36,13 @@ interface AppContextType {
   setWordCount: (count: number) => void;
   isEncrypted: boolean;
   setIsEncrypted: (encrypted: boolean) => void;
+
+  // Notifications
+  showNotification: (
+    message: string,
+    severity: 'success' | 'error' | 'warning' | 'info',
+  ) => void;
+  hideNotification: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -61,6 +68,23 @@ export function AppProvider({ children }: AppProviderProps) {
   const [wordCount, setWordCount] = useState<number>(0);
   const [isEncrypted, setIsEncrypted] = useState<boolean>(false);
 
+  // Notification functions
+  const showNotification = (
+    message: string,
+    severity: 'success' | 'error' | 'warning' | 'info',
+  ) => {
+    // This will be handled by the notification component
+    window.dispatchEvent(
+      new CustomEvent('show-notification', {
+        detail: { message, severity },
+      }),
+    );
+  };
+
+  const hideNotification = () => {
+    window.dispatchEvent(new CustomEvent('hide-notification'));
+  };
+
   const contextValue: AppContextType = useMemo(
     () => ({
       currentFile,
@@ -75,6 +99,8 @@ export function AppProvider({ children }: AppProviderProps) {
       setWordCount,
       isEncrypted,
       setIsEncrypted,
+      showNotification,
+      hideNotification,
     }),
     [currentFile, tabs, activeTab, refreshSidebar, wordCount, isEncrypted],
   );

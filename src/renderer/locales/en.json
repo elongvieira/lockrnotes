@@ -86,5 +86,11 @@
       "cancel": "Cancel",
       "create": "Create"
     }
+  },
+  "notifications": {
+    "fileCreated": "File created successfully",
+    "fileCreationError": "Error creating file",
+    "folderCreated": "Folder created successfully",
+    "folderCreationError": "Error creating folder"
   }
 }

@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
+import { useTranslation } from 'react-i18next';
 import FileCreationDialog from './FileCreationDialog';
 import {
   fileCreationService,
@@ -37,8 +38,10 @@ export default function Editor() {
     setCurrentFile,
     setWordCount,
     setIsEncrypted,
+    showNotification,
   } = useAppContext();
 
+  const { t } = useTranslation();
   const [fileDialogOpen, setFileDialogOpen] = useState<boolean>(false);
 
   // Função para abrir um novo arquivo em uma aba
@@ -149,10 +152,18 @@ export default function Editor() {
 
         // Notificar sidebar para fazer refresh via context
         refreshSidebar();
+
+        // Mostrar notificação de sucesso
+        showNotification(t('notifications.fileCreated'), 'success');
+      } else {
+        // Mostrar notificação de erro se a criação falhou
+        showNotification(t('notifications.fileCreationError'), 'error');
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error creating file:', error);
+      // Mostrar notificação de erro
+      showNotification(t('notifications.fileCreationError'), 'error');
     }
     setFileDialogOpen(false);
   };
