@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../theme.css';
 import './Sidebar.css';
 import Box from '@mui/material/Box';
@@ -21,8 +21,10 @@ import {
 import { FileSystemItem } from '../types/filesystem';
 import FolderDialog from './FolderDialog';
 import FileCreationDialog from './FileCreationDialog';
+import { useAppContext } from '../contexts/AppContext';
 
 export default function Sidebar() {
+  const { setRefreshSidebar } = useAppContext();
   const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
   const [directoryItems, setDirectoryItems] = useState<FileSystemItem[]>([]);
@@ -134,7 +136,7 @@ export default function Sidebar() {
     setTargetFolderPath(''); // Clear the target path
   };
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     // Reload the current path (or default if unset)
     try {
       await loadDirectory(currentPath || undefined);
@@ -142,7 +144,7 @@ export default function Sidebar() {
       // eslint-disable-next-line no-console
       console.error('Failed to refresh directory:', err);
     }
-  };
+  }, [currentPath]);
 
   const renderTreeItems = (
     items: FileSystemItem[],
@@ -281,6 +283,11 @@ export default function Sidebar() {
 
     initializeDirectory();
   }, []);
+
+  // Registrar função de refresh no context
+  useEffect(() => {
+    setRefreshSidebar(() => handleRefresh);
+  }, [handleRefresh, setRefreshSidebar]);
 
   return (
     <aside className="sidebar">

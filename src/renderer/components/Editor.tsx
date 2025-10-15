@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -8,6 +8,13 @@ import AddIcon from '@mui/icons-material/Add';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
+import FileCreationDialog from './FileCreationDialog';
+import {
+  fileCreationService,
+  FileCreationData,
+} from '../services/fileCreationService';
+import { fileSystemService } from '../services/fileSystemService';
+import { useAppContext } from '../contexts/AppContext';
 import './Editor.css';
 
 interface FileTab {
@@ -21,8 +28,18 @@ interface FileTab {
 }
 
 export default function Editor() {
-  const [tabs, setTabs] = useState<FileTab[]>([]);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const {
+    tabs,
+    setTabs,
+    activeTab,
+    setActiveTab,
+    refreshSidebar,
+    setCurrentFile,
+    setWordCount,
+    setIsEncrypted,
+  } = useAppContext();
+
+  const [fileDialogOpen, setFileDialogOpen] = useState<boolean>(false);
 
   // Função para abrir um novo arquivo em uma aba
   const openFile = (
@@ -81,9 +98,68 @@ export default function Editor() {
   // Obter aba ativa
   const currentTab = tabs.find((tab) => tab.id === activeTab);
 
-  // Função para criar uma nova aba em branco
+  // Atualizar status no context quando aba mudar
+  useEffect(() => {
+    if (currentTab) {
+      setCurrentFile(currentTab.filePath);
+      setIsEncrypted(currentTab.isEncrypted);
+
+      // Calcular contagem de palavras
+      const wordCount = currentTab.content
+        .split(/\s+/)
+        .filter((word) => word.length > 0).length;
+      setWordCount(wordCount);
+    } else {
+      setCurrentFile(null);
+      setIsEncrypted(false);
+      setWordCount(0);
+    }
+  }, [currentTab, setCurrentFile, setIsEncrypted, setWordCount]);
+
+  // Função para abrir dialog de criação de arquivo
+  const handleCreateFile = () => {
+    setFileDialogOpen(true);
+  };
+
+  // Função para fechar dialog
+  const handleFileDialogClose = () => {
+    setFileDialogOpen(false);
+  };
+
+  // Função para confirmar criação de arquivo
+  const handleFileDialogConfirm = async (fileData: FileCreationData) => {
+    try {
+      const notesPath = await fileSystemService.getDefaultNotesDirectory();
+      const success = await fileCreationService.createFile(notesPath, fileData);
+
+      if (success) {
+        // Abrir o arquivo criado no editor
+        const filePath = `${notesPath}/${fileData.filename}`;
+        openFile(
+          filePath,
+          fileData.filename,
+          undefined,
+          '',
+          fileData.encrypted,
+        );
+
+        // Atualizar contexto
+        setCurrentFile(filePath);
+        setIsEncrypted(fileData.encrypted);
+
+        // Notificar sidebar para fazer refresh via context
+        refreshSidebar();
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error creating file:', error);
+    }
+    setFileDialogOpen(false);
+  };
+
+  // Função para criar uma nova aba em branco (antigo comportamento)
   const createNewTab = () => {
-    openFile('', 'Untitled');
+    handleCreateFile();
   };
 
   return (
@@ -159,6 +235,12 @@ export default function Editor() {
           </IconButton>
         </Box>
       )}
+
+      <FileCreationDialog
+        open={fileDialogOpen}
+        onClose={handleFileDialogClose}
+        onConfirm={handleFileDialogConfirm}
+      />
     </Box>
   );
 }

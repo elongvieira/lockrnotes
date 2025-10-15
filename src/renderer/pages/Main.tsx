@@ -2,8 +2,11 @@ import AppBar from '../components/AppBar';
 import Sidebar from '../components/Sidebar';
 import Editor from '../components/Editor';
 import StatusBar from '../components/StatusBar';
+import { AppProvider, useAppContext } from '../contexts/AppContext';
 
-export default function Main() {
+function MainContent() {
+  const { currentFile, isEncrypted, wordCount } = useAppContext();
+
   return (
     <>
       <AppBar />
@@ -12,11 +15,19 @@ export default function Main() {
         <Editor />
       </div>
       <StatusBar
-        currentFile="teste.txt"
-        isEncrypted={false}
-        wordCount={42}
+        currentFile={currentFile || undefined}
+        isEncrypted={isEncrypted}
+        wordCount={wordCount}
         status="Ready"
       />
     </>
+  );
+}
+
+export default function Main() {
+  return (
+    <AppProvider>
+      <MainContent />
+    </AppProvider>
   );
 }
