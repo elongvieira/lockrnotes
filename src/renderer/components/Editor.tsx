@@ -55,19 +55,39 @@ export default function Editor() {
       content = '',
       isEncrypted = false,
     ) => {
-      const fileId = `file-${Date.now()}-${Math.random()}`;
-      const newTab: FileTab = {
-        id: fileId,
-        filename,
-        content,
-        isDirty: false,
-        isEncrypted,
-        originalExtension,
-        filePath,
-      };
+      setTabs((prev) => {
+        // If file is already open, focus existing tab and optionally update content
+        const existing = prev.find((tabItem) => tabItem.filePath === filePath);
+        if (existing) {
+          // If provided content differs, update the tab content but keep isDirty as false
+          if (content && existing.content !== content) {
+            const updated = prev.map((tabItem) =>
+              tabItem.filePath === filePath ? { ...tabItem, content } : tabItem,
+            );
+            // focus existing
+            setActiveTab(existing.id);
+            return updated;
+          }
 
-      setTabs((prev) => [...prev, newTab]);
-      setActiveTab(fileId);
+          setActiveTab(existing.id);
+          return prev;
+        }
+
+        const fileId = `file-${Date.now()}-${Math.random()}`;
+        const newTab: FileTab = {
+          id: fileId,
+          filename,
+          content,
+          isDirty: false,
+          isEncrypted,
+          originalExtension,
+          filePath,
+        };
+
+        // focus new tab
+        setActiveTab(fileId);
+        return [...prev, newTab];
+      });
     },
     [setTabs, setActiveTab],
   );
