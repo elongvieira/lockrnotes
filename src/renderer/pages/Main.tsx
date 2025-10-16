@@ -3,11 +3,9 @@ import Sidebar from '../components/Sidebar';
 import Editor from '../components/Editor';
 import StatusBar from '../components/StatusBar';
 import NotificationSnackbar from '../components/NotificationSnackbar';
-import { AppProvider, useAppContext } from '../contexts/AppContext';
+import { AppProvider } from '../contexts/AppContext';
 
 function MainContent() {
-  const { currentFile, isEncrypted, wordCount } = useAppContext();
-
   return (
     <>
       <AppBar />
@@ -15,12 +13,7 @@ function MainContent() {
         <Sidebar />
         <Editor />
       </div>
-      <StatusBar
-        currentFile={currentFile || undefined}
-        isEncrypted={isEncrypted}
-        wordCount={wordCount}
-        status="Ready"
-      />
+      <StatusBar />
     </>
   );
 }

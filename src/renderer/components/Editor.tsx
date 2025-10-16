@@ -39,6 +39,7 @@ export default function Editor() {
     setWordCount,
     setIsEncrypted,
     showNotification,
+    triggerSavePulse,
   } = useAppContext();
 
   const { t } = useTranslation();
@@ -126,7 +127,8 @@ export default function Editor() {
               tabItem.id === tabId ? { ...tabItem, isDirty: false } : tabItem,
             ),
           );
-          showNotification(t('notifications.fileSaved'), 'success');
+          // Trigger status bar save pulse instead of a global notification
+          triggerSavePulse();
         } else {
           showNotification(t('notifications.fileSaveError'), 'error');
         }
@@ -136,7 +138,7 @@ export default function Editor() {
         showNotification(t('notifications.fileSaveError'), 'error');
       }
     },
-    [tabs, setTabs, showNotification, t],
+    [tabs, setTabs, showNotification, t, triggerSavePulse],
   );
 
   // Obter aba ativa

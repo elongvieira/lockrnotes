@@ -1,21 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import DoneIcon from '@mui/icons-material/Done';
+import EditIcon from '@mui/icons-material/Edit';
+import { useTranslation } from 'react-i18next';
+import { useAppContext } from '../contexts/AppContext';
 import './StatusBar.css';
 
-interface StatusBarProps {
-  currentFile?: string;
-  isEncrypted?: boolean;
-  wordCount?: number;
-  status?: string;
-}
+export default function StatusBar() {
+  const { currentFile, isEncrypted, wordCount, tabs, activeTab, lastSavedAt } =
+    useAppContext();
 
-export default function StatusBar({
-  currentFile,
-  isEncrypted = false,
-  wordCount = 0,
-  status = 'Ready',
-}: StatusBarProps) {
+  const [pulse, setPulse] = useState(false);
+  const { t } = useTranslation();
+
+  // Determine active tab dirty state
+  const activeTabObj = tabs.find((tabItem) => tabItem.id === activeTab);
+  const isDirty = !!activeTabObj?.isDirty;
+
+  // Pulse animation when lastSavedAt changes
+  useEffect(() => {
+    if (!lastSavedAt) return;
+    setPulse(true);
+    const id = setTimeout(() => setPulse(false), 700);
+    // cleanup
+    return function cleanup() {
+      clearTimeout(id);
+    };
+  }, [lastSavedAt]);
+
+  // compute color for status indicator
+  let statusColor = 'var(--success-muted)';
+  if (pulse) statusColor = 'var(--success)';
+  else if (isDirty) statusColor = 'var(--warning)';
+
+  // Hide saved/unsaved indicator when no file open
+  const showSaveIndicator = !!currentFile;
+
   return (
     <Box
       className="status-bar"
@@ -33,7 +54,7 @@ export default function StatusBar({
         zIndex: 100,
       }}
     >
-      {/* Left side - Current file and encryption status */}
+      {/* Left side - Current file */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography
           variant="caption"
@@ -46,29 +67,37 @@ export default function StatusBar({
             <>
               {isEncrypted && '🔒 '}
               {currentFile}
-              {isEncrypted && ' (Encrypted)'}
             </>
           ) : (
-            'No file open'
+            ''
           )}
         </Typography>
-
-        {status && (
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'var(--text-secondary)',
-              fontSize: '0.75rem',
-              opacity: 0.7,
-            }}
-          >
-            • {status}
-          </Typography>
-        )}
       </Box>
 
       {/* Right side - Word count and app info */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        {showSaveIndicator && (
+          <Box
+            className={pulse ? 'save-pulse' : ''}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              transition: 'color 0.25s ease-in-out',
+              color: statusColor,
+            }}
+          >
+            {isDirty ? (
+              <EditIcon fontSize="small" />
+            ) : (
+              <DoneIcon fontSize="small" />
+            )}
+            <Typography variant="caption" sx={{ fontSize: '0.75rem' }}>
+              {isDirty ? t('status.unsaved') : t('status.saved')}
+            </Typography>
+          </Box>
+        )}
+
         {wordCount > 0 && (
           <Typography
             variant="caption"

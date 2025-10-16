@@ -96,4 +96,9 @@
     "fileSaved": "Arquivo salvo com sucesso",
     "fileSaveError": "Erro ao salvar arquivo"
   }
+  ,
+  "status": {
+    "saved": "Salvo",
+    "unsaved": "Não salvo"
+  }
 }

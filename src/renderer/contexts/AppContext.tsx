@@ -43,6 +43,9 @@ interface AppContextType {
     severity: 'success' | 'error' | 'warning' | 'info',
   ) => void;
   hideNotification: () => void;
+  // Save pulse indicator (timestamp updated when a successful save happens)
+  lastSavedAt: number | null;
+  triggerSavePulse: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -85,6 +88,13 @@ export function AppProvider({ children }: AppProviderProps) {
     window.dispatchEvent(new CustomEvent('hide-notification'));
   };
 
+  // Save pulse state
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+
+  const triggerSavePulse = () => {
+    setLastSavedAt(Date.now());
+  };
+
   const contextValue: AppContextType = useMemo(
     () => ({
       currentFile,
@@ -101,8 +111,18 @@ export function AppProvider({ children }: AppProviderProps) {
       setIsEncrypted,
       showNotification,
       hideNotification,
+      lastSavedAt,
+      triggerSavePulse,
     }),
-    [currentFile, tabs, activeTab, refreshSidebar, wordCount, isEncrypted],
+    [
+      currentFile,
+      tabs,
+      activeTab,
+      refreshSidebar,
+      wordCount,
+      isEncrypted,
+      lastSavedAt,
+    ],
   );
 
   return (
