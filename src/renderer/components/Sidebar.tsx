@@ -5,11 +5,17 @@ import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import EditIcon from '@mui/icons-material/Edit';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +27,7 @@ import {
 import { FileSystemItem } from '../types/filesystem';
 import FolderDialog from './FolderDialog';
 import FileCreationDialog from './FileCreationDialog';
+import RenameDialog from './RenameDialog';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function Sidebar() {
@@ -34,6 +41,17 @@ export default function Sidebar() {
   const [folderDialogOpen, setFolderDialogOpen] = useState<boolean>(false);
   const [fileDialogOpen, setFileDialogOpen] = useState<boolean>(false);
   const [targetFolderPath, setTargetFolderPath] = useState<string>('');
+
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+    item: FileSystemItem | null;
+  } | null>(null);
+
+  // Rename dialog state
+  const [renameDialogOpen, setRenameDialogOpen] = useState<boolean>(false);
+  const [itemToRename, setItemToRename] = useState<FileSystemItem | null>(null);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -207,6 +225,67 @@ export default function Sidebar() {
     }
   };
 
+  // Handle context menu (right-click)
+  const handleContextMenu = (event: React.MouseEvent, item: FileSystemItem) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      item,
+    });
+  };
+
+  const handleContextMenuClose = () => {
+    setContextMenu(null);
+  };
+
+  const handleContextMenuOpen = () => {
+    if (contextMenu?.item) {
+      handleFileClick(contextMenu.item.id);
+    }
+    handleContextMenuClose();
+  };
+
+  const handleContextMenuRename = () => {
+    if (contextMenu?.item) {
+      setItemToRename(contextMenu.item);
+      setRenameDialogOpen(true);
+    }
+    handleContextMenuClose();
+  };
+
+  const handleRenameDialogClose = () => {
+    setRenameDialogOpen(false);
+    setItemToRename(null);
+  };
+
+  const handleRenameDialogConfirm = async (newName: string) => {
+    if (!itemToRename) return;
+
+    try {
+      const oldPath = itemToRename.path;
+      const parentDir = oldPath.substring(
+        0,
+        oldPath.lastIndexOf('\\') || oldPath.lastIndexOf('/'),
+      );
+      const newPath = `${parentDir}/${newName}`;
+
+      const success = await fileSystemService.renameItem(oldPath, newPath);
+
+      if (success) {
+        await loadDirectory(currentPath);
+        showNotification(t('notifications.fileRenamed'), 'success');
+      } else {
+        showNotification(t('notifications.fileRenameError'), 'error');
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error renaming item:', error);
+      showNotification(t('notifications.fileRenameError'), 'error');
+    }
+  };
+
   const renderTreeItems = (
     items: FileSystemItem[],
     depth = 0,
@@ -227,6 +306,7 @@ export default function Sidebar() {
           itemId={item.id}
           label={
             <Box
+              onContextMenu={(e) => handleContextMenu(e, item)}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -448,6 +528,43 @@ export default function Sidebar() {
         open={fileDialogOpen}
         onClose={handleFileDialogClose}
         onConfirm={handleFileDialogConfirm}
+      />
+
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleContextMenuClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+        slotProps={{
+          paper: {
+            className: 'app-menu-paper',
+          },
+        }}
+      >
+        <MenuItem onClick={handleContextMenuOpen} className="app-menu-item">
+          <ListItemIcon className="app-menu-icon">
+            <OpenInNewIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('contextMenu.open')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleContextMenuRename} className="app-menu-item">
+          <ListItemIcon className="app-menu-icon">
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('contextMenu.rename')}</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      <RenameDialog
+        open={renameDialogOpen}
+        onClose={handleRenameDialogClose}
+        onConfirm={handleRenameDialogConfirm}
+        currentName={itemToRename?.name || ''}
+        itemType={itemToRename?.type === 'directory' ? 'folder' : 'file'}
       />
     </aside>
   );

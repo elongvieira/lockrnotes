@@ -92,8 +92,24 @@
     },
     "actions": {
       "cancel": "Cancel",
-      "create": "Create"
+      "create": "Create",
+      "rename": "Rename"
+    },
+    "rename": {
+      "titleFile": "Rename File",
+      "titleFolder": "Rename Folder",
+      "placeholder": "New name",
+      "errors": {
+        "empty": "Name cannot be empty",
+        "invalidChars": "Name contains invalid characters",
+        "tooLong": "Name is too long (maximum 255 characters)",
+        "startsWithDot": "Name cannot start with a dot"
+      }
     }
+  },
+  "contextMenu": {
+    "open": "Open",
+    "rename": "Rename"
   },
   "notifications": {
     "fileCreated": "File created successfully",
@@ -101,7 +117,9 @@
     "folderCreated": "Folder created successfully",
     "folderCreationError": "Error creating folder",
     "fileSaved": "File saved successfully",
-    "fileSaveError": "Error saving file"
+    "fileSaveError": "Error saving file",
+    "fileRenamed": "File renamed successfully",
+    "fileRenameError": "Error renaming file"
   }
   ,
   "status": {

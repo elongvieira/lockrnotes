@@ -92,8 +92,24 @@
     },
     "actions": {
       "cancel": "Cancelar",
-      "create": "Criar"
+      "create": "Criar",
+      "rename": "Renomear"
+    },
+    "rename": {
+      "titleFile": "Renomear Arquivo",
+      "titleFolder": "Renomear Pasta",
+      "placeholder": "Novo nome",
+      "errors": {
+        "empty": "Nome não pode estar vazio",
+        "invalidChars": "Nome contém caracteres inválidos",
+        "tooLong": "Nome é muito longo (máximo 255 caracteres)",
+        "startsWithDot": "Nome não pode começar com ponto"
+      }
     }
+  },
+  "contextMenu": {
+    "open": "Abrir",
+    "rename": "Renomear"
   },
   "notifications": {
     "fileCreated": "Arquivo criado com sucesso",
@@ -101,7 +117,9 @@
     "folderCreated": "Pasta criada com sucesso",
     "folderCreationError": "Erro ao criar pasta",
     "fileSaved": "Arquivo salvo com sucesso",
-    "fileSaveError": "Erro ao salvar arquivo"
+    "fileSaveError": "Erro ao salvar arquivo",
+    "fileRenamed": "Arquivo renomeado com sucesso",
+    "fileRenameError": "Erro ao renomear arquivo"
   }
   ,
   "status": {

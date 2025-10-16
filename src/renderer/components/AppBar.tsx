@@ -91,11 +91,24 @@ export default function AppBar() {
             open={Boolean(langAnchor)}
             onClose={handleLangClose}
             keepMounted
+            slotProps={{
+              paper: {
+                className: 'app-menu-paper',
+              },
+            }}
           >
-            <MenuItem onClick={() => changeLanguage('pt-BR')}>
+            <MenuItem
+              onClick={() => changeLanguage('pt-BR')}
+              className="app-menu-item"
+            >
               Português (BR)
             </MenuItem>
-            <MenuItem onClick={() => changeLanguage('en')}>English</MenuItem>
+            <MenuItem
+              onClick={() => changeLanguage('en')}
+              className="app-menu-item"
+            >
+              English
+            </MenuItem>
           </Menu>
           <button type="button" className="window-btn" onClick={handleMinimize}>
             —
@@ -122,14 +135,26 @@ export default function AppBar() {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
           keepMounted
+          slotProps={{
+            paper: {
+              className: 'app-menu-paper',
+            },
+          }}
         >
-          <MenuItem onClick={handleMenuClose}>{t('menu.new')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{t('menu.save')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{t('menu.delete')}</MenuItem>
+          <MenuItem onClick={handleMenuClose} className="app-menu-item">
+            {t('menu.new')}
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose} className="app-menu-item">
+            {t('menu.save')}
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose} className="app-menu-item">
+            {t('menu.delete')}
+          </MenuItem>
           <MenuItem
             onClick={() => {
               handleMenuClose();
             }}
+            className="app-menu-item"
           >
             {t('menu.exit')}
           </MenuItem>

@@ -49,6 +49,26 @@
   --spacing-xl: 20px;
 }
 
+/* App menus (context menu, app menu, language menu) */
+.app-menu-paper {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  min-width: 180px;
+  border-radius: var(--border-radius-sm);
+}
+.app-menu-item {
+  /* subtle hover that works on dark backgrounds */
+  transition: background-color 120ms ease-in-out;
+}
+.app-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+.app-menu-icon {
+  color: var(--primary-blue);
+  min-width: 40px; /* keep icon spacing consistent */
+}
+
 /* Light theme overrides (for future use) */
 [data-theme='light'] {
   --primary-blue: #3b82f6;
