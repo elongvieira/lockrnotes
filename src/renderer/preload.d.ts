@@ -7,6 +7,13 @@ declare global {
     electron: ElectronHandler;
     encryptionAPI: EncryptionAPI;
   }
+
+  namespace NodeJS {
+    interface ProcessEnv {
+      APP_VERSION?: string;
+      NODE_ENV: 'development' | 'production';
+    }
+  }
 }
 
 export {};

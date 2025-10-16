@@ -11,6 +11,12 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 
+// Load version from release/app/package.json
+const appPackageJson = require(
+  path.resolve(__dirname, '../../release/app/package.json'),
+);
+const appVersion = appPackageJson.version || '0.0.0';
+
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
 if (process.env.NODE_ENV === 'production') {
@@ -141,6 +147,10 @@ const configuration: webpack.Configuration = {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
+    }),
+
+    new webpack.DefinePlugin({
+      'process.env.APP_VERSION': JSON.stringify(appVersion),
     }),
 
     new webpack.LoaderOptionsPlugin({

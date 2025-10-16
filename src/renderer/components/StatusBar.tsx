@@ -134,7 +134,7 @@ export default function StatusBar() {
             opacity: 0.7,
           }}
         >
-          LockrNotes v2.0
+          {`LockrNotes v${process.env.APP_VERSION || '0.0.0'}`}
         </Typography>
       </Box>
     </Box>
