@@ -7,6 +7,13 @@
     "save": "Save",
     "delete": "Delete",
     "exit": "Exit"
+  },
+  "editor": {
+    "placeholder": "Type your content here...",
+    "welcome": {
+      "title": "LockrNotes Editor",
+      "message": "Click a file in the sidebar to open it in a new tab, or create a new file to start writing."
+    }
   }
   ,"sidebar":{
     "tabs":{
@@ -99,6 +106,7 @@
   ,
   "status": {
     "saved": "Saved",
-    "unsaved": "Unsaved"
+    "unsaved": "Unsaved",
+    "words": "{{count}} words"
   }
 }

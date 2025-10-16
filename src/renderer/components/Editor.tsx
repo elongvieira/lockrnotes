@@ -280,7 +280,9 @@ export default function Editor() {
             <TextField
               multiline
               fullWidth
-              placeholder="Digite seu conteúdo aqui..."
+              placeholder={
+                t('editor.placeholder') || 'Digite seu conteúdo aqui...'
+              }
               value={currentTab.content}
               onChange={(e) => updateTabContent(currentTab.id, e.target.value)}
               variant="outlined"
@@ -292,11 +294,11 @@ export default function Editor() {
         // Tela de boas-vindas quando não há abas abertas
         <Box className="editor-welcome">
           <Typography variant="h5" className="editor-welcome-title">
-            LockrNotes Editor
+            {t('editor.welcome.title') || 'LockrNotes Editor'}
           </Typography>
           <Typography variant="body1" className="editor-welcome-text">
-            Clique em um arquivo na barra lateral para abri-lo em uma nova aba,
-            ou crie uma nova aba para começar a escrever.
+            {t('editor.welcome.message') ||
+              'Clique em um arquivo na barra lateral para abri-lo em uma nova aba, ou crie uma nova aba para começar a escrever.'}
           </Typography>
           <IconButton
             onClick={createNewTab}

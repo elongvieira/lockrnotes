@@ -7,6 +7,13 @@
     "save": "Salvar",
     "delete": "Excluir",
     "exit": "Sair"
+  },
+  "editor": {
+    "placeholder": "Digite seu conteúdo aqui...",
+    "welcome": {
+      "title": "Editor LockrNotes",
+      "message": "Clique em um arquivo na barra lateral para abri-lo em uma nova aba, ou crie um novo arquivo para começar a escrever."
+    }
   }
   ,"sidebar":{
     "tabs":{
@@ -99,6 +106,7 @@
   ,
   "status": {
     "saved": "Salvo",
-    "unsaved": "Não salvo"
+    "unsaved": "Não salvo",
+    "words": "{{count}} palavras"
   }
 }

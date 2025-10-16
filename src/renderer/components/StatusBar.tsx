@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DoneIcon from '@mui/icons-material/Done';
@@ -19,15 +19,31 @@ export default function StatusBar() {
   const isDirty = !!activeTabObj?.isDirty;
 
   // Pulse animation when lastSavedAt changes
+  const timerRef = useRef<number | null>(null);
   useEffect(() => {
     if (!lastSavedAt) return;
+    // clear existing timer if any
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     setPulse(true);
-    const id = setTimeout(() => setPulse(false), 700);
-    // cleanup
-    return function cleanup() {
-      clearTimeout(id);
-    };
+    timerRef.current = window.setTimeout(() => {
+      setPulse(false);
+      timerRef.current = null;
+    }, 700) as unknown as number;
+    // no return to satisfy linter rule
   }, [lastSavedAt]);
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
 
   // compute color for status indicator
   let statusColor = 'var(--success-muted)';
@@ -106,7 +122,7 @@ export default function StatusBar() {
               fontSize: '0.75rem',
             }}
           >
-            {wordCount} words
+            {t('status.words', { count: wordCount }) || `${wordCount} words`}
           </Typography>
         )}
 
