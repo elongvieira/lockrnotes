@@ -253,9 +253,11 @@ export default function Editor() {
                       {tab.isEncrypted && ' 🔒'}
                     </Typography>
                     <IconButton
+                      component="span"
                       size="small"
                       onClick={(e) => closeTab(tab.id, e)}
                       className="tab-close-btn"
+                      aria-label={`close-${tab.filename}`}
                     >
                       <CloseIcon sx={{ fontSize: 14 }} />
                     </IconButton>
