@@ -16,8 +16,10 @@ import {
   Alert,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { fileSystemService } from '../services/fileSystemService';
+import { fileCreationService } from '../services/fileCreationService';
 import { dialogStyles } from '../styles/dialogStyles';
-import { FileCreationData } from '../services/fileCreationService';
+import type { FileCreationData } from '../services/fileCreationService';
 
 interface FileCreationDialogProps {
   open: boolean;
@@ -115,19 +117,49 @@ export default function FileCreationDialog({
 
   const handleConfirm = () => {
     if (!validateForm()) return;
+    (async () => {
+      // Prepare final filename including extension (using template info from service)
+      const cleanName = filename.trim();
+      const template = fileCreationService.getTemplate(selectedType);
+      const extension = template ? template.extension : '';
+      const finalFilename = `${cleanName}${extension}`;
 
-    const fileData: FileCreationData = {
-      filename: filename.trim(),
-      type: selectedType as 'text' | 'keyvalue',
-      encrypted,
-      encryptionType: encrypted
-        ? (encryptionType as 'managed' | 'manual')
-        : undefined,
-      password: encrypted && encryptionType === 'manual' ? password : undefined,
-    };
+      try {
+        const notesDir = await fileSystemService.getDefaultNotesDirectory();
+        const targetPath = `${notesDir}/${finalFilename}`;
+        const existing = await fileSystemService.getItem(targetPath);
+        if (existing) {
+          setErrors((prev) => ({
+            ...prev,
+            filename:
+              t('dialog.file.errors.fileExists') ||
+              'A file with that name already exists',
+          }));
+          return;
+        }
 
-    onConfirm(fileData);
-    onClose();
+        const fileData: FileCreationData = {
+          filename: filename.trim(),
+          type: selectedType as 'text' | 'keyvalue',
+          encrypted,
+          encryptionType: encrypted
+            ? (encryptionType as 'managed' | 'manual')
+            : undefined,
+          password:
+            encrypted && encryptionType === 'manual' ? password : undefined,
+        };
+
+        onConfirm(fileData);
+        onClose();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Error checking file existence:', err);
+        setErrors((prev) => ({
+          ...prev,
+          filename: t('dialog.file.errors.invalidChars') || 'Invalid filename',
+        }));
+      }
+    })();
   };
 
   const selectedTypeData = fileTypes.find((type) => type.id === selectedType);

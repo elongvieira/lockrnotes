@@ -80,6 +80,7 @@
         "passwordMismatch": "Senhas não coincidem",
         "passwordTooLong": "Senha é muito longa (máximo 128 caracteres)",
         "passwordSpecialChars": "Senha deve conter pelo menos um caractere especial"
+        ,"fileExists": "Já existe um arquivo com esse nome"
       }
     },
     "actions": {

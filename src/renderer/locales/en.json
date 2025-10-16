@@ -80,6 +80,7 @@
         "passwordMismatch": "Passwords do not match",
         "passwordTooLong": "Password is too long (maximum 128 characters)",
         "passwordSpecialChars": "Password must contain at least one special character"
+        ,"fileExists": "A file with that name already exists"
       }
     },
     "actions": {
