@@ -69,6 +69,27 @@
   min-width: 40px; /* keep icon spacing consistent */
 }
 
+/* Stronger selectors to ensure MUI internal styles don't override our theme */
+.app-menu-paper.MuiPaper-root,
+.app-menu-paper {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 4px 12px var(--shadow-medium) !important;
+}
+.app-menu-paper .MuiMenuItem-root,
+.app-menu-item.MuiMenuItem-root,
+.app-menu-item {
+  color: var(--text-primary) !important;
+}
+.app-menu-item:hover,
+.app-menu-paper .MuiMenuItem-root:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+.app-menu-icon,
+.app-menu-icon svg {
+  color: var(--primary-blue) !important;
+}
+
 /* Light theme overrides (for future use) */
 [data-theme='light'] {
   --primary-blue: #3b82f6;
