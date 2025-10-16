@@ -31,6 +31,24 @@ interface AppContextType {
   refreshSidebar: () => void;
   setRefreshSidebar: (fn: () => void) => void;
 
+  // Editor file opening
+  openFileInEditor: (
+    filePath: string,
+    filename: string,
+    originalExtension?: string,
+    content?: string,
+    isEncrypted?: boolean,
+  ) => void;
+  setOpenFileInEditor: (
+    fn: (
+      filePath: string,
+      filename: string,
+      originalExtension?: string,
+      content?: string,
+      isEncrypted?: boolean,
+    ) => void,
+  ) => void;
+
   // Status bar info
   wordCount: number;
   setWordCount: (count: number) => void;
@@ -66,6 +84,17 @@ export function AppProvider({ children }: AppProviderProps) {
   const [refreshSidebar, setRefreshSidebar] = useState<() => void>(
     () => () => {},
   );
+
+  // Editor file opening function
+  const [openFileInEditor, setOpenFileInEditor] = useState<
+    (
+      filePath: string,
+      filename: string,
+      originalExtension?: string,
+      content?: string,
+      isEncrypted?: boolean,
+    ) => void
+  >(() => () => {});
 
   // Status bar state
   const [wordCount, setWordCount] = useState<number>(0);
@@ -105,6 +134,8 @@ export function AppProvider({ children }: AppProviderProps) {
       setActiveTab,
       refreshSidebar,
       setRefreshSidebar,
+      openFileInEditor,
+      setOpenFileInEditor,
       wordCount,
       setWordCount,
       isEncrypted,
@@ -119,6 +150,7 @@ export function AppProvider({ children }: AppProviderProps) {
       tabs,
       activeTab,
       refreshSidebar,
+      openFileInEditor,
       wordCount,
       isEncrypted,
       lastSavedAt,

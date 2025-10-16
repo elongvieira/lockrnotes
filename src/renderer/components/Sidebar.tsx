@@ -24,7 +24,8 @@ import FileCreationDialog from './FileCreationDialog';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function Sidebar() {
-  const { setRefreshSidebar, showNotification } = useAppContext();
+  const { setRefreshSidebar, showNotification, openFileInEditor } =
+    useAppContext();
   const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
   const [directoryItems, setDirectoryItems] = useState<FileSystemItem[]>([]);
@@ -158,6 +159,53 @@ export default function Sidebar() {
       console.error('Failed to refresh directory:', err);
     }
   }, [currentPath]);
+
+  // Handle file click
+  const handleFileClick = async (itemId: string) => {
+    // Find the item in directoryItems
+    const findItem = (
+      items: FileSystemItem[],
+      id: string,
+    ): FileSystemItem | null => {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of items) {
+        if (item.id === id) return item;
+        if (item.children) {
+          const found = findItem(item.children, id);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const item = findItem(directoryItems, itemId);
+    if (!item || item.type === 'directory') return;
+
+    // Only open .txt files for now (plaintext, unencrypted)
+    if (!item.path.endsWith('.txt')) {
+      showNotification(
+        'Only .txt files are supported at the moment',
+        'warning',
+      );
+      return;
+    }
+
+    try {
+      // Load file content
+      const content = await fileSystemService.readFile(item.path);
+      if (content === null) {
+        showNotification('Failed to read file', 'error');
+        return;
+      }
+
+      // Open in editor
+      openFileInEditor(item.path, item.name, item.extension, content, false);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error opening file:', error);
+      showNotification('Error opening file', 'error');
+    }
+  };
 
   const renderTreeItems = (
     items: FileSystemItem[],
@@ -367,6 +415,9 @@ export default function Sidebar() {
               multiSelect
               defaultExpandedItems={[]}
               defaultSelectedItems={[]}
+              onItemClick={(event, itemId) => {
+                handleFileClick(itemId);
+              }}
               sx={{
                 flex: 1,
                 overflow: 'auto',

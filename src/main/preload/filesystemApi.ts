@@ -31,6 +31,10 @@ export const filesystemApi = {
     return ipcRenderer.invoke('fs-save-file', path, content);
   },
 
+  readFile(path: string): Promise<string | null> {
+    return ipcRenderer.invoke('fs-read-file', path);
+  },
+
   deleteItem(path: string): Promise<boolean> {
     return ipcRenderer.invoke('fs-delete-item', path);
   },

@@ -138,6 +138,17 @@ export function setupFilesystemHandlers() {
     },
   );
 
+  // Read file content
+  ipcMain.handle('fs-read-file', async (event, filePath: string) => {
+    try {
+      const content = await fs.promises.readFile(filePath, 'utf8');
+      return content;
+    } catch (error) {
+      console.error('Error reading file:', error);
+      return null;
+    }
+  });
+
   // Delete item
   ipcMain.handle('fs-delete-item', async (event, itemPath: string) => {
     try {

@@ -40,33 +40,37 @@ export default function Editor() {
     setIsEncrypted,
     showNotification,
     triggerSavePulse,
+    setOpenFileInEditor,
   } = useAppContext();
 
   const { t } = useTranslation();
   const [fileDialogOpen, setFileDialogOpen] = useState<boolean>(false);
 
   // Função para abrir um novo arquivo em uma aba
-  const openFile = (
-    filePath: string,
-    filename: string,
-    originalExtension?: string,
-    content = '',
-    isEncrypted = false,
-  ) => {
-    const fileId = `file-${Date.now()}-${Math.random()}`;
-    const newTab: FileTab = {
-      id: fileId,
-      filename,
-      content,
-      isDirty: false,
-      isEncrypted,
-      originalExtension,
-      filePath,
-    };
+  const openFile = useCallback(
+    (
+      filePath: string,
+      filename: string,
+      originalExtension?: string,
+      content = '',
+      isEncrypted = false,
+    ) => {
+      const fileId = `file-${Date.now()}-${Math.random()}`;
+      const newTab: FileTab = {
+        id: fileId,
+        filename,
+        content,
+        isDirty: false,
+        isEncrypted,
+        originalExtension,
+        filePath,
+      };
 
-    setTabs((prev) => [...prev, newTab]);
-    setActiveTab(fileId);
-  };
+      setTabs((prev) => [...prev, newTab]);
+      setActiveTab(fileId);
+    },
+    [setTabs, setActiveTab],
+  );
 
   // Função para fechar uma aba
   const closeTab = (tabId: string, event?: React.MouseEvent) => {
@@ -161,6 +165,11 @@ export default function Editor() {
       setWordCount(0);
     }
   }, [currentTab, setCurrentFile, setIsEncrypted, setWordCount]);
+
+  // Register openFile function in context (so Sidebar can open files)
+  useEffect(() => {
+    setOpenFileInEditor(() => openFile);
+  }, [openFile, setOpenFileInEditor]);
 
   // Listener para Ctrl+S (salvar arquivo)
   useEffect(() => {

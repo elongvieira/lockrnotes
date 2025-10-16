@@ -76,6 +76,18 @@ class FileSystemServiceImpl implements FileSystemService {
   }
 
   /**
+   * Read file content
+   */
+  async readFile(path: string): Promise<string | null> {
+    try {
+      return await this.fs.readFile(path);
+    } catch (error) {
+      console.error('Failed to read file:', error);
+      return null;
+    }
+  }
+
+  /**
    * Delete a file or directory
    */
   async deleteItem(path: string): Promise<boolean> {
