@@ -11,13 +11,18 @@ import {
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
 
+interface RenameResult {
+  success: boolean;
+  message?: string;
+}
+
 interface RenameDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (newName: string) => void;
+  onConfirm: (newName: string) => Promise<RenameResult> | RenameResult;
   currentName: string;
   itemType: 'file' | 'folder';
-  isFileOpen?: boolean;
+  isFileOpen: boolean;
 }
 
 export default function RenameDialog({
@@ -26,7 +31,7 @@ export default function RenameDialog({
   onConfirm,
   currentName,
   itemType,
-  isFileOpen = false,
+  isFileOpen,
 }: RenameDialogProps) {
   const { t } = useTranslation();
   const [newName, setNewName] = useState<string>('');
@@ -40,7 +45,7 @@ export default function RenameDialog({
     }
   }, [open, currentName]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const trimmedName = newName.trim();
 
     if (!trimmedName) {
@@ -82,8 +87,26 @@ export default function RenameDialog({
       return;
     }
 
-    onConfirm(trimmedName);
-    onClose();
+    try {
+      const result = await onConfirm(trimmedName);
+      if (result && !result.success) {
+        setError(
+          result.message ||
+            t('dialog.rename.errors.fileExists') ||
+            'A file with that name already exists',
+        );
+        return;
+      }
+
+      // success
+      onClose();
+    } catch {
+      // fallback error
+      setError(
+        t('dialog.rename.errors.fileExists') ||
+          'A file with that name already exists',
+      );
+    }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {

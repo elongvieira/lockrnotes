@@ -109,7 +109,8 @@
         "empty": "Nome não pode estar vazio",
         "invalidChars": "Nome contém caracteres inválidos",
         "tooLong": "Nome é muito longo (máximo 255 caracteres)",
-        "startsWithDot": "Nome não pode começar com ponto"
+        "startsWithDot": "Nome não pode começar com ponto",
+        "fileExists": "Já existe um arquivo com esse nome"
       }
     }
   },

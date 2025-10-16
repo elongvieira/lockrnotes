@@ -266,12 +266,31 @@ export default function Sidebar() {
   };
 
   const handleRenameDialogConfirm = async (newName: string) => {
-    if (!itemToRename) return;
+    if (!itemToRename) return { success: false };
 
     const oldPath = itemToRename.path;
     const openTab = tabs.find((tab) => tab.filePath === oldPath);
 
     try {
+      // compute new path
+      const lastSep = Math.max(
+        oldPath.lastIndexOf('/'),
+        oldPath.lastIndexOf('\\'),
+      );
+      const parentDir = oldPath.substring(0, lastSep);
+      const newPath = `${parentDir}/${newName}`;
+
+      // check if target already exists
+      const existing = await fileSystemService.getItem(newPath);
+      if (existing) {
+        return {
+          success: false,
+          message:
+            t('dialog.rename.errors.fileExists') ||
+            'A file with that name already exists',
+        };
+      }
+
       // If file is open, save current content first
       let contentToReopen = '';
       if (openTab) {
@@ -282,13 +301,6 @@ export default function Sidebar() {
       }
 
       // Perform rename
-      const lastSep = Math.max(
-        oldPath.lastIndexOf('/'),
-        oldPath.lastIndexOf('\\'),
-      );
-      const parentDir = oldPath.substring(0, lastSep);
-      const newPath = `${parentDir}/${newName}`;
-
       const success = await fileSystemService.renameItem(oldPath, newPath);
 
       if (success) {
@@ -307,13 +319,16 @@ export default function Sidebar() {
         }
 
         showNotification(t('notifications.fileRenamed'), 'success');
-      } else {
-        showNotification(t('notifications.fileRenameError'), 'error');
+        return { success: true };
       }
+
+      showNotification(t('notifications.fileRenameError'), 'error');
+      return { success: false };
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error renaming item:', error);
       showNotification(t('notifications.fileRenameError'), 'error');
+      return { success: false };
     }
   };
 

@@ -109,7 +109,8 @@
         "empty": "Name cannot be empty",
         "invalidChars": "Name contains invalid characters",
         "tooLong": "Name is too long (maximum 255 characters)",
-        "startsWithDot": "Name cannot start with a dot"
+        "startsWithDot": "Name cannot start with a dot",
+        "fileExists": "A file with that name already exists"
       }
     }
   },
