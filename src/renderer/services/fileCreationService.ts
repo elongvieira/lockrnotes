@@ -70,11 +70,12 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
 
   /**
    * Creates a new file based on the provided data
+   * Returns an object with success status and the full filename with extension
    */
   async createFile(
     targetPath: string,
     fileData: FileCreationData,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; filename?: string; filePath?: string }> {
     try {
       // Validate input
       if (!targetPath || !fileData.filename.trim()) {
@@ -131,11 +132,11 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
         throw new Error('Failed to create file');
       }
 
-      return true;
+      return { success: true, filename, filePath };
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error in FileCreationService.createFile:', error);
-      return false;
+      return { success: false };
     }
   }
 

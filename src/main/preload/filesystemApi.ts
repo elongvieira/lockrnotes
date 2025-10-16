@@ -27,6 +27,10 @@ export const filesystemApi = {
     return ipcRenderer.invoke('fs-create-file', path, content);
   },
 
+  saveFile(path: string, content: string): Promise<boolean> {
+    return ipcRenderer.invoke('fs-save-file', path, content);
+  },
+
   deleteItem(path: string): Promise<boolean> {
     return ipcRenderer.invoke('fs-delete-item', path);
   },

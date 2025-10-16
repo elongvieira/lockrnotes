@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -98,6 +98,47 @@ export default function Editor() {
     );
   };
 
+  // Função para salvar arquivo
+  const saveFile = useCallback(
+    async (tabId: string) => {
+      const targetTab = tabs.find((tab) => tab.id === tabId);
+      if (!targetTab) return;
+
+      // Por enquanto, só salvar arquivos .txt não criptografados
+      if (targetTab.isEncrypted || !targetTab.filePath.endsWith('.txt')) {
+        showNotification(
+          `${t('notifications.fileSaveError')}: Only plain .txt files supported`,
+          'warning',
+        );
+        return;
+      }
+
+      try {
+        const success = await fileSystemService.saveFile(
+          targetTab.filePath,
+          targetTab.content,
+        );
+
+        if (success) {
+          // Marcar aba como não modificada
+          setTabs((prev) =>
+            prev.map((tabItem) =>
+              tabItem.id === tabId ? { ...tabItem, isDirty: false } : tabItem,
+            ),
+          );
+          showNotification(t('notifications.fileSaved'), 'success');
+        } else {
+          showNotification(t('notifications.fileSaveError'), 'error');
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error saving file:', error);
+        showNotification(t('notifications.fileSaveError'), 'error');
+      }
+    },
+    [tabs, setTabs, showNotification, t],
+  );
+
   // Obter aba ativa
   const currentTab = tabs.find((tab) => tab.id === activeTab);
 
@@ -119,6 +160,23 @@ export default function Editor() {
     }
   }, [currentTab, setCurrentFile, setIsEncrypted, setWordCount]);
 
+  // Listener para Ctrl+S (salvar arquivo)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        if (activeTab) {
+          saveFile(activeTab);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeTab, tabs, saveFile]);
+
   // Função para abrir dialog de criação de arquivo
   const handleCreateFile = () => {
     setFileDialogOpen(true);
@@ -133,21 +191,20 @@ export default function Editor() {
   const handleFileDialogConfirm = async (fileData: FileCreationData) => {
     try {
       const notesPath = await fileSystemService.getDefaultNotesDirectory();
-      const success = await fileCreationService.createFile(notesPath, fileData);
+      const result = await fileCreationService.createFile(notesPath, fileData);
 
-      if (success) {
-        // Abrir o arquivo criado no editor
-        const filePath = `${notesPath}/${fileData.filename}`;
+      if (result.success && result.filename && result.filePath) {
+        // Abrir o arquivo criado no editor com o nome completo (incluindo extensão)
         openFile(
-          filePath,
-          fileData.filename,
+          result.filePath,
+          result.filename,
           undefined,
           '',
           fileData.encrypted,
         );
 
         // Atualizar contexto
-        setCurrentFile(filePath);
+        setCurrentFile(result.filePath);
         setIsEncrypted(fileData.encrypted);
 
         // Notificar sidebar para fazer refresh via context

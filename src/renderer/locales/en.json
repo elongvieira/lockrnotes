@@ -91,6 +91,8 @@
     "fileCreated": "File created successfully",
     "fileCreationError": "Error creating file",
     "folderCreated": "Folder created successfully",
-    "folderCreationError": "Error creating folder"
+    "folderCreationError": "Error creating folder",
+    "fileSaved": "File saved successfully",
+    "fileSaveError": "Error saving file"
   }
 }

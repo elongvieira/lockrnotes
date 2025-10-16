@@ -64,6 +64,18 @@ class FileSystemServiceImpl implements FileSystemService {
   }
 
   /**
+   * Save file content
+   */
+  async saveFile(path: string, content: string): Promise<boolean> {
+    try {
+      return await this.fs.saveFile(path, content);
+    } catch (error) {
+      console.error('Failed to save file:', error);
+      return false;
+    }
+  }
+
+  /**
    * Delete a file or directory
    */
   async deleteItem(path: string): Promise<boolean> {

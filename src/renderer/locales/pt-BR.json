@@ -91,6 +91,8 @@
     "fileCreated": "Arquivo criado com sucesso",
     "fileCreationError": "Erro ao criar arquivo",
     "folderCreated": "Pasta criada com sucesso",
-    "folderCreationError": "Erro ao criar pasta"
+    "folderCreationError": "Erro ao criar pasta",
+    "fileSaved": "Arquivo salvo com sucesso",
+    "fileSaveError": "Erro ao salvar arquivo"
   }
 }

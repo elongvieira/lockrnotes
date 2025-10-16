@@ -124,6 +124,20 @@ export function setupFilesystemHandlers() {
     },
   );
 
+  // Save file
+  ipcMain.handle(
+    'fs-save-file',
+    async (event, filePath: string, content: string) => {
+      try {
+        await fs.promises.writeFile(filePath, content, 'utf8');
+        return true;
+      } catch (error) {
+        console.error('Error saving file:', error);
+        return false;
+      }
+    },
+  );
+
   // Delete item
   ipcMain.handle('fs-delete-item', async (event, itemPath: string) => {
     try {
