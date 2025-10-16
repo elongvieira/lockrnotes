@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
-import { validateFolderName } from '../utils/validation';
 
 interface FolderDialogProps {
   open: boolean;

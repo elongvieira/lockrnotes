@@ -14,8 +14,8 @@
       "title": "Editor LockrNotes",
       "message": "Clique em um arquivo na barra lateral para abri-lo em uma nova aba, ou crie um novo arquivo para começar a escrever."
     }
-  }
-  ,"sidebar":{
+  },
+  "sidebar":{
     "tabs":{
       "aria":"Abas da barra lateral",
       "local":"Local",
@@ -93,12 +93,18 @@
     "actions": {
       "cancel": "Cancelar",
       "create": "Criar",
+      "confirm": "Confirmar",
       "rename": "Renomear"
+    },
+    "confirm": {
+      "title": "Confirmação",
+      "message": "Tem certeza de que deseja continuar?"
     },
     "rename": {
       "titleFile": "Renomear Arquivo",
       "titleFolder": "Renomear Pasta",
       "placeholder": "Novo nome",
+      "warningFileOpen": "Este arquivo está aberto. Ele será salvo, fechado e reaberto com o novo nome.",
       "errors": {
         "empty": "Nome não pode estar vazio",
         "invalidChars": "Nome contém caracteres inválidos",

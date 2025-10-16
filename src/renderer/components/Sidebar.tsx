@@ -31,8 +31,13 @@ import RenameDialog from './RenameDialog';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function Sidebar() {
-  const { setRefreshSidebar, showNotification, openFileInEditor } =
-    useAppContext();
+  const {
+    setRefreshSidebar,
+    showNotification,
+    openFileInEditor,
+    tabs,
+    setTabs,
+  } = useAppContext();
   const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
   const [directoryItems, setDirectoryItems] = useState<FileSystemItem[]>([]);
@@ -263,18 +268,44 @@ export default function Sidebar() {
   const handleRenameDialogConfirm = async (newName: string) => {
     if (!itemToRename) return;
 
+    const oldPath = itemToRename.path;
+    const openTab = tabs.find((tab) => tab.filePath === oldPath);
+
     try {
-      const oldPath = itemToRename.path;
-      const parentDir = oldPath.substring(
-        0,
-        oldPath.lastIndexOf('\\') || oldPath.lastIndexOf('/'),
+      // If file is open, save current content first
+      let contentToReopen = '';
+      if (openTab) {
+        await fileSystemService.saveFile(oldPath, openTab.content);
+        contentToReopen = openTab.content;
+        // close the tab
+        setTabs((prev) => prev.filter((tab) => tab.filePath !== oldPath));
+      }
+
+      // Perform rename
+      const lastSep = Math.max(
+        oldPath.lastIndexOf('/'),
+        oldPath.lastIndexOf('\\'),
       );
+      const parentDir = oldPath.substring(0, lastSep);
       const newPath = `${parentDir}/${newName}`;
 
       const success = await fileSystemService.renameItem(oldPath, newPath);
 
       if (success) {
+        // refresh tree
         await loadDirectory(currentPath);
+
+        // reopen in editor if was open
+        if (openTab) {
+          openFileInEditor(
+            newPath,
+            newName,
+            itemToRename.extension,
+            contentToReopen,
+            itemToRename.extension?.startsWith('.l') ?? false,
+          );
+        }
+
         showNotification(t('notifications.fileRenamed'), 'success');
       } else {
         showNotification(t('notifications.fileRenameError'), 'error');
@@ -565,6 +596,11 @@ export default function Sidebar() {
         onConfirm={handleRenameDialogConfirm}
         currentName={itemToRename?.name || ''}
         itemType={itemToRename?.type === 'directory' ? 'folder' : 'file'}
+        isFileOpen={
+          itemToRename
+            ? tabs.some((tab) => tab.filePath === itemToRename.path)
+            : false
+        }
       />
     </aside>
   );

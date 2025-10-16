@@ -6,6 +6,7 @@ import {
   DialogActions,
   TextField,
   Button,
+  Typography,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
@@ -16,6 +17,7 @@ interface RenameDialogProps {
   onConfirm: (newName: string) => void;
   currentName: string;
   itemType: 'file' | 'folder';
+  isFileOpen?: boolean;
 }
 
 export default function RenameDialog({
@@ -24,6 +26,7 @@ export default function RenameDialog({
   onConfirm,
   currentName,
   itemType,
+  isFileOpen = false,
 }: RenameDialogProps) {
   const { t } = useTranslation();
   const [newName, setNewName] = useState<string>('');
@@ -131,6 +134,23 @@ export default function RenameDialog({
             },
           }}
         />
+        {isFileOpen && (
+          <Typography
+            sx={{
+              mt: 2,
+              p: 1.5,
+              backgroundColor: 'rgba(255, 193, 7, 0.1)',
+              border: '1px solid rgba(255, 193, 7, 0.3)',
+              borderRadius: '4px',
+              color: 'var(--text-primary)',
+              fontSize: '0.875rem',
+              lineHeight: 1.5,
+            }}
+          >
+            {t('dialog.rename.warningFileOpen') ||
+              'This file is currently open. It will be saved and renamed.'}
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
         <Button onClick={onClose} sx={dialogStyles.cancelButton}>

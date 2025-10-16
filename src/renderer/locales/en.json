@@ -14,8 +14,8 @@
       "title": "LockrNotes Editor",
       "message": "Click a file in the sidebar to open it in a new tab, or create a new file to start writing."
     }
-  }
-  ,"sidebar":{
+  },
+  "sidebar":{
     "tabs":{
       "aria":"Sidebar Tabs",
       "local":"Local",
@@ -93,12 +93,18 @@
     "actions": {
       "cancel": "Cancel",
       "create": "Create",
+      "confirm": "Confirm",
       "rename": "Rename"
+    },
+    "confirm": {
+      "title": "Confirmation",
+      "message": "Are you sure you want to continue?"
     },
     "rename": {
       "titleFile": "Rename File",
       "titleFolder": "Rename Folder",
       "placeholder": "New name",
+      "warningFileOpen": "This file is currently open. It will be saved, closed and reopened with the new name.",
       "errors": {
         "empty": "Name cannot be empty",
         "invalidChars": "Name contains invalid characters",
