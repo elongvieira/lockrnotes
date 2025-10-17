@@ -42,7 +42,7 @@ export default function ConfirmDialog({
     >
       <DialogTitle sx={dialogStyles.dialogTitle}>{dialogTitle}</DialogTitle>
       <DialogContent sx={dialogStyles.dialogContent}>
-        <Typography sx={dialogStyles.primaryText} variant="body2">
+        <Typography sx={{ ...dialogStyles.primaryText, mt: 1 }} variant="body2">
           {dialogMessage}
         </Typography>
       </DialogContent>

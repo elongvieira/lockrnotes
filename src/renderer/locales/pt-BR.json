@@ -94,11 +94,16 @@
       "cancel": "Cancelar",
       "create": "Criar",
       "confirm": "Confirmar",
-      "rename": "Renomear"
+      "rename": "Renomear",
+      "delete": "Excluir"
     },
     "confirm": {
       "title": "Confirmação",
       "message": "Tem certeza de que deseja continuar?"
+    },
+    "delete": {
+      "title": "Excluir",
+      "message": "Este item será excluído permanentemente. Tem certeza?"
     },
     "rename": {
       "titleFile": "Renomear Arquivo",

@@ -16,6 +16,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +29,7 @@ import { FileSystemItem } from '../types/filesystem';
 import FolderDialog from './FolderDialog';
 import FileCreationDialog from './FileCreationDialog';
 import RenameDialog from './RenameDialog';
+import ConfirmDialog from './ConfirmDialog';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function Sidebar() {
@@ -57,6 +59,8 @@ export default function Sidebar() {
   // Rename dialog state
   const [renameDialogOpen, setRenameDialogOpen] = useState<boolean>(false);
   const [itemToRename, setItemToRename] = useState<FileSystemItem | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<boolean>(false);
+  const [itemToDelete, setItemToDelete] = useState<FileSystemItem | null>(null);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -260,6 +264,14 @@ export default function Sidebar() {
     handleContextMenuClose();
   };
 
+  const handleContextMenuDelete = () => {
+    if (contextMenu?.item) {
+      setItemToDelete(contextMenu.item);
+      setDeleteConfirmOpen(true);
+    }
+    handleContextMenuClose();
+  };
+
   const handleRenameDialogClose = () => {
     setRenameDialogOpen(false);
     setItemToRename(null);
@@ -329,6 +341,39 @@ export default function Sidebar() {
       console.error('Error renaming item:', error);
       showNotification(t('notifications.fileRenameError'), 'error');
       return { success: false };
+    }
+  };
+
+  const handleDeleteConfirmCancel = () => {
+    setDeleteConfirmOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleDeleteConfirmProceed = async () => {
+    if (!itemToDelete) return;
+
+    const { path } = itemToDelete;
+    try {
+      // If open in tab, close it
+      const openTab = tabs.find((tab) => tab.filePath === path);
+      if (openTab) {
+        setTabs((prev) => prev.filter((tab) => tab.filePath !== path));
+      }
+
+      const success = await fileSystemService.deleteItem(path);
+      if (success) {
+        await loadDirectory(currentPath);
+        showNotification(t('notifications.fileDeleted'), 'success');
+      } else {
+        showNotification(t('notifications.fileDeleteError'), 'error');
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error deleting item:', err);
+      showNotification(t('notifications.fileDeleteError'), 'error');
+    } finally {
+      setDeleteConfirmOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -603,6 +648,12 @@ export default function Sidebar() {
           </ListItemIcon>
           <ListItemText>{t('contextMenu.rename')}</ListItemText>
         </MenuItem>
+        <MenuItem onClick={handleContextMenuDelete} className="app-menu-item">
+          <ListItemIcon className="app-menu-icon">
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('contextMenu.delete')}</ListItemText>
+        </MenuItem>
       </Menu>
 
       <RenameDialog
@@ -616,6 +667,16 @@ export default function Sidebar() {
             ? tabs.some((tab) => tab.filePath === itemToRename.path)
             : false
         }
+      />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title={t('dialog.delete.title')}
+        message={t('dialog.delete.message')}
+        confirmLabel={t('dialog.actions.delete')}
+        cancelLabel={t('dialog.actions.cancel')}
+        onConfirm={handleDeleteConfirmProceed}
+        onClose={handleDeleteConfirmCancel}
       />
     </aside>
   );

@@ -94,11 +94,16 @@
       "cancel": "Cancel",
       "create": "Create",
       "confirm": "Confirm",
-      "rename": "Rename"
+      "rename": "Rename",
+      "delete": "Delete"
     },
     "confirm": {
       "title": "Confirmation",
       "message": "Are you sure you want to continue?"
+    },
+    "delete": {
+      "title": "Delete",
+      "message": "This item will be permanently deleted. Are you sure?"
     },
     "rename": {
       "titleFile": "Rename File",
@@ -116,7 +121,8 @@
   },
   "contextMenu": {
     "open": "Open",
-    "rename": "Rename"
+    "rename": "Rename",
+    "delete": "Delete"
   },
   "notifications": {
     "fileCreated": "File created successfully",
