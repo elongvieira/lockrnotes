@@ -15,6 +15,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -110,6 +112,16 @@ export default function JsonEditor({
   const handleDeleteCancel = () => {
     setDeleteConfirmOpen(false);
     setEntryToDelete(null);
+  };
+
+  const moveEntry = (index: number, direction: 'up' | 'down') => {
+    const newEntries = [...entries];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newEntries.length) return;
+    const [moved] = newEntries.splice(index, 1);
+    newEntries.splice(targetIndex, 0, moved);
+    setEntries(newEntries);
+    onContentChange(serializeJsonContent(newEntries));
   };
 
   const togglePasswordVisibility = (entryId: string) => {
@@ -302,6 +314,9 @@ export default function JsonEditor({
           <Table stickyHeader className="json-editor-table">
             <TableHead>
               <TableRow>
+                <TableCell className="json-editor-table-head json-editor-order-col">
+                  {/* Order column */}
+                </TableCell>
                 <TableCell className="json-editor-table-head">
                   {t('jsonEditor.fields.title') || 'Title'}
                 </TableCell>
@@ -316,6 +331,28 @@ export default function JsonEditor({
             <TableBody>
               {entries.map((entry) => (
                 <TableRow key={entry.id} className="json-editor-row">
+                  <TableCell className="json-editor-cell json-editor-order-cell">
+                    <Box className="json-editor-order-buttons">
+                      <IconButton
+                        size="small"
+                        onClick={() => moveEntry(entries.indexOf(entry), 'up')}
+                        className="move-up-btn"
+                        disabled={entries.indexOf(entry) === 0}
+                      >
+                        <ArrowUpwardIcon fontSize="inherit" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          moveEntry(entries.indexOf(entry), 'down')
+                        }
+                        className="move-down-btn"
+                        disabled={entries.indexOf(entry) === entries.length - 1}
+                      >
+                        <ArrowDownwardIcon fontSize="inherit" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
                   <TableCell className="json-editor-cell">
                     {entry.title}
                   </TableCell>
