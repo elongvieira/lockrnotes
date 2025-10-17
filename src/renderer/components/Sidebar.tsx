@@ -208,10 +208,13 @@ export default function Sidebar() {
     const item = findItem(directoryItems, itemId);
     if (!item || item.type === 'directory') return;
 
-    // Only open .txt files for now (plaintext, unencrypted)
-    if (!item.path.endsWith('.txt')) {
+    // Support .txt and .json files (plaintext, unencrypted)
+    const isTxt = item.path.endsWith('.txt');
+    const isJson = item.path.endsWith('.json');
+
+    if (!isTxt && !isJson) {
       showNotification(
-        'Only .txt files are supported at the moment',
+        'Only .txt and .json files are supported at the moment',
         'warning',
       );
       return;

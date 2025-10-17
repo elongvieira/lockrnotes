@@ -3,6 +3,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Suspense } from 'react';
 import './App.css';
+import './styles/scrollbar.css';
 import Main from './pages/Main';
 import theme from './theme';
 

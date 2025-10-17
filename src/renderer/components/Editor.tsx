@@ -10,6 +10,7 @@ import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
 import { useTranslation } from 'react-i18next';
 import FileCreationDialog from './FileCreationDialog';
+import JsonEditor from './JsonEditor';
 import {
   fileCreationService,
   FileCreationData,
@@ -129,10 +130,13 @@ export default function Editor() {
       const targetTab = tabs.find((tab) => tab.id === tabId);
       if (!targetTab) return;
 
-      // Por enquanto, só salvar arquivos .txt não criptografados
-      if (targetTab.isEncrypted || !targetTab.filePath.endsWith('.txt')) {
+      // Support .txt and .json files (not encrypted)
+      const isTxt = targetTab.filePath.endsWith('.txt');
+      const isJson = targetTab.filePath.endsWith('.json');
+
+      if (targetTab.isEncrypted || (!isTxt && !isJson)) {
         showNotification(
-          `${t('notifications.fileSaveError')}: Only plain .txt files supported`,
+          `${t('notifications.fileSaveError')}: Only plain .txt and .json files supported`,
           'warning',
         );
         return;
@@ -306,17 +310,28 @@ export default function Editor() {
         <Card className="editor-card" elevation={2}>
           {/* Container do editor */}
           <Box className="editor-content">
-            <TextField
-              multiline
-              fullWidth
-              placeholder={
-                t('editor.placeholder') || 'Digite seu conteúdo aqui...'
-              }
-              value={currentTab.content}
-              onChange={(e) => updateTabContent(currentTab.id, e.target.value)}
-              variant="outlined"
-              className="editor-textfield"
-            />
+            {currentTab.filePath.endsWith('.json') ? (
+              <JsonEditor
+                content={currentTab.content}
+                onContentChange={(newContent) =>
+                  updateTabContent(currentTab.id, newContent)
+                }
+              />
+            ) : (
+              <TextField
+                multiline
+                fullWidth
+                placeholder={
+                  t('editor.placeholder') || 'Digite seu conteúdo aqui...'
+                }
+                value={currentTab.content}
+                onChange={(e) =>
+                  updateTabContent(currentTab.id, e.target.value)
+                }
+                variant="outlined"
+                className="editor-textfield"
+              />
+            )}
           </Box>
         </Card>
       ) : (

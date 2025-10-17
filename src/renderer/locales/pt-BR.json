@@ -95,7 +95,9 @@
       "create": "Criar",
       "confirm": "Confirmar",
       "rename": "Renomear",
-      "delete": "Excluir"
+      "delete": "Excluir",
+      "add": "Adicionar",
+      "save": "Salvar"
     },
     "confirm": {
       "title": "Confirmação",
@@ -119,6 +121,34 @@
       }
     }
   },
+  "jsonEditor": {
+  "title": "Registros",
+    "addEntry": "Adicionar Registro",
+    "editEntry": "Editar Registro",
+    "entryType": "Tipo de Registro",
+    "actions": "Ações",
+    "empty": "Nenhum registro ainda. Clique em \"Adicionar Registro\" para criar um.",
+    "types": {
+      "keyValue": "Título + Valor",
+      "titlePassword": "Título + Senha",
+      "titleValuePassword": "Título + Valor + Senha"
+    },
+    "fields": {
+      "title": "Título",
+      "value": "Valor",
+      "password": "Senha",
+      "type": "Tipo"
+    },
+    "errors": {
+      "emptyTitle": "Título é obrigatório",
+      "emptyValue": "Valor é obrigatório",
+      "emptyPassword": "Senha é obrigatória"
+    },
+    "deleteConfirm": {
+      "title": "Excluir Registro",
+      "message": "Tem certeza de que deseja excluir este registro?"
+    }
+  },
   "contextMenu": {
     "open": "Abrir",
     "rename": "Renomear"
@@ -131,7 +161,9 @@
     "fileSaved": "Arquivo salvo com sucesso",
     "fileSaveError": "Erro ao salvar arquivo",
     "fileRenamed": "Arquivo renomeado com sucesso",
-    "fileRenameError": "Erro ao renomear arquivo"
+    "fileRenameError": "Erro ao renomear arquivo",
+    "fileDeleted": "Arquivo excluído com sucesso",
+    "fileDeleteError": "Erro ao excluir arquivo"
   }
   ,
   "status": {

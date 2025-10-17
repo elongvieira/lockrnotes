@@ -41,10 +41,10 @@ export const dialogStyles = {
         borderColor: 'var(--border-secondary)',
       },
       '&:hover fieldset': {
-        borderColor: 'var(--primary-blue)',
+        borderColor: 'var(--accent-light)',
       },
       '&.Mui-focused fieldset': {
-        borderColor: 'var(--primary-blue)',
+        borderColor: 'var(--accent-light)',
         borderWidth: '2px',
       },
     },
@@ -90,7 +90,22 @@ export const dialogStyles = {
   checkboxRadio: {
     color: 'var(--text-secondary)',
     '&.Mui-checked': {
-      color: 'var(--primary-blue)',
+      color: 'var(--accent-light)',
+    },
+    // target the inner svg when not checked (hover/focus)
+    '& .MuiSvgIcon-root': {
+      color: 'var(--text-secondary)',
+    },
+    '&:hover .MuiSvgIcon-root': {
+      color: 'var(--accent-light)',
+    },
+  } as SxProps<Theme>,
+
+  // IconButtons used for toggling password visibility
+  passwordIcon: {
+    color: 'var(--text-secondary)',
+    '&:hover': {
+      color: 'var(--accent-light)',
     },
   } as SxProps<Theme>,
 

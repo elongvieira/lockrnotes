@@ -1,0 +1,25 @@
+/* Shared scrollbar styles for app scrollable areas */
+.app-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.app-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scroll::-webkit-scrollbar-thumb {
+  background: rgba(88, 166, 255, 0.12);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.app-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(88, 166, 255, 0.18);
+}
+
+/* Firefox */
+.app-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(88, 166, 255, 0.12) transparent;
+}

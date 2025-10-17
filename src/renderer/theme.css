@@ -34,6 +34,9 @@
   --selected-bg: rgba(88, 166, 255, 0.2);
   --disabled-bg: rgba(107, 114, 128, 0.1);
 
+  /* Accent alternatives (lighter accents for form controls) */
+  --accent-light: rgba(88, 166, 255, 0.6);
+
   /* Component Specific */
   --sidebar-width: 300px;
   --tab-height: 42px;

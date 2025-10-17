@@ -95,7 +95,9 @@
       "create": "Create",
       "confirm": "Confirm",
       "rename": "Rename",
-      "delete": "Delete"
+      "delete": "Delete",
+      "add": "Add",
+      "save": "Save"
     },
     "confirm": {
       "title": "Confirmation",
@@ -119,6 +121,34 @@
       }
     }
   },
+  "jsonEditor": {
+  "title": "Records",
+    "addEntry": "Add Record",
+    "editEntry": "Edit Record",
+    "entryType": "Record Type",
+    "actions": "Actions",
+    "empty": "No records yet. Click \"Add Record\" to create one.",
+    "types": {
+      "keyValue": "Title + Value",
+      "titlePassword": "Title + Password",
+      "titleValuePassword": "Title + Value + Password"
+    },
+    "fields": {
+      "title": "Title",
+      "value": "Value",
+      "password": "Password",
+      "type": "Type"
+    },
+    "errors": {
+      "emptyTitle": "Title is required",
+      "emptyValue": "Value is required",
+      "emptyPassword": "Password is required"
+    },
+    "deleteConfirm": {
+      "title": "Delete Record",
+      "message": "Are you sure you want to delete this record?"
+    }
+  },
   "contextMenu": {
     "open": "Open",
     "rename": "Rename",
@@ -132,7 +162,9 @@
     "fileSaved": "File saved successfully",
     "fileSaveError": "Error saving file",
     "fileRenamed": "File renamed successfully",
-    "fileRenameError": "Error renaming file"
+    "fileRenameError": "Error renaming file",
+    "fileDeleted": "File deleted successfully",
+    "fileDeleteError": "Error deleting file"
   }
   ,
   "status": {
