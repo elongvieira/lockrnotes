@@ -44,6 +44,97 @@ export default function Editor() {
 
   const { t } = useTranslation();
   const [fileDialogOpen, setFileDialogOpen] = useState<boolean>(false);
+  const [isRestoringTabs, setIsRestoringTabs] = useState<boolean>(true);
+
+  // Carregar abas salvas ao montar o componente
+  useEffect(() => {
+    const restoreTabs = async () => {
+      try {
+        const config = await fileSystemService.readConfig();
+        if (config && config.openTabs && Array.isArray(config.openTabs)) {
+          // Carregar todos os arquivos em paralelo
+          const tabPromises = config.openTabs.map(async (savedTab: any) => {
+            try {
+              const fileContent = await fileSystemService.readFile(
+                savedTab.filePath,
+              );
+              if (fileContent !== null) {
+                return {
+                  id: savedTab.id,
+                  filename: savedTab.filename,
+                  content: fileContent,
+                  isDirty: false,
+                  isEncrypted: savedTab.isEncrypted || false,
+                  originalExtension: savedTab.originalExtension,
+                  filePath: savedTab.filePath,
+                };
+              }
+            } catch (err) {
+              // eslint-disable-next-line no-console
+              console.warn(`Failed to restore tab: ${savedTab.filename}`, err);
+            }
+            return null;
+          });
+
+          const results = await Promise.all(tabPromises);
+          const restoredTabs = results.filter(
+            (tab): tab is FileTab => tab !== null,
+          );
+
+          if (restoredTabs.length > 0) {
+            setTabs(restoredTabs);
+            // Restaurar aba ativa
+            if (config.activeTabId) {
+              const activeExists = restoredTabs.find(
+                (tab) => tab.id === config.activeTabId,
+              );
+              if (activeExists) {
+                setActiveTab(config.activeTabId);
+              } else {
+                setActiveTab(restoredTabs[0].id);
+              }
+            } else {
+              setActiveTab(restoredTabs[0].id);
+            }
+          }
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to restore tabs:', error);
+      } finally {
+        setIsRestoringTabs(false);
+      }
+    };
+
+    restoreTabs();
+  }, [setTabs, setActiveTab]);
+
+  // Salvar abas sempre que mudarem (depois da restauração inicial)
+  useEffect(() => {
+    if (isRestoringTabs) return;
+
+    const saveTabs = async () => {
+      try {
+        const tabsToSave = tabs.map((tab) => ({
+          id: tab.id,
+          filename: tab.filename,
+          filePath: tab.filePath,
+          isEncrypted: tab.isEncrypted,
+          originalExtension: tab.originalExtension,
+        }));
+
+        await fileSystemService.updateConfig({
+          openTabs: tabsToSave,
+          activeTabId: activeTab,
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to save tabs:', error);
+      }
+    };
+
+    saveTabs();
+  }, [tabs, activeTab, isRestoringTabs]);
 
   // Função para abrir um novo arquivo em uma aba
   const openFile = useCallback(

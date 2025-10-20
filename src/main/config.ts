@@ -27,6 +27,8 @@ export async function ensureConfigFile(): Promise<void> {
     const defaultConfig = {
       defaultPath,
       firstRun: true,
+      openTabs: [],
+      activeTabId: null,
     };
 
     // Write atomically: write to a temp file then rename
