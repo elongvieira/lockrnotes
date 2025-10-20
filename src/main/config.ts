@@ -21,7 +21,8 @@ export async function ensureConfigFile(): Promise<void> {
       // File does not exist — proceed to create
     }
 
-    const defaultPath = process.platform === 'win32' ? '.\\' : './';
+    // Use Electron's API to get user's Documents/LockrNotes folder
+    const defaultPath = path.join(app.getPath('documents'), 'LockrNotes');
 
     const defaultConfig = {
       defaultPath,
