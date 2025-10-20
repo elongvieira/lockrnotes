@@ -77,5 +77,5 @@ export function setupEncryptionHandlers(): void {
     }
   });
 
-  console.log('Encryption IPC handlers registered');
+  // Encryption IPC handlers registered
 }

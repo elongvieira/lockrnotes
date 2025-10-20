@@ -130,22 +130,33 @@ export default function Editor() {
       const targetTab = tabs.find((tab) => tab.id === tabId);
       if (!targetTab) return;
 
-      // Support .txt and .json files (not encrypted)
-      const isTxt = targetTab.filePath.endsWith('.txt');
-      const isJson = targetTab.filePath.endsWith('.json');
-
-      if (targetTab.isEncrypted || (!isTxt && !isJson)) {
-        showNotification(
-          `${t('notifications.fileSaveError')}: Only plain .txt and .json files supported`,
-          'warning',
-        );
-        return;
-      }
-
       try {
+        let contentToSave = targetTab.content;
+
+        // If file is encrypted, encrypt content before saving
+        if (targetTab.isEncrypted) {
+          try {
+            const originalExt = targetTab.originalExtension || '.txt';
+            const encryptedData = await window.encryptionAPI.encryptContent(
+              targetTab.content,
+              targetTab.filePath,
+              originalExt,
+            );
+            contentToSave = JSON.stringify(encryptedData, null, 2);
+          } catch (encryptError) {
+            // eslint-disable-next-line no-console
+            console.error('Error encrypting file:', encryptError);
+            showNotification(
+              `${t('notifications.fileSaveError')}: Encryption failed`,
+              'error',
+            );
+            return;
+          }
+        }
+
         const success = await fileSystemService.saveFile(
           targetTab.filePath,
-          targetTab.content,
+          contentToSave,
         );
 
         if (success) {
@@ -310,7 +321,9 @@ export default function Editor() {
         <Card className="editor-card" elevation={2}>
           {/* Container do editor */}
           <Box className="editor-content">
-            {currentTab.filePath.endsWith('.json') ? (
+            {currentTab.filePath.endsWith('.json') ||
+            (currentTab.isEncrypted &&
+              currentTab.originalExtension === '.json') ? (
               <JsonEditor
                 content={currentTab.content}
                 onContentChange={(newContent) =>

@@ -208,28 +208,89 @@ export default function Sidebar() {
     const item = findItem(directoryItems, itemId);
     if (!item || item.type === 'directory') return;
 
-    // Support .txt and .json files (plaintext, unencrypted)
-    const isTxt = item.path.endsWith('.txt');
-    const isJson = item.path.endsWith('.json');
+    // Ensure we have an absolute path - if path is relative, make it absolute
+    const absolutePath = item.path;
 
-    if (!isTxt && !isJson) {
+    // Support plain and encrypted variants:
+    // - plain: .txt, .json
+    // - encrypted wrappers: .ltxt (encrypted text), .ljson (encrypted json), .lenc (generic)
+    const isPlainTxt = item.path.toLowerCase().endsWith('.txt');
+    const isPlainJson = item.path.toLowerCase().endsWith('.json');
+    const isEncLtxt = item.path.toLowerCase().endsWith('.ltxt');
+    const isEncLjson = item.path.toLowerCase().endsWith('.ljson');
+    const isEncGeneric = item.path.toLowerCase().endsWith('.lenc');
+    const isEncrypted = isEncLtxt || isEncLjson || isEncGeneric;
+
+    if (!isPlainTxt && !isPlainJson && !isEncrypted) {
       showNotification(
-        'Only .txt and .json files are supported at the moment',
+        'Only .txt, .json and encrypted (.ltxt, .ljson, .lenc) files are supported',
         'warning',
       );
       return;
     }
 
     try {
-      // Load file content
-      const content = await fileSystemService.readFile(item.path);
-      if (content === null) {
+      // Load file content using absolute path
+      const rawContent = await fileSystemService.readFile(absolutePath);
+      if (rawContent === null) {
         showNotification('Failed to read file', 'error');
         return;
       }
 
+      let content = rawContent;
+      let originalExtension = item.extension;
+      // If the filename indicates the encrypted wrapper, set a sensible default
+      // for the original extension so the editor chooses the correct view before decrypting.
+      if (isEncLtxt) {
+        originalExtension = '.txt';
+      }
+      if (isEncLjson) {
+        originalExtension = '.json';
+      }
+      let isFileEncrypted = false;
+
+      // If file is encrypted, decrypt it
+      if (isEncrypted) {
+        try {
+          const looksEncrypted =
+            await window.encryptionAPI.isContentEncrypted(rawContent);
+
+          if (!looksEncrypted) {
+            showNotification(
+              'File is marked encrypted but payload is invalid',
+              'error',
+            );
+            return;
+          }
+
+          const encryptedData = JSON.parse(rawContent);
+          const decrypted = await window.encryptionAPI.decryptContent(
+            encryptedData,
+            absolutePath,
+          );
+
+          content = decrypted;
+          isFileEncrypted = true;
+
+          if (encryptedData && encryptedData.originalExtension) {
+            originalExtension = encryptedData.originalExtension;
+          }
+        } catch (decryptError: any) {
+          const msg =
+            (decryptError && decryptError.message) || String(decryptError);
+          showNotification(`Failed to decrypt file: ${msg}`, 'error');
+          return;
+        }
+      }
+
       // Open in editor
-      openFileInEditor(item.path, item.name, item.extension, content, false);
+      openFileInEditor(
+        absolutePath,
+        item.name,
+        originalExtension,
+        content,
+        isFileEncrypted,
+      );
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error opening file:', error);

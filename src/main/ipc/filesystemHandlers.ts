@@ -74,7 +74,8 @@ export function setupFilesystemHandlers() {
   ipcMain.handle(
     'fs-read-directory',
     async (event, dirPath: string, options?: any) => {
-      return readDirectoryRecursive(dirPath, options);
+      const result = await readDirectoryRecursive(dirPath, options);
+      return result;
     },
   );
 
@@ -187,6 +188,31 @@ export function setupFilesystemHandlers() {
     } catch (error) {
       console.error('Error reading config:', error);
       return null;
+    }
+  });
+
+  // Get default notes directory
+  ipcMain.handle('fs-get-default-notes-directory', async () => {
+    try {
+      const config = await readConfigFile();
+      const configDefaultPath = config?.defaultPath;
+
+      let baseDefault = '';
+      if (configDefaultPath && configDefaultPath.trim() !== '') {
+        baseDefault = configDefaultPath;
+      } else if (process.platform === 'win32') {
+        baseDefault = process.env.USERPROFILE || process.cwd();
+      } else {
+        baseDefault = process.env.HOME || process.cwd();
+      }
+
+      // Append 'notes' folder
+      const notesPath = path.join(baseDefault, 'notes');
+      return notesPath;
+    } catch (error) {
+      console.error('Error getting default notes directory:', error);
+      const fallback = path.join(process.cwd(), 'notes');
+      return fallback;
     }
   });
 }

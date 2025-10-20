@@ -46,4 +46,8 @@ export const filesystemApi = {
   readConfig(): Promise<any | null> {
     return ipcRenderer.invoke('fs-read-config');
   },
+
+  getDefaultNotesDirectory(): Promise<string> {
+    return ipcRenderer.invoke('fs-get-default-notes-directory');
+  },
 };

@@ -116,32 +116,13 @@ class FileSystemServiceImpl implements FileSystemService {
    * Reads `config.defaultPath` via readConfig() when available and appends `notes` folder.
    */
   async getDefaultNotesDirectory(): Promise<string> {
-    let config: any = null;
     try {
-      config = await this.readConfig();
-    } catch (err) {
-      // ignore - will fallback
+      const notesPath = await this.fs.getDefaultNotesDirectory();
+      return notesPath;
+    } catch (error) {
+      console.error('Failed to get default notes directory:', error);
+      throw new Error('Failed to get default notes directory');
     }
-
-    const configDefaultPath = config?.defaultPath;
-
-    let baseDefault = '';
-    if (configDefaultPath && configDefaultPath.trim() !== '') {
-      baseDefault = configDefaultPath;
-    } else if (process.platform === 'win32') {
-      baseDefault = process.env.USERPROFILE || '.\\';
-    } else {
-      baseDefault = process.env.HOME || './';
-    }
-
-    const appendNotes = (base: string) => {
-      if (base.endsWith('\\') || base.endsWith('/')) {
-        return `${base}notes`;
-      }
-      return `${base}${base.includes('\\') ? '\\\\' : '/'}notes`;
-    };
-
-    return appendNotes(baseDefault);
   }
 
   /**

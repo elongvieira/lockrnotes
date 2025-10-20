@@ -25,4 +25,5 @@ export interface FileSystemService {
   createFile(path: string, content?: string): Promise<boolean>;
   deleteItem(path: string): Promise<boolean>;
   renameItem(oldPath: string, newPath: string): Promise<boolean>;
+  getDefaultNotesDirectory(): Promise<string>;
 }

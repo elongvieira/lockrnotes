@@ -97,19 +97,22 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       // Handle managed encryption
       if (fileData.encrypted && fileData.encryptionType === 'managed') {
         try {
+          // Altera extensão baseada no tipo original ANTES de criptografar
+          const encryptedExtension =
+            this.getEncryptedExtension(originalExtension);
+          filename = `${cleanFilename}${encryptedExtension}`;
+
+          // Calcula o caminho final do arquivo
           const filePath = `${targetPath}/${filename}`;
 
-          // Criptografa o conteúdo
+          // Criptografa o conteúdo usando o caminho final
           const encryptedData = await window.encryptionAPI.encryptContent(
             content,
             filePath,
             originalExtension,
           );
 
-          // Altera extensão baseada no tipo original
-          const encryptedExtension =
-            this.getEncryptedExtension(originalExtension);
-          filename = `${cleanFilename}${encryptedExtension}`;
+          // No immediate verification in production
 
           // Conteúdo vira JSON com dados criptografados
           content = JSON.stringify(encryptedData, null, 2);
