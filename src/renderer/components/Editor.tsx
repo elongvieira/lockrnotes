@@ -11,10 +11,8 @@ import Card from '@mui/material/Card';
 import { useTranslation } from 'react-i18next';
 import FileCreationDialog from './FileCreationDialog';
 import JsonEditor from './JsonEditor';
-import {
-  fileCreationService,
-  FileCreationData,
-} from '../services/fileCreationService';
+import { fileCreationService } from '../services/fileCreationService';
+import type { FileCreationData } from '../types/fileCreation';
 import { fileSystemService } from '../services/fileSystemService';
 import { useAppContext } from '../contexts/AppContext';
 import './Editor.css';

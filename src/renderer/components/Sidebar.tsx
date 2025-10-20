@@ -21,10 +21,8 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
 import { fileSystemService } from '../services/fileSystemService';
-import {
-  fileCreationService,
-  FileCreationData,
-} from '../services/fileCreationService';
+import { fileCreationService } from '../services/fileCreationService';
+import type { FileCreationData } from '../types/fileCreation';
 import { joinPath } from '../utils/pathUtil';
 import { FileSystemItem } from '../types/filesystem';
 import FolderDialog from './FolderDialog';

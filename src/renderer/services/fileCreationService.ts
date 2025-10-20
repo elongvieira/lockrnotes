@@ -1,20 +1,12 @@
 import { fileSystemService } from './fileSystemService';
 import { joinPath } from '../utils/pathUtil';
+import type {
+  FileCreationData,
+  FileTemplate,
+  FileCreationService,
+} from '../types/fileCreation';
 
-export interface FileCreationData {
-  filename: string;
-  type: 'text' | 'keyvalue';
-  encrypted: boolean;
-  encryptionType?: 'managed' | 'manual';
-  password?: string;
-}
-
-export interface FileTemplate {
-  extension: string;
-  generateContent: (filename: string, data?: any) => string;
-}
-
-class FileCreationService {
+class FileCreationServiceImpl implements FileCreationService {
   private templates: Record<string, FileTemplate> = {
     text: {
       extension: '.txt',
@@ -139,7 +131,7 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       return { success: true, filename, filePath };
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Error in FileCreationService.createFile:', error);
+      console.error('Error in FileCreationServiceImpl.createFile:', error);
       return { success: false };
     }
   }
@@ -222,4 +214,6 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
 }
 
 // Export singleton instance
-export const fileCreationService = new FileCreationService();
+export const fileCreationService: FileCreationService =
+  new FileCreationServiceImpl();
+export default fileCreationService;

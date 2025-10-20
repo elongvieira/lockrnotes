@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { fileSystemService } from '../services/fileSystemService';
 import { fileCreationService } from '../services/fileCreationService';
 import { dialogStyles } from '../styles/dialogStyles';
-import type { FileCreationData } from '../services/fileCreationService';
+import type { FileCreationData } from '../types/fileCreation';
 
 interface FileCreationDialogProps {
   open: boolean;
