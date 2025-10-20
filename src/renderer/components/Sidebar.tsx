@@ -115,7 +115,9 @@ export default function Sidebar() {
     if (!targetPath) return;
 
     try {
-      const newPath = `${targetPath}/${folderName}`;
+      // Use centralized joinPath helper to respect OS-specific separators
+      const { joinPath } = await import('../utils/pathUtil');
+      const newPath = await joinPath(targetPath, folderName);
       const success = await fileSystemService.createDirectory(newPath);
       if (success) {
         await loadDirectory(currentPath); // Refresh the tree
@@ -351,7 +353,9 @@ export default function Sidebar() {
         oldPath.lastIndexOf('\\'),
       );
       const parentDir = oldPath.substring(0, lastSep);
-      const newPath = `${parentDir}/${newName}`;
+      // Use centralized joinPath helper to respect OS-specific separators
+      const { joinPath } = await import('../utils/pathUtil');
+      const newPath = await joinPath(parentDir, newName);
 
       // check if target already exists
       const existing = await fileSystemService.getItem(newPath);

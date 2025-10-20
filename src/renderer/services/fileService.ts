@@ -103,7 +103,9 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
           filename = `${cleanFilename}${encryptedExtension}`;
 
           // Calcula o caminho final do arquivo
-          const filePath = `${targetPath}/${filename}`;
+          const filePath = await (
+            await import('../utils/pathUtil')
+          ).joinPath(targetPath, filename);
 
           // Criptografa o conteúdo usando o caminho final
           const encryptedData = await window.encryptionAPI.encryptContent(
@@ -126,7 +128,9 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       }
 
       // Create file path
-      const filePath = `${targetPath}/${filename}`;
+      const filePath = await (
+        await import('../utils/pathUtil')
+      ).joinPath(targetPath, filename);
 
       // Create the file
       const success = await fileSystemService.createFile(filePath, content);

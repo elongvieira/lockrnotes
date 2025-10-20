@@ -215,4 +215,14 @@ export function setupFilesystemHandlers() {
       return fallback;
     }
   });
+
+  // System utilities
+  ipcMain.handle('system:get-path-separator', async () => {
+    try {
+      return { success: true, data: path.sep };
+    } catch (error) {
+      console.error('Error getting path separator:', error);
+      return { success: false, error: String(error) };
+    }
+  });
 }
