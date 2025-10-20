@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { readConfigFile } from '../config';
+import { readConfigFile, updateConfigFile } from '../config';
 
 /**
  * Recursively read directory contents
@@ -188,6 +188,17 @@ export function setupFilesystemHandlers() {
     } catch (error) {
       console.error('Error reading config:', error);
       return null;
+    }
+  });
+
+  // Update config file
+  ipcMain.handle('fs-update-config', async (event, updates: any) => {
+    try {
+      const success = await updateConfigFile(updates);
+      return success;
+    } catch (error) {
+      console.error('Error updating config:', error);
+      return false;
     }
   });
 

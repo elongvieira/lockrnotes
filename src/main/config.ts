@@ -26,6 +26,7 @@ export async function ensureConfigFile(): Promise<void> {
 
     const defaultConfig = {
       defaultPath,
+      firstRun: true,
     };
 
     // Write atomically: write to a temp file then rename
@@ -59,5 +60,39 @@ export async function readConfigFile(): Promise<any | null> {
     // eslint-disable-next-line no-console
     console.error('Failed to read config.json:', error);
     return null;
+  }
+}
+
+/**
+ * Update the config.json file with new values.
+ * Returns true if successful, false otherwise.
+ */
+export async function updateConfigFile(updates: any): Promise<boolean> {
+  try {
+    const cwd = process.cwd();
+    const configPath = path.join(cwd, 'config.json');
+
+    // Read existing config
+    const existingConfig = (await readConfigFile()) || {};
+
+    // Merge with updates
+    const newConfig = { ...existingConfig, ...updates };
+
+    // Write atomically
+    const tmpPath = `${configPath}.tmp`;
+    await fs.promises.writeFile(
+      tmpPath,
+      JSON.stringify(newConfig, null, 2),
+      'utf8',
+    );
+    await fs.promises.rename(tmpPath, configPath);
+
+    // eslint-disable-next-line no-console
+    console.log('Updated config.json successfully');
+    return true;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to update config.json:', error);
+    return false;
   }
 }

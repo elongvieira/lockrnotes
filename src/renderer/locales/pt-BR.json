@@ -170,5 +170,18 @@
     "saved": "Salvo",
     "unsaved": "Não salvo",
     "words": "{{count}} palavras"
+  },
+  "welcome": {
+    "title": "🔒 Bem-vindo ao LockrNotes",
+    "subtitle": "Suas Notas Seguras e Criptografadas",
+    "description": "LockrNotes é um aplicativo de anotações com foco em segurança e privacidade. Seus arquivos podem ser criptografados de forma automática e segura, mantendo suas informações protegidas.",
+    "features": "Recursos principais:\n• Criptografia gerenciada automática para seus arquivos\n• Suporte para arquivos de texto (.txt) e JSON estruturados (.json)\n• Interface moderna e intuitiva com tema escuro\n• Organização em pastas e armazenamento local ou remoto",
+    "storageTitle": "Local de Armazenamento",
+    "storageDescription": "Escolha onde seus arquivos serão armazenados. Por padrão, usamos a pasta \"LockrNotes\" dentro de seus Documentos. Você pode alterar isso a qualquer momento nas configurações.",
+    "defaultPath": "Pasta Padrão",
+    "pathHelper": "Caminho completo onde os arquivos serão salvos",
+    "browseButton": "Procurar pasta",
+    "infoMessage": "Esta pasta será criada automaticamente se não existir. Você sempre pode mudar esse local nas configurações do aplicativo.",
+    "getStarted": "Começar a Usar"
   }
 }

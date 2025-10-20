@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain, BrowserWindow, dialog } from 'electron';
 
 /**
  * Setup window control IPC handlers
@@ -44,5 +44,27 @@ export function setupWindowHandlers(mainWindow: BrowserWindow | null) {
     if (!mainWindow) return { width: 0, height: 0 };
     const [width, height] = mainWindow.getSize();
     return { width, height };
+  });
+
+  // Open folder picker dialog
+  ipcMain.handle('dialog-open-folder', async () => {
+    if (!mainWindow) return null;
+
+    try {
+      const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory'],
+        title: 'Selecionar Pasta',
+        message: 'Escolha onde seus arquivos serão armazenados',
+      });
+
+      if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths[0];
+      }
+      return null;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error opening folder picker:', error);
+      return null;
+    }
   });
 }

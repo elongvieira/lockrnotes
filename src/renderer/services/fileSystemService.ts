@@ -164,6 +164,18 @@ class FileSystemServiceImpl implements FileSystemService {
       return null;
     }
   }
+
+  /**
+   * Update the application config
+   */
+  async updateConfig(updates: any): Promise<boolean> {
+    try {
+      return await this.fs.updateConfig(updates);
+    } catch (error) {
+      console.error('Failed to update config:', error);
+      return false;
+    }
+  }
 }
 
 // Export singleton instance

@@ -171,5 +171,18 @@
     "saved": "Saved",
     "unsaved": "Unsaved",
     "words": "{{count}} words"
+  },
+  "welcome": {
+    "title": "🔒 Welcome to LockrNotes",
+    "subtitle": "Your Secure and Encrypted Notes",
+    "description": "LockrNotes is a note-taking application focused on security and privacy. Your files can be encrypted automatically and securely, keeping your information protected.",
+    "features": "Main features:\n• Automatic managed encryption for your files\n• Support for text files (.txt) and structured JSON (.json)\n• Modern and intuitive interface with dark theme\n• Folder organization and local or remote storage",
+    "storageTitle": "Storage Location",
+    "storageDescription": "Choose where your files will be stored. By default, we use the \"LockrNotes\" folder inside your Documents. You can change this at any time in settings.",
+    "defaultPath": "Default Folder",
+    "pathHelper": "Full path where files will be saved",
+    "browseButton": "Browse folder",
+    "infoMessage": "This folder will be created automatically if it doesn't exist. You can always change this location in the application settings.",
+    "getStarted": "Get Started"
   }
 }

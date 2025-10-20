@@ -47,6 +47,10 @@ export const filesystemApi = {
     return ipcRenderer.invoke('fs-read-config');
   },
 
+  updateConfig(updates: any): Promise<boolean> {
+    return ipcRenderer.invoke('fs-update-config', updates);
+  },
+
   getDefaultNotesDirectory(): Promise<string> {
     return ipcRenderer.invoke('fs-get-default-notes-directory');
   },
