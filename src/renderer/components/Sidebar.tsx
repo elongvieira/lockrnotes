@@ -22,6 +22,7 @@ import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
 import { fileSystemService } from '../services/fileSystemService';
 import { fileCreationService, FileCreationData } from '../services/fileService';
+import { joinPath } from '../utils/pathUtil';
 import { FileSystemItem } from '../types/filesystem';
 import FolderDialog from './FolderDialog';
 import FileCreationDialog from './FileCreationDialog';
@@ -116,7 +117,6 @@ export default function Sidebar() {
 
     try {
       // Use centralized joinPath helper to respect OS-specific separators
-      const { joinPath } = await import('../utils/pathUtil');
       const newPath = await joinPath(targetPath, folderName);
       const success = await fileSystemService.createDirectory(newPath);
       if (success) {
@@ -354,7 +354,6 @@ export default function Sidebar() {
       );
       const parentDir = oldPath.substring(0, lastSep);
       // Use centralized joinPath helper to respect OS-specific separators
-      const { joinPath } = await import('../utils/pathUtil');
       const newPath = await joinPath(parentDir, newName);
 
       // check if target already exists
