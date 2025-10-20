@@ -127,6 +127,8 @@
     "editEntry": "Edit Record",
     "entryType": "Record Type",
     "actions": "Actions",
+    "showAll": "Show All",
+    "hideAll": "Hide All",
     "empty": "No records yet. Click \"Add Record\" to create one.",
     "types": {
       "keyValue": "Title + Value",

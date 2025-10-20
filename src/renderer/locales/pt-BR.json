@@ -127,6 +127,8 @@
     "editEntry": "Editar Registro",
     "entryType": "Tipo de Registro",
     "actions": "Ações",
+    "showAll": "Mostrar Tudo",
+    "hideAll": "Ocultar Tudo",
     "empty": "Nenhum registro ainda. Clique em \"Adicionar Registro\" para criar um.",
     "types": {
       "keyValue": "Título + Valor",

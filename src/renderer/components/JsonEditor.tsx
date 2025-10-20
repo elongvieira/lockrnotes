@@ -56,6 +56,7 @@ export default function JsonEditor({
   );
   const [visibleValues, setVisibleValues] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<Record<string, number | null>>({});
+  const [showAll, setShowAll] = useState<boolean>(false);
 
   // Função para mascarar parcialmente um valor (mostra últimos 4 caracteres)
   const maskValue = (value: string, visible: boolean): string => {
@@ -157,6 +158,34 @@ export default function JsonEditor({
       }
       return newSet;
     });
+  };
+
+  const toggleShowAll = () => {
+    if (showAll) {
+      // Hide all
+      setVisiblePasswords(new Set());
+      setVisibleValues(new Set());
+      setShowAll(false);
+    } else {
+      // Show all
+      const allPasswordIds = new Set(entries.map((e) => e.id));
+      const allValueIds = new Set<string>();
+
+      entries.forEach((entry) => {
+        if (entry.type === 'keyValue') {
+          allValueIds.add(`${entry.id}-0`);
+        } else if (entry.type === 'titleValuePassword') {
+          allValueIds.add(`${entry.id}-0`);
+        } else if (entry.type === 'titleTwoValuesPassword') {
+          allValueIds.add(`${entry.id}-0`);
+          allValueIds.add(`${entry.id}-1`);
+        }
+      });
+
+      setVisiblePasswords(allPasswordIds);
+      setVisibleValues(allValueIds);
+      setShowAll(true);
+    }
   };
 
   const handleCopy = async (entryId: string, text: string, idx = 0) => {
@@ -450,14 +479,34 @@ export default function JsonEditor({
         <Typography variant="h6" className="json-editor-title">
           {t('jsonEditor.title') || 'JSON Entries'}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddEntry}
-          className="json-editor-add-btn"
-        >
-          {t('jsonEditor.addEntry') || 'Add Entry'}
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {entries.length > 0 && (
+            <IconButton
+              onClick={toggleShowAll}
+              title={
+                showAll
+                  ? t('jsonEditor.hideAll') || 'Hide All'
+                  : t('jsonEditor.showAll') || 'Show All'
+              }
+              sx={{
+                color: 'var(--text-primary)',
+                '&:hover': {
+                  backgroundColor: 'rgba(33, 150, 243, 0.12)',
+                },
+              }}
+            >
+              {showAll ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          )}
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddEntry}
+            className="json-editor-add-btn"
+          >
+            {t('jsonEditor.addEntry') || 'Add Entry'}
+          </Button>
+        </Box>
       </Box>
 
       {entries.length === 0 ? (
