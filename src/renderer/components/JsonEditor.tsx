@@ -195,7 +195,7 @@ export default function JsonEditor({
               onClick={() => togglePasswordVisibility(entry.id)}
               sx={{
                 color: 'var(--text-secondary)',
-                '&:hover': { color: 'var(--accent-light)' },
+                '&:hover': { color: 'var(--primary-blue)' },
               }}
             >
               {tpVisible ? (
@@ -254,7 +254,7 @@ export default function JsonEditor({
                 onClick={() => togglePasswordVisibility(entry.id)}
                 sx={{
                   color: 'var(--text-secondary)',
-                  '&:hover': { color: 'var(--accent-light)' },
+                  '&:hover': { color: 'var(--primary-blue)' },
                 }}
               >
                 {tvpVisible ? (

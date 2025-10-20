@@ -112,14 +112,14 @@
   color: var(--text-secondary);
 }
 .json-editor-visibility-btn:hover {
-  color: var(--accent-light);
+  color: var(--primary-blue-light);
 }
 
 .json-editor-copy-btn {
   color: var(--text-secondary);
 }
 .json-editor-copy-btn:hover {
-  color: var(--accent-light);
+  color: var(--primary-blue-light);
 }
 
 /* Order column styles - vertically stacked arrows */
@@ -147,7 +147,7 @@
 }
 .move-up-btn:hover,
 .move-down-btn:hover {
-  color: var(--accent-light);
+  color: var(--primary-blue-light);
 }
 .move-up-btn .MuiSvgIcon-root,
 .move-down-btn .MuiSvgIcon-root {
