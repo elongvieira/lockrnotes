@@ -17,9 +17,9 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { fileSystemService } from '../services/fileSystemService';
-import { fileCreationService } from '../services/fileService';
+import { fileCreationService } from '../services/fileCreationService';
 import { dialogStyles } from '../styles/dialogStyles';
-import type { FileCreationData } from '../services/fileService';
+import type { FileCreationData } from '../services/fileCreationService';
 
 interface FileCreationDialogProps {
   open: boolean;
