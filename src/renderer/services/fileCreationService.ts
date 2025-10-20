@@ -24,6 +24,8 @@ class FileCreationService {
 Suas anotações começam aqui...
 
 Você pode escrever qualquer coisa neste arquivo de texto.
+- Lista de tarefas
+- Ideias
 - Rascunhos
 - Notas importantes
 
@@ -102,7 +104,7 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
           filename = `${cleanFilename}${encryptedExtension}`;
 
           // Calcula o caminho final do arquivo
-          const filePath = `${targetPath}/${filename}`;
+          const filePath = await joinPath(targetPath, filename);
 
           // Criptografa o conteúdo usando o caminho final
           const encryptedData = await window.encryptionAPI.encryptContent(
@@ -125,7 +127,7 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       }
 
       // Create file path
-      const filePath = `${targetPath}/${filename}`;
+      const filePath = await joinPath(targetPath, filename);
 
       // Create the file
       const success = await fileSystemService.createFile(filePath, content);
