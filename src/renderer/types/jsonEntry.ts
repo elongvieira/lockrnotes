@@ -2,7 +2,11 @@
  * Types for structured JSON entries in .json files
  */
 
-export type JsonEntryType = 'keyValue' | 'titlePassword' | 'titleValuePassword';
+export type JsonEntryType =
+  | 'keyValue'
+  | 'titlePassword'
+  | 'titleValuePassword'
+  | 'titleTwoValuesPassword';
 
 export interface BaseEntry {
   id: string;
@@ -38,10 +42,23 @@ export interface TitleValuePasswordEntry extends BaseEntry {
   password: string;
 }
 
+/**
+ * Title with two values and password (título + entrada 1 + entrada 2 + senha)
+ * Example: Server name, username, key, password
+ */
+export interface TitleTwoValuesPasswordEntry extends BaseEntry {
+  type: 'titleTwoValuesPassword';
+  title: string;
+  value1: string;
+  value2: string;
+  password: string;
+}
+
 export type JsonEntry =
   | KeyValueEntry
   | TitlePasswordEntry
-  | TitleValuePasswordEntry;
+  | TitleValuePasswordEntry
+  | TitleTwoValuesPasswordEntry;
 
 /**
  * Structure of a JSON file content
@@ -81,6 +98,15 @@ export function createEntry(
         title: (data as TitleValuePasswordEntry).title || '',
         value: (data as TitleValuePasswordEntry).value || '',
         password: (data as TitleValuePasswordEntry).password || '',
+      };
+    case 'titleTwoValuesPassword':
+      return {
+        id,
+        type: 'titleTwoValuesPassword',
+        title: (data as TitleTwoValuesPasswordEntry).title || '',
+        value1: (data as TitleTwoValuesPasswordEntry).value1 || '',
+        value2: (data as TitleTwoValuesPasswordEntry).value2 || '',
+        password: (data as TitleTwoValuesPasswordEntry).password || '',
       };
     default:
       throw new Error(`Unknown entry type: ${type}`);

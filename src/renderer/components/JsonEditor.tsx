@@ -27,6 +27,7 @@ import {
   KeyValueEntry,
   TitlePasswordEntry,
   TitleValuePasswordEntry,
+  TitleTwoValuesPasswordEntry,
   parseJsonContent,
   serializeJsonContent,
   createEntry,
@@ -269,6 +270,84 @@ export default function JsonEditor({
                 className="json-editor-copy-btn"
               >
                 {copied[entry.id] === 1 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
+          </Box>
+        );
+      }
+      case 'titleTwoValuesPassword': {
+        const ttpEntry = entry as TitleTwoValuesPasswordEntry;
+        const ttpVisible = visiblePasswords.has(entry.id);
+        return (
+          <Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {ttpEntry.value1}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, ttpEntry.value1, 0)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 0 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {ttpEntry.value2}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, ttpEntry.value2, 1)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 1 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'var(--text-secondary)' }}
+              >
+                {t('jsonEditor.fields.password')}:{' '}
+                {ttpVisible ? ttpEntry.password : '••••••••'}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => togglePasswordVisibility(entry.id)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {ttpVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, ttpEntry.password, 2)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 2 ? (
                   <CheckIcon fontSize="small" />
                 ) : (
                   <ContentCopyIcon fontSize="small" />

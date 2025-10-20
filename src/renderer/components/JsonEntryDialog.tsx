@@ -25,6 +25,7 @@ import {
   KeyValueEntry,
   TitlePasswordEntry,
   TitleValuePasswordEntry,
+  TitleTwoValuesPasswordEntry,
 } from '../types/jsonEntry';
 
 interface JsonEntryDialogProps {
@@ -44,6 +45,8 @@ export default function JsonEntryDialog({
   const [entryType, setEntryType] = useState<JsonEntryType>('keyValue');
   const [title, setTitle] = useState<string>('');
   const [value, setValue] = useState<string>('');
+  const [value1, setValue1] = useState<string>('');
+  const [value2, setValue2] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -56,18 +59,31 @@ export default function JsonEntryDialog({
         setTitle(editingEntry.title);
         if (editingEntry.type === 'keyValue') {
           setValue((editingEntry as KeyValueEntry).value);
+          setValue1('');
+          setValue2('');
           setPassword('');
         } else if (editingEntry.type === 'titlePassword') {
           setValue('');
+          setValue1('');
+          setValue2('');
           setPassword((editingEntry as TitlePasswordEntry).password);
         } else if (editingEntry.type === 'titleValuePassword') {
           setValue((editingEntry as TitleValuePasswordEntry).value);
+          setValue1('');
+          setValue2('');
           setPassword((editingEntry as TitleValuePasswordEntry).password);
+        } else if (editingEntry.type === 'titleTwoValuesPassword') {
+          setValue('');
+          setValue1((editingEntry as TitleTwoValuesPasswordEntry).value1);
+          setValue2((editingEntry as TitleTwoValuesPasswordEntry).value2);
+          setPassword((editingEntry as TitleTwoValuesPasswordEntry).password);
         }
       } else {
         setEntryType('keyValue');
         setTitle('');
         setValue('');
+        setValue1('');
+        setValue2('');
         setPassword('');
       }
       setError('');
@@ -88,7 +104,9 @@ export default function JsonEntryDialog({
     }
 
     if (
-      (entryType === 'titlePassword' || entryType === 'titleValuePassword') &&
+      (entryType === 'titlePassword' ||
+        entryType === 'titleValuePassword' ||
+        entryType === 'titleTwoValuesPassword') &&
       !password.trim()
     ) {
       setError(t('jsonEditor.errors.emptyPassword') || 'Password is required');
@@ -98,6 +116,17 @@ export default function JsonEntryDialog({
     if (entryType === 'titleValuePassword' && !value.trim()) {
       setError(t('jsonEditor.errors.emptyValue') || 'Value is required');
       return;
+    }
+
+    if (entryType === 'titleTwoValuesPassword') {
+      if (!value1.trim()) {
+        setError(t('jsonEditor.errors.emptyValue1') || 'Entry 1 is required');
+        return;
+      }
+      if (!value2.trim()) {
+        setError(t('jsonEditor.errors.emptyValue2') || 'Entry 2 is required');
+        return;
+      }
     }
 
     // Build entry data
@@ -114,6 +143,10 @@ export default function JsonEntryDialog({
     } else if (entryType === 'titleValuePassword') {
       (entryData as TitleValuePasswordEntry).value = value.trim();
       (entryData as TitleValuePasswordEntry).password = password.trim();
+    } else if (entryType === 'titleTwoValuesPassword') {
+      (entryData as TitleTwoValuesPasswordEntry).value1 = value1.trim();
+      (entryData as TitleTwoValuesPasswordEntry).value2 = value2.trim();
+      (entryData as TitleTwoValuesPasswordEntry).password = password.trim();
     }
 
     onConfirm(entryData);
@@ -168,6 +201,14 @@ export default function JsonEntryDialog({
                 'Title + Value + Password'
               }
             />
+            <FormControlLabel
+              value="titleTwoValuesPassword"
+              control={<Radio sx={dialogStyles.checkboxRadio} />}
+              label={
+                t('jsonEditor.types.titleTwoValuesPassword') ||
+                'Title + Entry 1 + Entry 2 + Password'
+              }
+            />
           </RadioGroup>
         </FormControl>
 
@@ -200,8 +241,38 @@ export default function JsonEntryDialog({
           />
         )}
 
+        {entryType === 'titleTwoValuesPassword' && (
+          <>
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.value1') || 'Entry 1'}
+              fullWidth
+              variant="outlined"
+              value={value1}
+              onChange={(e) => {
+                setValue1(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.value2') || 'Entry 2'}
+              fullWidth
+              variant="outlined"
+              value={value2}
+              onChange={(e) => {
+                setValue2(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+          </>
+        )}
+
         {(entryType === 'titlePassword' ||
-          entryType === 'titleValuePassword') && (
+          entryType === 'titleValuePassword' ||
+          entryType === 'titleTwoValuesPassword') && (
           <TextField
             margin="dense"
             label={t('jsonEditor.fields.password') || 'Password'}

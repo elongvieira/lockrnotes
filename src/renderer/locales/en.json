@@ -131,17 +131,22 @@
     "types": {
       "keyValue": "Title + Value",
       "titlePassword": "Title + Password",
-      "titleValuePassword": "Title + Value + Password"
+      "titleValuePassword": "Title + Value + Password",
+      "titleTwoValuesPassword": "Title + Entry 1 + Entry 2 + Password"
     },
     "fields": {
       "title": "Title",
       "value": "Value",
+      "value1": "Entry 1",
+      "value2": "Entry 2",
       "password": "Password",
       "type": "Type"
     },
     "errors": {
       "emptyTitle": "Title is required",
       "emptyValue": "Value is required",
+      "emptyValue1": "Entry 1 is required",
+      "emptyValue2": "Entry 2 is required",
       "emptyPassword": "Password is required"
     },
     "deleteConfirm": {
