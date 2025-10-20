@@ -1,3 +1,8 @@
+.move-up-btn:disabled,
+.move-down-btn:disabled {
+  color: var(--text-disabled) !important;
+  cursor: not-allowed !important;
+}
 /* JsonEditor component styles (dark mode, consistent with app) */
 .json-editor-root {
   height: 100%;
@@ -35,8 +40,20 @@
 .json-editor-table-container {
   flex: 1;
   overflow: auto;
-  background-color: var(--bg-tree-container);
+  background-color: var(--bg-tree-container) !important;
   border-radius: var(--border-radius-md);
+}
+
+.json-editor-table-container .MuiPaper-root {
+  background-color: var(--bg-tree-container) !important;
+}
+
+.json-editor-table {
+  background-color: var(--bg-tree-container) !important;
+}
+
+.json-editor-table tbody {
+  background-color: var(--bg-tree-container) !important;
 }
 
 .json-editor-table thead th,
@@ -55,13 +72,18 @@
   background-clip: padding-box !important;
 }
 
+.json-editor-row {
+  background-color: var(--bg-tree-container) !important;
+}
+
 .json-editor-row:hover {
-  background-color: var(--hover-bg);
+  background-color: var(--hover-bg) !important;
 }
 
 .json-editor-cell {
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-primary) !important;
+  background-color: transparent !important;
 }
 
 /* Column width adjustments: Order (arrows), Title, Value (largest), Actions */
@@ -116,10 +138,11 @@
 }
 
 .json-editor-copy-btn {
-  color: var(--text-secondary);
+  color: var(--primary-blue) !important;
+  transition: color 0.2s;
 }
 .json-editor-copy-btn:hover {
-  color: var(--primary-blue-light);
+  color: var(--primary-blue-dark) !important;
 }
 
 /* Order column styles - vertically stacked arrows */
@@ -141,13 +164,14 @@
 
 .move-up-btn,
 .move-down-btn {
-  color: var(--text-secondary);
+  color: var(--primary-blue) !important;
   padding: 2px;
   font-size: 14px;
+  transition: color 0.2s;
 }
 .move-up-btn:hover,
 .move-down-btn:hover {
-  color: var(--primary-blue-light);
+  color: var(--primary-blue-dark) !important;
 }
 .move-up-btn .MuiSvgIcon-root,
 .move-down-btn .MuiSvgIcon-root {
