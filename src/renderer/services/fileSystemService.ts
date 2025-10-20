@@ -3,6 +3,7 @@ import {
   DirectoryReadOptions,
   FileSystemService,
 } from '../types/filesystem';
+import { joinPath } from '../utils/pathUtil';
 
 /**
  * Service for interacting with the filesystem through Electron's IPC
@@ -122,6 +123,20 @@ class FileSystemServiceImpl implements FileSystemService {
     } catch (error) {
       console.error('Failed to get default notes directory:', error);
       throw new Error('Failed to get default notes directory');
+    }
+  }
+
+  /**
+   * Check whether an item exists given a directory path and filename
+   */
+  async itemExists(dirPath: string, filename: string): Promise<boolean> {
+    try {
+      const fullPath = await joinPath(dirPath, filename);
+      const item = await this.getItem(fullPath);
+      return !!item;
+    } catch (error) {
+      console.error('Failed to check item existence:', error);
+      return false;
     }
   }
 

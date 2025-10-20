@@ -147,7 +147,7 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
   /**
    * Gets the encrypted extension based on original extension
    */
-  private getEncryptedExtension(originalExtension: string): string {
+  getEncryptedExtension(originalExtension: string): string {
     switch (originalExtension) {
       case '.txt':
         return '.ltxt'; // Lockr Text

@@ -121,14 +121,21 @@ export default function FileCreationDialog({
       // Prepare final filename including extension (using template info from service)
       const cleanName = filename.trim();
       const template = fileCreationService.getTemplate(selectedType);
-      const extension = template ? template.extension : '';
+      const originalExtension = template ? template.extension : '';
+      // If user requested managed encryption, use the encrypted wrapper extension
+      const extension =
+        encrypted && encryptionType === 'managed'
+          ? fileCreationService.getEncryptedExtension(originalExtension)
+          : originalExtension;
       const finalFilename = `${cleanName}${extension}`;
 
       try {
         const notesDir = await fileSystemService.getDefaultNotesDirectory();
-        const targetPath = `${notesDir}/${finalFilename}`;
-        const existing = await fileSystemService.getItem(targetPath);
-        if (existing) {
+        const exists = await fileSystemService.itemExists(
+          notesDir,
+          finalFilename,
+        );
+        if (exists) {
           setErrors((prev) => ({
             ...prev,
             filename:

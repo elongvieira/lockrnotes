@@ -176,6 +176,8 @@ export default function Sidebar() {
     setTargetFolderPath(''); // Clear the target path
   };
 
+  // NOTE: Use fileSystemService.itemExists(dirPath, filename) instead of local helper
+
   const handleRefresh = useCallback(async () => {
     // Reload the current path (or default if unset)
     try {
@@ -353,12 +355,11 @@ export default function Sidebar() {
         oldPath.lastIndexOf('\\'),
       );
       const parentDir = oldPath.substring(0, lastSep);
-      // Use centralized joinPath helper to respect OS-specific separators
+      // check if target already exists (check by dir + filename to avoid confusion)
+      const exists = await fileSystemService.itemExists(parentDir, newName);
+      // compute newPath after confirming existence
       const newPath = await joinPath(parentDir, newName);
-
-      // check if target already exists
-      const existing = await fileSystemService.getItem(newPath);
-      if (existing) {
+      if (exists) {
         return {
           success: false,
           message:
