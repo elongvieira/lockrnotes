@@ -54,7 +54,16 @@ export default function JsonEditor({
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(
     new Set(),
   );
+  const [visibleValues, setVisibleValues] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<Record<string, number | null>>({});
+
+  // Função para mascarar parcialmente um valor (mostra últimos 4 caracteres)
+  const maskValue = (value: string, visible: boolean): string => {
+    if (visible || value.length <= 4) return value;
+    const visiblePart = value.slice(-4);
+    const maskedPart = '••••••';
+    return maskedPart + visiblePart;
+  };
 
   // Parse content on mount or when content changes externally
   useEffect(() => {
@@ -137,6 +146,19 @@ export default function JsonEditor({
     });
   };
 
+  const toggleValueVisibility = (entryId: string, fieldIndex: number) => {
+    const key = `${entryId}-${fieldIndex}`;
+    setVisibleValues((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
+  };
+
   const handleCopy = async (entryId: string, text: string, idx = 0) => {
     try {
       if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
@@ -161,17 +183,31 @@ export default function JsonEditor({
 
   const renderEntryValue = (entry: JsonEntry) => {
     switch (entry.type) {
-      case 'keyValue':
+      case 'keyValue': {
+        const kvEntry = entry as KeyValueEntry;
+        const kvVisible = visibleValues.has(`${entry.id}-0`);
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
-              {(entry as KeyValueEntry).value}
+              {maskValue(kvEntry.value, kvVisible)}
             </Typography>
             <IconButton
               size="small"
-              onClick={() =>
-                handleCopy(entry.id, (entry as KeyValueEntry).value)
-              }
+              onClick={() => toggleValueVisibility(entry.id, 0)}
+              sx={{
+                color: 'var(--text-secondary)',
+                '&:hover': { color: 'var(--primary-blue)' },
+              }}
+            >
+              {kvVisible ? (
+                <VisibilityOffIcon fontSize="small" />
+              ) : (
+                <VisibilityIcon fontSize="small" />
+              )}
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() => handleCopy(entry.id, kvEntry.value)}
               className="json-editor-copy-btn"
             >
               {copied[entry.id] === 0 ? (
@@ -182,6 +218,7 @@ export default function JsonEditor({
             </IconButton>
           </Box>
         );
+      }
       case 'titlePassword': {
         const tpEntry = entry as TitlePasswordEntry;
         const tpVisible = visiblePasswords.has(entry.id);
@@ -189,7 +226,7 @@ export default function JsonEditor({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
               {t('jsonEditor.fields.password')}:{' '}
-              {tpVisible ? tpEntry.password : '••••••••'}
+              {maskValue(tpEntry.password, tpVisible)}
             </Typography>
             <IconButton
               size="small"
@@ -221,15 +258,30 @@ export default function JsonEditor({
       }
       case 'titleValuePassword': {
         const tvpEntry = entry as TitleValuePasswordEntry;
-        const tvpVisible = visiblePasswords.has(entry.id);
+        const tvpPasswordVisible = visiblePasswords.has(entry.id);
+        const tvpValueVisible = visibleValues.has(`${entry.id}-0`);
         return (
           <Box>
             <Box
               sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
             >
               <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
-                {tvpEntry.value}
+                {maskValue(tvpEntry.value, tvpValueVisible)}
               </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {tvpValueVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
               <IconButton
                 size="small"
                 onClick={() => handleCopy(entry.id, tvpEntry.value, 0)}
@@ -248,7 +300,7 @@ export default function JsonEditor({
                 sx={{ color: 'var(--text-secondary)' }}
               >
                 {t('jsonEditor.fields.password')}:{' '}
-                {tvpVisible ? tvpEntry.password : '••••••••'}
+                {maskValue(tvpEntry.password, tvpPasswordVisible)}
               </Typography>
               <IconButton
                 size="small"
@@ -258,7 +310,7 @@ export default function JsonEditor({
                   '&:hover': { color: 'var(--primary-blue)' },
                 }}
               >
-                {tvpVisible ? (
+                {tvpPasswordVisible ? (
                   <VisibilityOffIcon fontSize="small" />
                 ) : (
                   <VisibilityIcon fontSize="small" />
@@ -281,15 +333,31 @@ export default function JsonEditor({
       }
       case 'titleTwoValuesPassword': {
         const ttpEntry = entry as TitleTwoValuesPasswordEntry;
-        const ttpVisible = visiblePasswords.has(entry.id);
+        const ttpPasswordVisible = visiblePasswords.has(entry.id);
+        const ttpValue1Visible = visibleValues.has(`${entry.id}-0`);
+        const ttpValue2Visible = visibleValues.has(`${entry.id}-1`);
         return (
           <Box>
             <Box
               sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
             >
               <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
-                {ttpEntry.value1}
+                {maskValue(ttpEntry.value1, ttpValue1Visible)}
               </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {ttpValue1Visible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
               <IconButton
                 size="small"
                 onClick={() => handleCopy(entry.id, ttpEntry.value1, 0)}
@@ -306,8 +374,22 @@ export default function JsonEditor({
               sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
             >
               <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
-                {ttpEntry.value2}
+                {maskValue(ttpEntry.value2, ttpValue2Visible)}
               </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 1)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {ttpValue2Visible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
               <IconButton
                 size="small"
                 onClick={() => handleCopy(entry.id, ttpEntry.value2, 1)}
@@ -326,7 +408,7 @@ export default function JsonEditor({
                 sx={{ color: 'var(--text-secondary)' }}
               >
                 {t('jsonEditor.fields.password')}:{' '}
-                {ttpVisible ? ttpEntry.password : '••••••••'}
+                {maskValue(ttpEntry.password, ttpPasswordVisible)}
               </Typography>
               <IconButton
                 size="small"
@@ -336,7 +418,7 @@ export default function JsonEditor({
                   '&:hover': { color: 'var(--primary-blue)' },
                 }}
               >
-                {ttpVisible ? (
+                {ttpPasswordVisible ? (
                   <VisibilityOffIcon fontSize="small" />
                 ) : (
                   <VisibilityIcon fontSize="small" />
