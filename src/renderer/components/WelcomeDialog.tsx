@@ -53,7 +53,9 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
   const handleBrowseFolder = async () => {
     try {
       setBrowsing(true);
-      const selectedPath = await (window as any).electron.window.selectFolder();
+      const selectedPath = await (window as any).electron.window.selectFolder(
+        defaultPath || undefined,
+      );
       if (selectedPath) {
         setDefaultPath(selectedPath);
       }

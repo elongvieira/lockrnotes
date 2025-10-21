@@ -17,6 +17,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +29,7 @@ import { FileSystemItem } from '../types/filesystem';
 import FolderDialog from './FolderDialog';
 import FileCreationDialog from './FileCreationDialog';
 import RenameDialog from './RenameDialog';
+import MoveDialog from './MoveDialog';
 import ConfirmDialog from './ConfirmDialog';
 import { useAppContext } from '../contexts/AppContext';
 
@@ -60,6 +62,10 @@ export default function Sidebar() {
   const [itemToRename, setItemToRename] = useState<FileSystemItem | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<boolean>(false);
   const [itemToDelete, setItemToDelete] = useState<FileSystemItem | null>(null);
+
+  // Move dialog state
+  const [moveDialogOpen, setMoveDialogOpen] = useState<boolean>(false);
+  const [itemToMove, setItemToMove] = useState<FileSystemItem | null>(null);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -338,6 +344,14 @@ export default function Sidebar() {
     handleContextMenuClose();
   };
 
+  const handleContextMenuMove = () => {
+    if (contextMenu?.item) {
+      setItemToMove(contextMenu.item);
+      setMoveDialogOpen(true);
+    }
+    handleContextMenuClose();
+  };
+
   const handleRenameDialogClose = () => {
     setRenameDialogOpen(false);
     setItemToRename(null);
@@ -440,6 +454,86 @@ export default function Sidebar() {
     } finally {
       setDeleteConfirmOpen(false);
       setItemToDelete(null);
+    }
+  };
+
+  const handleMoveDialogClose = () => {
+    setMoveDialogOpen(false);
+    setItemToMove(null);
+  };
+
+  const handleMoveDialogConfirm = async (destinationPath: string) => {
+    if (!itemToMove) return { success: false };
+
+    const oldPath = itemToMove.path;
+    const itemName = itemToMove.name;
+    const openTab = tabs.find((tab) => tab.filePath === oldPath);
+
+    try {
+      // Compute new path
+      const newPath = await joinPath(destinationPath, itemName);
+
+      // Check if target already exists
+      const exists = await fileSystemService.itemExists(
+        destinationPath,
+        itemName,
+      );
+      if (exists) {
+        return {
+          success: false,
+          message:
+            t('dialog.move.errors.fileExists') ||
+            'An item with that name already exists in the destination',
+        };
+      }
+
+      // If file is open, save current content first
+      let contentToReopen = '';
+      if (openTab) {
+        await fileSystemService.saveFile(oldPath, openTab.content);
+        contentToReopen = openTab.content;
+        // Close the tab
+        setTabs((prev) => prev.filter((tab) => tab.filePath !== oldPath));
+      }
+
+      // Perform move (using renameItem which handles both rename and move)
+      const success = await fileSystemService.renameItem(oldPath, newPath);
+
+      if (success) {
+        // Refresh tree
+        await loadDirectory(currentPath);
+
+        // Reopen in editor if was open
+        if (openTab) {
+          openFileInEditor(
+            newPath,
+            itemName,
+            itemToMove.extension,
+            contentToReopen,
+            itemToMove.extension?.startsWith('.l') ?? false,
+          );
+        }
+
+        showNotification(
+          t('notifications.fileMoved') || 'Item moved successfully',
+          'success',
+        );
+        return { success: true };
+      }
+
+      showNotification(
+        t('notifications.fileMoveError') || 'Failed to move item',
+        'error',
+      );
+      return { success: false };
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error moving item:', error);
+      showNotification(
+        t('notifications.fileMoveError') || 'Failed to move item',
+        'error',
+      );
+      return { success: false };
     }
   };
 
@@ -714,6 +808,12 @@ export default function Sidebar() {
           </ListItemIcon>
           <ListItemText>{t('contextMenu.rename')}</ListItemText>
         </MenuItem>
+        <MenuItem onClick={handleContextMenuMove} className="app-menu-item">
+          <ListItemIcon className="app-menu-icon">
+            <DriveFileMoveIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('contextMenu.move')}</ListItemText>
+        </MenuItem>
         <MenuItem onClick={handleContextMenuDelete} className="app-menu-item">
           <ListItemIcon className="app-menu-icon">
             <DeleteIcon fontSize="small" />
@@ -733,6 +833,25 @@ export default function Sidebar() {
             ? tabs.some((tab) => tab.filePath === itemToRename.path)
             : false
         }
+      />
+
+      <MoveDialog
+        open={moveDialogOpen}
+        onClose={handleMoveDialogClose}
+        onConfirm={handleMoveDialogConfirm}
+        currentPath={
+          itemToMove
+            ? itemToMove.path.substring(
+                0,
+                Math.max(
+                  itemToMove.path.lastIndexOf('/'),
+                  itemToMove.path.lastIndexOf('\\'),
+                ),
+              )
+            : ''
+        }
+        itemName={itemToMove?.name || ''}
+        itemType={itemToMove?.type === 'directory' ? 'folder' : 'file'}
       />
 
       <ConfirmDialog

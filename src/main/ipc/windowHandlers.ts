@@ -47,15 +47,21 @@ export function setupWindowHandlers(mainWindow: BrowserWindow | null) {
   });
 
   // Open folder picker dialog
-  ipcMain.handle('dialog-open-folder', async () => {
+  ipcMain.handle('dialog-open-folder', async (event, initialPath?: string) => {
     if (!mainWindow) return null;
 
     try {
-      const result = await dialog.showOpenDialog(mainWindow, {
+      const options: Electron.OpenDialogOptions = {
         properties: ['openDirectory'],
         title: 'Selecionar Pasta',
         message: 'Escolha onde seus arquivos serão armazenados',
-      });
+      };
+
+      if (initialPath && typeof initialPath === 'string') {
+        options.defaultPath = initialPath;
+      }
+
+      const result = await dialog.showOpenDialog(mainWindow, options);
 
       if (!result.canceled && result.filePaths.length > 0) {
         return result.filePaths[0];

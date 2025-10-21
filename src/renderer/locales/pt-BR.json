@@ -97,7 +97,8 @@
       "rename": "Renomear",
       "delete": "Excluir",
       "add": "Adicionar",
-      "save": "Salvar"
+      "save": "Salvar",
+      "move": "Mover"
     },
     "confirm": {
       "title": "Confirmação",
@@ -118,6 +119,21 @@
         "tooLong": "Nome é muito longo (máximo 255 caracteres)",
         "startsWithDot": "Nome não pode começar com ponto",
         "fileExists": "Já existe um arquivo com esse nome"
+      }
+    },
+    "move": {
+      "titleFile": "Mover Arquivo",
+      "titleFolder": "Mover Pasta",
+      "itemName": "Item:",
+      "currentLocation": "Local atual:",
+      "destination": "Mover para:",
+      "destinationPlaceholder": "Selecione a pasta de destino",
+      "browse": "Procurar",
+      "errors": {
+        "emptyPath": "Selecione uma pasta de destino",
+        "sameLocation": "O destino é o mesmo que a localização atual",
+        "failed": "Falha ao mover o item",
+        "fileExists": "Já existe um item com esse nome no destino"
       }
     }
   },
@@ -158,7 +174,9 @@
   },
   "contextMenu": {
     "open": "Abrir",
-    "rename": "Renomear"
+    "rename": "Renomear",
+    "move": "Mover",
+    "delete": "Excluir"
   },
   "notifications": {
     "fileCreated": "Arquivo criado com sucesso",
@@ -169,6 +187,8 @@
     "fileSaveError": "Erro ao salvar arquivo",
     "fileRenamed": "Arquivo renomeado com sucesso",
     "fileRenameError": "Erro ao renomear arquivo",
+    "fileMoved": "Item movido com sucesso",
+    "fileMoveError": "Erro ao mover item",
     "fileDeleted": "Arquivo excluído com sucesso",
     "fileDeleteError": "Erro ao excluir arquivo"
   }

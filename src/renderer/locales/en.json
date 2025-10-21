@@ -97,7 +97,8 @@
       "rename": "Rename",
       "delete": "Delete",
       "add": "Add",
-      "save": "Save"
+      "save": "Save",
+      "move": "Move"
     },
     "confirm": {
       "title": "Confirmation",
@@ -118,6 +119,21 @@
         "tooLong": "Name is too long (maximum 255 characters)",
         "startsWithDot": "Name cannot start with a dot",
         "fileExists": "A file with that name already exists"
+      }
+    },
+    "move": {
+      "titleFile": "Move File",
+      "titleFolder": "Move Folder",
+      "itemName": "Item:",
+      "currentLocation": "Current location:",
+      "destination": "Move to:",
+      "destinationPlaceholder": "Select destination folder",
+      "browse": "Browse",
+      "errors": {
+        "emptyPath": "Please select a destination folder",
+        "sameLocation": "Destination is the same as current location",
+        "failed": "Failed to move item",
+        "fileExists": "An item with that name already exists in the destination"
       }
     }
   },
@@ -159,6 +175,7 @@
   "contextMenu": {
     "open": "Open",
     "rename": "Rename",
+    "move": "Move",
     "delete": "Delete"
   },
   "notifications": {
@@ -170,6 +187,8 @@
     "fileSaveError": "Error saving file",
     "fileRenamed": "File renamed successfully",
     "fileRenameError": "Error renaming file",
+    "fileMoved": "Item moved successfully",
+    "fileMoveError": "Error moving item",
     "fileDeleted": "File deleted successfully",
     "fileDeleteError": "Error deleting file"
   }

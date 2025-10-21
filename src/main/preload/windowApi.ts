@@ -28,7 +28,7 @@ export const windowApi = {
     return ipcRenderer.invoke('window-get-size');
   },
 
-  selectFolder(): Promise<string | null> {
-    return ipcRenderer.invoke('dialog-open-folder');
+  selectFolder(initialPath?: string): Promise<string | null> {
+    return ipcRenderer.invoke('dialog-open-folder', initialPath);
   },
 };
