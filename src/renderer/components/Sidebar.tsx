@@ -487,10 +487,40 @@ export default function Sidebar() {
         };
       }
 
-      // If file is open, save current content first
+      // If file is open, save current content first (handle encrypted case)
       let contentToReopen = '';
       if (openTab) {
-        await fileSystemService.saveFile(oldPath, openTab.content);
+        // If the tab is encrypted, ensure we encrypt before saving using the same logic
+        let contentToSave = openTab.content;
+        if (openTab.isEncrypted) {
+          try {
+            const originalExt = openTab.originalExtension || '.txt';
+            const encryptedData = await window.encryptionAPI.encryptContent(
+              openTab.content,
+              openTab.filePath,
+              originalExt,
+            );
+            contentToSave = JSON.stringify(encryptedData, null, 2);
+          } catch (encryptError) {
+            // eslint-disable-next-line no-console
+            console.error('Error encrypting file before move:', encryptError);
+            showNotification(
+              t('notifications.fileMoveError') || 'Failed to move item',
+              'error',
+            );
+            return { success: false };
+          }
+        }
+
+        const saved = await fileSystemService.saveFile(oldPath, contentToSave);
+        if (!saved) {
+          showNotification(
+            t('notifications.fileSaveError') || 'Failed to save file',
+            'error',
+          );
+          return { success: false };
+        }
+
         contentToReopen = openTab.content;
         // Close the tab
         setTabs((prev) => prev.filter((tab) => tab.filePath !== oldPath));
