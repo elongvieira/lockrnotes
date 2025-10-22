@@ -18,6 +18,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +41,8 @@ export default function Sidebar() {
     openFileInEditor,
     tabs,
     setTabs,
+    activeTab,
+    setActiveTab,
   } = useAppContext();
   const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
@@ -66,6 +69,10 @@ export default function Sidebar() {
   // Move dialog state
   const [moveDialogOpen, setMoveDialogOpen] = useState<boolean>(false);
   const [itemToMove, setItemToMove] = useState<FileSystemItem | null>(null);
+
+  // Copy dialog state
+  const [copyDialogOpen, setCopyDialogOpen] = useState<boolean>(false);
+  const [itemToCopy, setItemToCopy] = useState<FileSystemItem | null>(null);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -352,6 +359,14 @@ export default function Sidebar() {
     handleContextMenuClose();
   };
 
+  const handleContextMenuCopy = () => {
+    if (contextMenu?.item) {
+      setItemToCopy(contextMenu.item);
+      setCopyDialogOpen(true);
+    }
+    handleContextMenuClose();
+  };
+
   const handleRenameDialogClose = () => {
     setRenameDialogOpen(false);
     setItemToRename(null);
@@ -386,7 +401,19 @@ export default function Sidebar() {
       // If file is open, save current content first
       let contentToReopen = '';
       if (openTab) {
-        await fileSystemService.saveFile(oldPath, openTab.content);
+        const saved = await fileSystemService.saveFileWithEncryption(
+          oldPath,
+          openTab.content,
+          openTab.isEncrypted,
+          openTab.originalExtension,
+        );
+        if (!saved) {
+          showNotification(
+            t('notifications.fileSaveError') || 'Failed to save file',
+            'error',
+          );
+          return { success: false };
+        }
         contentToReopen = openTab.content;
         // close the tab
         setTabs((prev) => prev.filter((tab) => tab.filePath !== oldPath));
@@ -438,6 +465,12 @@ export default function Sidebar() {
       const openTab = tabs.find((tab) => tab.filePath === path);
       if (openTab) {
         setTabs((prev) => prev.filter((tab) => tab.filePath !== path));
+        // Se o arquivo deletado for o activeTab, setar activeTab para null
+        if (typeof setActiveTab === 'function' && openTab.id) {
+          setActiveTab((prevActive) =>
+            prevActive === openTab.id ? null : prevActive,
+          );
+        }
       }
 
       const success = await fileSystemService.deleteItem(path);
@@ -490,29 +523,12 @@ export default function Sidebar() {
       // If file is open, save current content first (handle encrypted case)
       let contentToReopen = '';
       if (openTab) {
-        // If the tab is encrypted, ensure we encrypt before saving using the same logic
-        let contentToSave = openTab.content;
-        if (openTab.isEncrypted) {
-          try {
-            const originalExt = openTab.originalExtension || '.txt';
-            const encryptedData = await window.encryptionAPI.encryptContent(
-              openTab.content,
-              openTab.filePath,
-              originalExt,
-            );
-            contentToSave = JSON.stringify(encryptedData, null, 2);
-          } catch (encryptError) {
-            // eslint-disable-next-line no-console
-            console.error('Error encrypting file before move:', encryptError);
-            showNotification(
-              t('notifications.fileMoveError') || 'Failed to move item',
-              'error',
-            );
-            return { success: false };
-          }
-        }
-
-        const saved = await fileSystemService.saveFile(oldPath, contentToSave);
+        const saved = await fileSystemService.saveFileWithEncryption(
+          oldPath,
+          openTab.content,
+          openTab.isEncrypted,
+          openTab.originalExtension,
+        );
         if (!saved) {
           showNotification(
             t('notifications.fileSaveError') || 'Failed to save file',
@@ -564,6 +580,84 @@ export default function Sidebar() {
         'error',
       );
       return { success: false };
+    }
+  };
+
+  const handleCopyDialogOpen = async () => {
+    if (!itemToCopy) return;
+
+    try {
+      // Open folder picker starting at default notes directory
+      const defaultNotesDir =
+        await fileSystemService.getDefaultNotesDirectory();
+      const selectedPath = await (window as any).electron.window.selectFolder(
+        defaultNotesDir,
+      );
+
+      if (!selectedPath) return; // user cancelled
+
+      const sourcePath = itemToCopy.path;
+      const itemName = itemToCopy.name;
+      const destPath = await joinPath(selectedPath, itemName);
+
+      // Check if target already exists
+      const exists = await fileSystemService.itemExists(selectedPath, itemName);
+      if (exists) {
+        showNotification(
+          t('dialog.move.errors.fileExists') ||
+            'An item with that name already exists in the destination',
+          'error',
+        );
+        setCopyDialogOpen(false);
+        setItemToCopy(null);
+        return;
+      }
+
+      // If copying a file, read content and write to new location
+      // If copying a folder, we'll just copy the folder recursively (simplified)
+      let success = false;
+      if (itemToCopy.type === 'file') {
+        const content = await fileSystemService.readFile(sourcePath);
+        if (content !== null) {
+          success = await fileSystemService.createFile(destPath, content);
+        }
+      } else {
+        // For folders, you would need a folder copy operation
+        // For now, show a message
+        showNotification(
+          t('notifications.copyFolderNotSupported') ||
+            'Folder copy not yet supported',
+          'warning',
+        );
+        setCopyDialogOpen(false);
+        setItemToCopy(null);
+        return;
+      }
+
+      if (success) {
+        await loadDirectory(currentPath);
+        showNotification(
+          t('notifications.fileCopied') || 'Item copied successfully',
+          'success',
+        );
+      } else {
+        showNotification(
+          t('notifications.fileCopyError') || 'Failed to copy item',
+          'error',
+        );
+      }
+
+      setCopyDialogOpen(false);
+      setItemToCopy(null);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error copying item:', error);
+      showNotification(
+        t('notifications.fileCopyError') || 'Failed to copy item',
+        'error',
+      );
+      setCopyDialogOpen(false);
+      setItemToCopy(null);
     }
   };
 
@@ -843,6 +937,18 @@ export default function Sidebar() {
             <DriveFileMoveIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('contextMenu.move')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleContextMenuCopy();
+            handleCopyDialogOpen();
+          }}
+          className="app-menu-item"
+        >
+          <ListItemIcon className="app-menu-icon">
+            <FileCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('contextMenu.copy')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleContextMenuDelete} className="app-menu-item">
           <ListItemIcon className="app-menu-icon">

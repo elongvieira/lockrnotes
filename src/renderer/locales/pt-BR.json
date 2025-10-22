@@ -141,10 +141,13 @@
   "title": "Registros",
     "addEntry": "Adicionar Registro",
     "editEntry": "Editar Registro",
+    "duplicate": "Duplicar Registro",
     "entryType": "Tipo de Registro",
     "actions": "Ações",
+    "menu": "Opções",
     "showAll": "Mostrar Tudo",
     "hideAll": "Ocultar Tudo",
+    "createNewFromCurrent": "Criar novo arquivo baseado no atual",
     "empty": "Nenhum registro ainda. Clique em \"Adicionar Registro\" para criar um.",
     "types": {
       "keyValue": "Título + Valor",
@@ -176,6 +179,7 @@
     "open": "Abrir",
     "rename": "Renomear",
     "move": "Mover",
+    "copy": "Copiar",
     "delete": "Excluir"
   },
   "notifications": {
@@ -189,6 +193,9 @@
     "fileRenameError": "Erro ao renomear arquivo",
     "fileMoved": "Item movido com sucesso",
     "fileMoveError": "Erro ao mover item",
+    "fileCopied": "Item copiado com sucesso",
+    "fileCopyError": "Erro ao copiar item",
+    "copyFolderNotSupported": "Cópia de pasta ainda não é suportada",
     "fileDeleted": "Arquivo excluído com sucesso",
     "fileDeleteError": "Erro ao excluir arquivo"
   }

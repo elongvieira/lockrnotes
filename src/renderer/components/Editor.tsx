@@ -220,32 +220,11 @@ export default function Editor() {
       if (!targetTab) return;
 
       try {
-        let contentToSave = targetTab.content;
-
-        // If file is encrypted, encrypt content before saving
-        if (targetTab.isEncrypted) {
-          try {
-            const originalExt = targetTab.originalExtension || '.txt';
-            const encryptedData = await window.encryptionAPI.encryptContent(
-              targetTab.content,
-              targetTab.filePath,
-              originalExt,
-            );
-            contentToSave = JSON.stringify(encryptedData, null, 2);
-          } catch (encryptError) {
-            // eslint-disable-next-line no-console
-            console.error('Error encrypting file:', encryptError);
-            showNotification(
-              `${t('notifications.fileSaveError')}: Encryption failed`,
-              'error',
-            );
-            return;
-          }
-        }
-
-        const success = await fileSystemService.saveFile(
+        const success = await fileSystemService.saveFileWithEncryption(
           targetTab.filePath,
-          contentToSave,
+          targetTab.content,
+          targetTab.isEncrypted,
+          targetTab.originalExtension,
         );
 
         if (success) {

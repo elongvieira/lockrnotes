@@ -141,10 +141,13 @@
   "title": "Records",
     "addEntry": "Add Record",
     "editEntry": "Edit Record",
+    "duplicate": "Duplicate Record",
     "entryType": "Record Type",
     "actions": "Actions",
+    "menu": "Options",
     "showAll": "Show All",
     "hideAll": "Hide All",
+    "createNewFromCurrent": "Create new file from current",
     "empty": "No records yet. Click \"Add Record\" to create one.",
     "types": {
       "keyValue": "Title + Value",
@@ -176,6 +179,7 @@
     "open": "Open",
     "rename": "Rename",
     "move": "Move",
+    "copy": "Copy",
     "delete": "Delete"
   },
   "notifications": {
@@ -189,6 +193,9 @@
     "fileRenameError": "Error renaming file",
     "fileMoved": "Item moved successfully",
     "fileMoveError": "Error moving item",
+    "fileCopied": "Item copied successfully",
+    "fileCopyError": "Error copying item",
+    "copyFolderNotSupported": "Folder copy not yet supported",
     "fileDeleted": "File deleted successfully",
     "fileDeleteError": "Error deleting file"
   }

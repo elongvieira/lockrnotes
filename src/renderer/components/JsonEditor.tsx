@@ -11,8 +11,13 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import CopyAllIcon from '@mui/icons-material/CopyAll';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -21,7 +26,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { useTranslation } from 'react-i18next';
+import { fileSystemService } from '../services/fileSystemService';
+import { joinPath } from '../utils/pathUtil';
+import { useAppContext } from '../contexts/AppContext';
 import {
   JsonEntry,
   KeyValueEntry,
@@ -49,6 +59,7 @@ export default function JsonEditor({
   const [entries, setEntries] = useState<JsonEntry[]>([]);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [editingEntry, setEditingEntry] = useState<JsonEntry | null>(null);
+  const [duplicateData, setDuplicateData] = useState<JsonEntry | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<boolean>(false);
   const [entryToDelete, setEntryToDelete] = useState<JsonEntry | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(
@@ -57,10 +68,24 @@ export default function JsonEditor({
   const [visibleValues, setVisibleValues] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<Record<string, number | null>>({});
   const [showAll, setShowAll] = useState<boolean>(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(menuAnchorEl);
+  const { refreshSidebar, showNotification } = useAppContext();
 
-  // Função para mascarar parcialmente um valor (mostra últimos 4 caracteres)
-  const maskValue = (value: string, visible: boolean): string => {
-    if (visible || value.length <= 4) return value;
+  // Função para mascarar um valor.
+  // - visible: se true, mostra o valor completo
+  // - fullHide: se true e visible=false, esconde todo o conteúdo (mostra apenas bullets)
+  const maskValue = (
+    value: string,
+    visible: boolean,
+    fullHide = false,
+  ): string => {
+    if (visible || value.length === 0) return value;
+    if (fullHide) {
+      // return bullets of same length to avoid leaking length? Use fixed bullets to avoid length leak
+      return '••••••••';
+    }
+    if (value.length <= 4) return '••••••';
     const visiblePart = value.slice(-4);
     const maskedPart = '••••••';
     return maskedPart + visiblePart;
@@ -87,9 +112,19 @@ export default function JsonEditor({
     setDeleteConfirmOpen(true);
   };
 
+  const handleDuplicateEntry = (entry: JsonEntry) => {
+    // Open dialog with pre-filled data from duplicated entry, but don't set editingEntry
+    // This ensures a NEW entry is created instead of modifying the original
+    setEditingEntry(null);
+    setDialogOpen(true);
+    // Store the duplicate data in a temporary state to pass to dialog
+    setDuplicateData(entry);
+  };
+
   const handleDialogClose = () => {
     setDialogOpen(false);
     setEditingEntry(null);
+    setDuplicateData(null);
   };
 
   const handleDialogConfirm = (entryData: Partial<JsonEntry>) => {
@@ -210,6 +245,53 @@ export default function JsonEditor({
     }
   };
 
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
+  const handleCreateNewFromCurrent = async () => {
+    handleMenuClose();
+
+    try {
+      // Get default notes directory to use as initial folder for picker
+      const defaultNotesDir =
+        await fileSystemService.getDefaultNotesDirectory();
+
+      const selectedPath = await (window as any).electron.window.selectFolder(
+        defaultNotesDir,
+      );
+
+      if (!selectedPath) return; // user cancelled
+
+      const jsonContent = serializeJsonContent(entries);
+      const filename = `copy-${Date.now()}.json`;
+      const filePath = await joinPath(selectedPath, filename);
+
+      const success = await fileSystemService.createFile(filePath, jsonContent);
+      if (success && refreshSidebar) refreshSidebar();
+
+      if (showNotification) {
+        const msg = success
+          ? t('notifications.fileCreated') || 'File created successfully'
+          : t('notifications.fileCreationError') || 'Error creating file';
+        const severity: 'success' | 'error' = success ? 'success' : 'error';
+        showNotification(msg, severity);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error creating file from current entries:', err);
+      if (showNotification)
+        showNotification(
+          t('notifications.fileCreationError') || 'Error creating file',
+          'error',
+        );
+    }
+  };
+
   const renderEntryValue = (entry: JsonEntry) => {
     switch (entry.type) {
       case 'keyValue': {
@@ -255,7 +337,7 @@ export default function JsonEditor({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
               {t('jsonEditor.fields.password')}:{' '}
-              {maskValue(tpEntry.password, tpVisible)}
+              {maskValue(tpEntry.password, tpVisible, true)}
             </Typography>
             <IconButton
               size="small"
@@ -329,7 +411,7 @@ export default function JsonEditor({
                 sx={{ color: 'var(--text-secondary)' }}
               >
                 {t('jsonEditor.fields.password')}:{' '}
-                {maskValue(tvpEntry.password, tvpPasswordVisible)}
+                {maskValue(tvpEntry.password, tvpPasswordVisible, true)}
               </Typography>
               <IconButton
                 size="small"
@@ -437,7 +519,7 @@ export default function JsonEditor({
                 sx={{ color: 'var(--text-secondary)' }}
               >
                 {t('jsonEditor.fields.password')}:{' '}
-                {maskValue(ttpEntry.password, ttpPasswordVisible)}
+                {maskValue(ttpEntry.password, ttpPasswordVisible, true)}
               </Typography>
               <IconButton
                 size="small"
@@ -479,35 +561,80 @@ export default function JsonEditor({
         <Typography variant="h6" className="json-editor-title">
           {t('jsonEditor.title') || 'JSON Entries'}
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {entries.length > 0 && (
-            <IconButton
-              onClick={toggleShowAll}
-              title={
-                showAll
-                  ? t('jsonEditor.hideAll') || 'Hide All'
-                  : t('jsonEditor.showAll') || 'Show All'
-              }
-              sx={{
-                color: 'var(--text-primary)',
-                '&:hover': {
-                  backgroundColor: 'rgba(33, 150, 243, 0.12)',
-                },
-              }}
+        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          {/* Spacer to push the controls to the right */}
+          <Box sx={{ flex: 1 }} />
+
+          {/* Right: Add (first in this group), eye (penultimate) and menu (last) */}
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddEntry}
+              className="json-editor-add-btn"
             >
-              {showAll ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            </IconButton>
-          )}
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddEntry}
-            className="json-editor-add-btn"
-          >
-            {t('jsonEditor.addEntry') || 'Add Entry'}
-          </Button>
+              {t('jsonEditor.addEntry') || 'Add Entry'}
+            </Button>
+            {entries.length > 0 && (
+              <IconButton
+                onClick={toggleShowAll}
+                title={
+                  showAll
+                    ? t('jsonEditor.hideAll') || 'Hide All'
+                    : t('jsonEditor.showAll') || 'Show All'
+                }
+                sx={{
+                  color: 'var(--text-primary)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(33, 150, 243, 0.12)',
+                  },
+                }}
+              >
+                {showAll ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            )}
+
+            {entries.length > 0 && (
+              <IconButton
+                onClick={handleMenuOpen}
+                title={t('jsonEditor.menu') || 'Options'}
+                sx={{
+                  color: 'var(--text-primary)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(33, 150, 243, 0.12)',
+                  },
+                }}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            )}
+          </Box>
         </Box>
       </Box>
+
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={menuOpen}
+        onClose={handleMenuClose}
+        slotProps={{
+          paper: {
+            className: 'app-menu-paper',
+          },
+        }}
+      >
+        <MenuItem
+          onClick={handleCreateNewFromCurrent}
+          className="app-menu-item"
+        >
+          <ListItemIcon className="app-menu-icon">
+            <FileCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {t('jsonEditor.createNewFromCurrent') ||
+              'Create new file from current'}
+          </ListItemText>
+        </MenuItem>
+      </Menu>
 
       {entries.length === 0 ? (
         <Box className="json-editor-empty">
@@ -575,6 +702,20 @@ export default function JsonEditor({
                   >
                     <IconButton
                       size="small"
+                      onClick={() => handleDuplicateEntry(entry)}
+                      className="duplicate-btn"
+                      title={t('jsonEditor.duplicate') || 'Duplicate entry'}
+                      sx={{
+                        color: 'var(--primary-blue)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(33, 150, 243, 0.12)',
+                        },
+                      }}
+                    >
+                      <CopyAllIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
                       onClick={() => handleEditEntry(entry)}
                       className="edit-btn"
                     >
@@ -600,6 +741,7 @@ export default function JsonEditor({
         onClose={handleDialogClose}
         onConfirm={handleDialogConfirm}
         editingEntry={editingEntry}
+        duplicateData={duplicateData}
       />
 
       <ConfirmDialog

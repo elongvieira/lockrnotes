@@ -77,6 +77,46 @@ class FileSystemServiceImpl implements FileSystemService {
   }
 
   /**
+   * Save file content with automatic encryption if needed
+   * @param path - File path
+   * @param content - Content to save (plain text)
+   * @param isEncrypted - Whether the file should be encrypted
+   * @param originalExtension - Original file extension (needed for encryption)
+   * @returns Promise<boolean> - Success status
+   */
+  async saveFileWithEncryption(
+    path: string,
+    content: string,
+    isEncrypted: boolean,
+    originalExtension?: string,
+  ): Promise<boolean> {
+    try {
+      let contentToSave = content;
+
+      // If file is encrypted, encrypt content before saving
+      if (isEncrypted) {
+        try {
+          const originalExt = originalExtension || '.txt';
+          const encryptedData = await window.encryptionAPI.encryptContent(
+            content,
+            path,
+            originalExt,
+          );
+          contentToSave = JSON.stringify(encryptedData, null, 2);
+        } catch (encryptError) {
+          console.error('Error encrypting file:', encryptError);
+          throw new Error('Encryption failed');
+        }
+      }
+
+      return await this.fs.saveFile(path, contentToSave);
+    } catch (error) {
+      console.error('Failed to save file with encryption:', error);
+      return false;
+    }
+  }
+
+  /**
    * Read file content
    */
   async readFile(path: string): Promise<string | null> {

@@ -33,6 +33,7 @@ interface JsonEntryDialogProps {
   onClose: () => void;
   onConfirm: (entry: Partial<JsonEntry>) => void;
   editingEntry: JsonEntry | null;
+  duplicateData?: JsonEntry | null;
 }
 
 export default function JsonEntryDialog({
@@ -40,6 +41,7 @@ export default function JsonEntryDialog({
   onClose,
   onConfirm,
   editingEntry = null,
+  duplicateData = null,
 }: JsonEntryDialogProps) {
   const { t } = useTranslation();
   const [entryType, setEntryType] = useState<JsonEntryType>('keyValue');
@@ -78,6 +80,31 @@ export default function JsonEntryDialog({
           setValue2((editingEntry as TitleTwoValuesPasswordEntry).value2);
           setPassword((editingEntry as TitleTwoValuesPasswordEntry).password);
         }
+      } else if (duplicateData) {
+        // Pre-fill from duplicated entry (but NO title, so user creates a "new" distinct entry)
+        setEntryType(duplicateData.type);
+        setTitle('');
+        if (duplicateData.type === 'keyValue') {
+          setValue((duplicateData as KeyValueEntry).value);
+          setValue1('');
+          setValue2('');
+          setPassword('');
+        } else if (duplicateData.type === 'titlePassword') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword((duplicateData as TitlePasswordEntry).password);
+        } else if (duplicateData.type === 'titleValuePassword') {
+          setValue((duplicateData as TitleValuePasswordEntry).value);
+          setValue1('');
+          setValue2('');
+          setPassword((duplicateData as TitleValuePasswordEntry).password);
+        } else if (duplicateData.type === 'titleTwoValuesPassword') {
+          setValue('');
+          setValue1((duplicateData as TitleTwoValuesPasswordEntry).value1);
+          setValue2((duplicateData as TitleTwoValuesPasswordEntry).value2);
+          setPassword((duplicateData as TitleTwoValuesPasswordEntry).password);
+        }
       } else {
         setEntryType('keyValue');
         setTitle('');
@@ -89,7 +116,7 @@ export default function JsonEntryDialog({
       setError('');
       setShowPassword(false);
     }
-  }, [open, editingEntry]);
+  }, [open, editingEntry, duplicateData]);
 
   const handleConfirm = () => {
     // Validation
@@ -325,3 +352,7 @@ export default function JsonEntryDialog({
     </Dialog>
   );
 }
+
+JsonEntryDialog.defaultProps = {
+  duplicateData: null,
+};
