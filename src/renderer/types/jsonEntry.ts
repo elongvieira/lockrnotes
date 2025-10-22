@@ -4,6 +4,7 @@
 
 export type JsonEntryType =
   | 'keyValue'
+  | 'titleTwoValues'
   | 'titlePassword'
   | 'titleValuePassword'
   | 'titleTwoValuesPassword';
@@ -20,6 +21,17 @@ export interface KeyValueEntry extends BaseEntry {
   type: 'keyValue';
   title: string;
   value: string;
+}
+
+/**
+ * Title with two values (título + valor 1 + valor 2)
+ * Example: Server name, username, URL
+ */
+export interface TitleTwoValuesEntry extends BaseEntry {
+  type: 'titleTwoValues';
+  title: string;
+  value1: string;
+  value2: string;
 }
 
 /**
@@ -56,6 +68,7 @@ export interface TitleTwoValuesPasswordEntry extends BaseEntry {
 
 export type JsonEntry =
   | KeyValueEntry
+  | TitleTwoValuesEntry
   | TitlePasswordEntry
   | TitleValuePasswordEntry
   | TitleTwoValuesPasswordEntry;
@@ -83,6 +96,14 @@ export function createEntry(
         type: 'keyValue',
         title: (data as KeyValueEntry).title || '',
         value: (data as KeyValueEntry).value || '',
+      };
+    case 'titleTwoValues':
+      return {
+        id,
+        type: 'titleTwoValues',
+        title: (data as TitleTwoValuesEntry).title || '',
+        value1: (data as TitleTwoValuesEntry).value1 || '',
+        value2: (data as TitleTwoValuesEntry).value2 || '',
       };
     case 'titlePassword':
       return {

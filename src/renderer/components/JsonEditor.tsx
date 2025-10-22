@@ -35,6 +35,7 @@ import { useAppContext } from '../contexts/AppContext';
 import {
   JsonEntry,
   KeyValueEntry,
+  TitleTwoValuesEntry,
   TitlePasswordEntry,
   TitleValuePasswordEntry,
   TitleTwoValuesPasswordEntry,
@@ -209,6 +210,9 @@ export default function JsonEditor({
       entries.forEach((entry) => {
         if (entry.type === 'keyValue') {
           allValueIds.add(`${entry.id}-0`);
+        } else if (entry.type === 'titleTwoValues') {
+          allValueIds.add(`${entry.id}-0`);
+          allValueIds.add(`${entry.id}-1`);
         } else if (entry.type === 'titleValuePassword') {
           allValueIds.add(`${entry.id}-0`);
         } else if (entry.type === 'titleTwoValuesPassword') {
@@ -327,6 +331,79 @@ export default function JsonEditor({
                 <ContentCopyIcon fontSize="small" />
               )}
             </IconButton>
+          </Box>
+        );
+      }
+      case 'titleTwoValues': {
+        const ttEntry = entry as TitleTwoValuesEntry;
+        const ttValue1Visible = visibleValues.has(`${entry.id}-0`);
+        const ttValue2Visible = visibleValues.has(`${entry.id}-1`);
+        return (
+          <Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.value1')}:{' '}
+                {maskValue(ttEntry.value1, ttValue1Visible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {ttValue1Visible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, ttEntry.value1, 0)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 0 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.value2')}:{' '}
+                {maskValue(ttEntry.value2, ttValue2Visible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 1)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {ttValue2Visible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, ttEntry.value2, 1)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 1 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
           </Box>
         );
       }

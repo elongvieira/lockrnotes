@@ -151,6 +151,7 @@
     "empty": "Nenhum registro ainda. Clique em \"Adicionar Registro\" para criar um.",
     "types": {
       "keyValue": "Título + Valor",
+      "titleTwoValues": "Título + Valor 1 + Valor 2",
       "titlePassword": "Título + Senha",
       "titleValuePassword": "Título + Valor + Senha",
       "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha"

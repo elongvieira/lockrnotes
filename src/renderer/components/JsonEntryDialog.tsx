@@ -23,6 +23,7 @@ import {
   JsonEntry,
   JsonEntryType,
   KeyValueEntry,
+  TitleTwoValuesEntry,
   TitlePasswordEntry,
   TitleValuePasswordEntry,
   TitleTwoValuesPasswordEntry,
@@ -64,6 +65,11 @@ export default function JsonEntryDialog({
           setValue1('');
           setValue2('');
           setPassword('');
+        } else if (editingEntry.type === 'titleTwoValues') {
+          setValue('');
+          setValue1((editingEntry as TitleTwoValuesEntry).value1);
+          setValue2((editingEntry as TitleTwoValuesEntry).value2);
+          setPassword('');
         } else if (editingEntry.type === 'titlePassword') {
           setValue('');
           setValue1('');
@@ -88,6 +94,11 @@ export default function JsonEntryDialog({
           setValue((duplicateData as KeyValueEntry).value);
           setValue1('');
           setValue2('');
+          setPassword('');
+        } else if (duplicateData.type === 'titleTwoValues') {
+          setValue('');
+          setValue1((duplicateData as TitleTwoValuesEntry).value1);
+          setValue2((duplicateData as TitleTwoValuesEntry).value2);
           setPassword('');
         } else if (duplicateData.type === 'titlePassword') {
           setValue('');
@@ -134,6 +145,9 @@ export default function JsonEntryDialog({
 
     if (entryType === 'keyValue') {
       (entryData as KeyValueEntry).value = value.trim();
+    } else if (entryType === 'titleTwoValues') {
+      (entryData as TitleTwoValuesEntry).value1 = value1.trim();
+      (entryData as TitleTwoValuesEntry).value2 = value2.trim();
     } else if (entryType === 'titlePassword') {
       (entryData as TitlePasswordEntry).password = password.trim();
     } else if (entryType === 'titleValuePassword') {
@@ -174,7 +188,7 @@ export default function JsonEntryDialog({
           : t('jsonEditor.addEntry') || 'Add Entry'}
       </DialogTitle>
       <DialogContent sx={dialogStyles.dialogContent}>
-        <FormControl component="fieldset" sx={{ mb: 2, width: '100%' }}>
+        <FormControl component="fieldset" sx={{ mt: 2, mb: 2, width: '100%' }}>
           <FormLabel component="legend" sx={{ mb: 1 }}>
             {t('jsonEditor.entryType') || 'Entry Type'}
           </FormLabel>
@@ -183,6 +197,14 @@ export default function JsonEntryDialog({
               value="keyValue"
               control={<Radio sx={dialogStyles.checkboxRadio} />}
               label={t('jsonEditor.types.keyValue') || 'Title + Value'}
+            />
+            <FormControlLabel
+              value="titleTwoValues"
+              control={<Radio sx={dialogStyles.checkboxRadio} />}
+              label={
+                t('jsonEditor.types.titleTwoValues') ||
+                'Title + Value 1 + Value 2'
+              }
             />
             <FormControlLabel
               value="titlePassword"
@@ -237,7 +259,8 @@ export default function JsonEntryDialog({
           />
         )}
 
-        {entryType === 'titleTwoValuesPassword' && (
+        {(entryType === 'titleTwoValues' ||
+          entryType === 'titleTwoValuesPassword') && (
           <>
             <TextField
               margin="dense"

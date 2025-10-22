@@ -151,6 +151,7 @@
     "empty": "No records yet. Click \"Add Record\" to create one.",
     "types": {
       "keyValue": "Title + Value",
+      "titleTwoValues": "Title + Value 1 + Value 2",
       "titlePassword": "Title + Password",
       "titleValuePassword": "Title + Value + Password",
       "titleTwoValuesPassword": "Title + Value 1 + Value 2 + Password"
