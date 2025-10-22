@@ -125,37 +125,6 @@ export default function JsonEntryDialog({
       return;
     }
 
-    if (entryType === 'keyValue' && !value.trim()) {
-      setError(t('jsonEditor.errors.emptyValue') || 'Value is required');
-      return;
-    }
-
-    if (
-      (entryType === 'titlePassword' ||
-        entryType === 'titleValuePassword' ||
-        entryType === 'titleTwoValuesPassword') &&
-      !password.trim()
-    ) {
-      setError(t('jsonEditor.errors.emptyPassword') || 'Password is required');
-      return;
-    }
-
-    if (entryType === 'titleValuePassword' && !value.trim()) {
-      setError(t('jsonEditor.errors.emptyValue') || 'Value is required');
-      return;
-    }
-
-    if (entryType === 'titleTwoValuesPassword') {
-      if (!value1.trim()) {
-        setError(t('jsonEditor.errors.emptyValue1') || 'Entry 1 is required');
-        return;
-      }
-      if (!value2.trim()) {
-        setError(t('jsonEditor.errors.emptyValue2') || 'Entry 2 is required');
-        return;
-      }
-    }
-
     // Build entry data
     const entryData: Partial<JsonEntry> = {
       type: entryType,
