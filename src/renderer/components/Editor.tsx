@@ -59,12 +59,43 @@ export default function Editor() {
                 savedTab.filePath,
               );
               if (fileContent !== null) {
+                let content = fileContent;
+                const isEncrypted = savedTab.isEncrypted || false;
+
+                // If file is encrypted, decrypt it
+                if (isEncrypted) {
+                  try {
+                    const isContentEncrypted =
+                      await window.encryptionAPI.isContentEncrypted(
+                        fileContent,
+                      );
+
+                    if (isContentEncrypted) {
+                      const encryptedData = JSON.parse(fileContent);
+                      const decrypted =
+                        await window.encryptionAPI.decryptContent(
+                          encryptedData,
+                          savedTab.filePath,
+                        );
+                      content = decrypted;
+                    }
+                  } catch (decryptErr) {
+                    // eslint-disable-next-line no-console
+                    console.warn(
+                      `Failed to decrypt tab: ${savedTab.filename}`,
+                      decryptErr,
+                    );
+                    // Return null to skip this tab
+                    return null;
+                  }
+                }
+
                 return {
                   id: savedTab.id,
                   filename: savedTab.filename,
-                  content: fileContent,
+                  content,
                   isDirty: false,
-                  isEncrypted: savedTab.isEncrypted || false,
+                  isEncrypted,
                   originalExtension: savedTab.originalExtension,
                   filePath: savedTab.filePath,
                 };
