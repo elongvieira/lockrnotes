@@ -153,15 +153,15 @@
       "keyValue": "Title + Value",
       "titlePassword": "Title + Password",
       "titleValuePassword": "Title + Value + Password",
-      "titleTwoValuesPassword": "Title + Entry 1 + Entry 2 + Password"
+      "titleTwoValuesPassword": "Title + Value 1 + Value 2 + Password"
     },
     "fields": {
-      "title": "Title",
-      "value": "Value",
-      "value1": "Entry 1",
-      "value2": "Entry 2",
-      "password": "Password",
-      "type": "Type"
+  "title": "Title",
+  "value": "Value",
+  "value1": "Value 1",
+  "value2": "Value 2",
+  "password": "Password",
+  "type": "Type"
     },
     "errors": {
       "emptyTitle": "Title is required",

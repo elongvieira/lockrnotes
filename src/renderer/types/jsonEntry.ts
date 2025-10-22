@@ -43,7 +43,7 @@ export interface TitleValuePasswordEntry extends BaseEntry {
 }
 
 /**
- * Title with two values and password (título + entrada 1 + entrada 2 + senha)
+ * Title with two values and password (título + valor 1 + valor 2 + senha)
  * Example: Server name, username, key, password
  */
 export interface TitleTwoValuesPasswordEntry extends BaseEntry {

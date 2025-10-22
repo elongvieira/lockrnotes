@@ -202,7 +202,7 @@ export default function JsonEntryDialog({
               control={<Radio sx={dialogStyles.checkboxRadio} />}
               label={
                 t('jsonEditor.types.titleTwoValuesPassword') ||
-                'Title + Entry 1 + Entry 2 + Password'
+                'Title + Value 1 + Value 2 + Password'
               }
             />
           </RadioGroup>
@@ -241,7 +241,7 @@ export default function JsonEntryDialog({
           <>
             <TextField
               margin="dense"
-              label={t('jsonEditor.fields.value1') || 'Entry 1'}
+              label={t('jsonEditor.fields.value1') || 'Value 1'}
               fullWidth
               variant="outlined"
               value={value1}
@@ -253,7 +253,7 @@ export default function JsonEntryDialog({
             />
             <TextField
               margin="dense"
-              label={t('jsonEditor.fields.value2') || 'Entry 2'}
+              label={t('jsonEditor.fields.value2') || 'Value 2'}
               fullWidth
               variant="outlined"
               value={value2}
