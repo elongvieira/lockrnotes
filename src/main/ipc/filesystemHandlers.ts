@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { readConfigFile, updateConfigFile } from '../config';
+import { managedEncryptionService } from '../services/managedEncryptionService';
 
 /**
  * Recursively read directory contents
@@ -171,8 +172,52 @@ export function setupFilesystemHandlers() {
     'fs-rename-item',
     async (event, oldPath: string, newPath: string) => {
       try {
-        await fs.promises.rename(oldPath, newPath);
-        return true;
+        // Check if the file is encrypted
+        const fileContent = await fs.promises.readFile(oldPath, 'utf8');
+
+        if (managedEncryptionService.isContentEncrypted(fileContent)) {
+          // File is encrypted - need to re-encrypt with new path key
+          try {
+            // Decrypt with old path
+            const encryptedData = JSON.parse(fileContent);
+            const decryptedContent =
+              await managedEncryptionService.decryptContent(
+                encryptedData,
+                oldPath,
+              );
+
+            // Get original extension from encrypted data
+            const originalExtension = encryptedData.originalExtension || '.txt';
+
+            // Re-encrypt with new path
+            const newEncryptedData =
+              await managedEncryptionService.encryptContent(
+                decryptedContent,
+                newPath,
+                originalExtension,
+              );
+
+            // Write encrypted data to new location
+            await fs.promises.writeFile(
+              newPath,
+              JSON.stringify(newEncryptedData, null, 2),
+            );
+
+            // Delete old file
+            await fs.promises.unlink(oldPath);
+            return true;
+          } catch (encryptError) {
+            console.error(
+              'Error handling encrypted file rename:',
+              encryptError,
+            );
+            throw encryptError;
+          }
+        } else {
+          // Regular file - just rename
+          await fs.promises.rename(oldPath, newPath);
+          return true;
+        }
       } catch (error) {
         console.error('Error renaming item:', error);
         return false;
