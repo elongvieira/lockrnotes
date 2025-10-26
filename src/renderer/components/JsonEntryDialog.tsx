@@ -187,7 +187,14 @@ export default function JsonEntryDialog({
           ? t('jsonEditor.editEntry') || 'Edit Entry'
           : t('jsonEditor.addEntry') || 'Add Entry'}
       </DialogTitle>
-      <DialogContent sx={dialogStyles.dialogContent}>
+      <DialogContent
+        sx={
+          {
+            ...dialogStyles.dialogContent,
+            ...dialogStyles.scrollbar,
+          } as any
+        }
+      >
         <FormControl component="fieldset" sx={{ mt: 2, mb: 2, width: '100%' }}>
           <FormLabel component="legend" sx={{ mb: 1 }}>
             {t('jsonEditor.entryType') || 'Entry Type'}

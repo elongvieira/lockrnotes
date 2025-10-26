@@ -101,6 +101,30 @@ export const dialogStyles = {
     },
   } as SxProps<Theme>,
 
+  // Scrollbar padrão para diálogos e containers
+  scrollbar: {
+    // WebKit (Chrome, Safari, Edge)
+    '&::-webkit-scrollbar': {
+      width: '10px',
+      height: '10px',
+    },
+    '&::-webkit-scrollbar-track': {
+      background: 'transparent',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: 'rgba(88, 166, 255, 0.12)',
+      borderRadius: '8px',
+      border: '2px solid transparent',
+      backgroundClip: 'padding-box',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: 'rgba(88, 166, 255, 0.18)',
+    },
+    // Firefox
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'rgba(88, 166, 255, 0.12) transparent',
+  } as SxProps<Theme>,
+
   // IconButtons used for toggling password visibility
   passwordIcon: {
     color: 'var(--text-secondary)',

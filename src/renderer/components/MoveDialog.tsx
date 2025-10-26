@@ -118,7 +118,14 @@ export default function MoveDialog({
           ? t('dialog.move.titleFile') || 'Move File'
           : t('dialog.move.titleFolder') || 'Move Folder'}
       </DialogTitle>
-      <DialogContent sx={dialogStyles.dialogContent}>
+      <DialogContent
+        sx={
+          {
+            ...dialogStyles.dialogContent,
+            ...dialogStyles.scrollbar,
+          } as any
+        }
+      >
         <Box sx={{ mt: 3, mb: 1 }}>
           <Typography
             variant="body2"

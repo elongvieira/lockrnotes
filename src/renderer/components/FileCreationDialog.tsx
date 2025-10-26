@@ -188,7 +188,14 @@ export default function FileCreationDialog({
         {t('dialog.file.title') || 'Criar Novo Arquivo'}
       </DialogTitle>
 
-      <DialogContent sx={dialogStyles.dialogContent}>
+      <DialogContent
+        sx={
+          {
+            ...dialogStyles.dialogContent,
+            ...dialogStyles.scrollbar,
+          } as any
+        }
+      >
         {/* Filename Input */}
         <TextField
           autoFocus

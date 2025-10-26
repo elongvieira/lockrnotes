@@ -34,6 +34,7 @@ import MoveDialog from './MoveDialog';
 import ConfirmDialog from './ConfirmDialog';
 import PasswordDialog from './PasswordDialog';
 import { useAppContext } from '../contexts/AppContext';
+import { dialogStyles } from '../styles/dialogStyles';
 
 export default function Sidebar() {
   const {
@@ -964,6 +965,7 @@ export default function Sidebar() {
               sx={{
                 flex: 1,
                 overflow: 'auto',
+                ...dialogStyles.scrollbar,
               }}
             >
               {renderTreeContent()}

@@ -117,7 +117,14 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
         {t('welcome.title') || '🔒 Bem-vindo ao LockrNotes'}
       </DialogTitle>
 
-      <DialogContent sx={dialogStyles.dialogContent}>
+      <DialogContent
+        sx={
+          {
+            ...dialogStyles.dialogContent,
+            ...dialogStyles.scrollbar,
+          } as any
+        }
+      >
         {/* Welcome Message */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ ...dialogStyles.headingText, mb: 2 }}>
