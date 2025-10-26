@@ -169,4 +169,31 @@ export const dialogStyles = {
       color: '#ffc107',
     },
   } as SxProps<Theme>,
+
+  // Select dropdown padrão
+  select: {
+    backgroundColor: 'var(--bg-tree-container)',
+    color: 'var(--text-primary)',
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--border-secondary)',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--primary-blue)',
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--primary-blue)',
+      borderWidth: '2px',
+    },
+    '& .MuiSvgIcon-root': {
+      color: 'var(--text-secondary)',
+    },
+  } as SxProps<Theme>,
+
+  // Label para Select
+  selectLabel: {
+    color: 'var(--text-secondary)',
+    '&.Mui-focused': {
+      color: 'var(--primary-blue)',
+    },
+  } as SxProps<Theme>,
 };

@@ -20,6 +20,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
 import { fileSystemService } from '../services/fileSystemService';
+import LanguageSelector from './LanguageSelector';
 
 interface WelcomeDialogProps {
   open: boolean;
@@ -34,6 +35,7 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
   const [keyStorageType, setKeyStorageType] = useState<'system' | 'folder'>(
     'system',
   );
+  const [language, setLanguage] = useState<string>('pt-BR');
 
   const loadConfig = async () => {
     try {
@@ -44,6 +46,14 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
       }
       if (config && config.keyStorageType) {
         setKeyStorageType(config.keyStorageType);
+      }
+      // Detect system language on first run
+      if (config?.firstRun) {
+        const systemLang = navigator.language || 'pt-BR';
+        const supportedLang = systemLang.startsWith('pt') ? 'pt-BR' : 'en';
+        setLanguage(supportedLang);
+      } else if (config && config.language) {
+        setLanguage(config.language);
       }
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -78,10 +88,11 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
 
   const handleConfirm = async () => {
     try {
-      // Update config with the chosen path, key storage type and mark firstRun as false
+      // Update config with the chosen path, key storage type, language and mark firstRun as false
       const success = await fileSystemService.updateConfig({
         defaultPath: defaultPath.trim(),
         keyStorageType,
+        language,
         firstRun: false,
       });
 
@@ -127,7 +138,10 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
       >
         {/* Welcome Message */}
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ ...dialogStyles.headingText, mb: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{ ...dialogStyles.headingText, mb: 2, mt: 2 }}
+          >
             {t('welcome.subtitle') || 'Suas Notas Seguras e Criptografadas'}
           </Typography>
           <Typography
@@ -156,6 +170,15 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
             )}
           </Typography>
         </Box>
+
+        <Divider sx={{ my: 3, ...dialogStyles.divider }} />
+
+        {/* Language Selection - First */}
+        <LanguageSelector
+          value={language}
+          onChange={setLanguage}
+          useDefaultSystemLanguage
+        />
 
         <Divider sx={{ my: 3, ...dialogStyles.divider }} />
 

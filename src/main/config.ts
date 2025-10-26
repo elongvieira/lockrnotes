@@ -27,6 +27,7 @@ export async function ensureConfigFile(): Promise<void> {
     const defaultConfig = {
       defaultPath,
       keyStorageType: 'system', // Default to system storage (can be changed to 'folder')
+      language: 'pt-BR', // Default language
       firstRun: true,
       openTabs: [],
       activeTabId: null,

@@ -234,6 +234,9 @@
       "folderPro": "✓ Recuperável - Se mover a pasta, continua funcionando",
       "folderCon": "✗ Menos seguro - Qualquer um com acesso à pasta pode descriptografar"
     },
+    "languageTitle": "Idioma do Sistema",
+    "languageDescription": "Escolha o idioma que será usado na interface do aplicativo.",
+    "languageLabel": "Idioma",
     "getStarted": "Começar a Usar"
   }
 }
