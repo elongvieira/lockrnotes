@@ -238,5 +238,15 @@
     "languageDescription": "Escolha o idioma que será usado na interface do aplicativo.",
     "languageLabel": "Idioma",
     "getStarted": "Começar a Usar"
+  },
+  "settings": {
+    "title": "⚙️ Configurações",
+    "editor": "Editor",
+    "autoSave": "Salvar automaticamente",
+    "autoSaveDescription": "Salva os arquivos automaticamente após 1.5 segundos de inatividade"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar"
   }
 }

@@ -28,6 +28,7 @@ export async function ensureConfigFile(): Promise<void> {
       defaultPath,
       keyStorageType: 'system', // Default to system storage (can be changed to 'folder')
       language: 'pt-BR', // Default language
+      autoSave: true, // Auto-save files on changes
       firstRun: true,
       openTabs: [],
       activeTabId: null,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,10 +7,12 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
 import logo from '../../../assets/logo_a.png';
+import SettingsDialog from './SettingsDialog';
 import './AppBar.css';
 
 export default function AppBar() {
   const { t, i18n } = useTranslation();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
 
@@ -141,24 +143,29 @@ export default function AppBar() {
             },
           }}
         >
-          <MenuItem onClick={handleMenuClose} className="app-menu-item">
-            {t('menu.new')}
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose} className="app-menu-item">
-            {t('menu.save')}
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose} className="app-menu-item">
-            {t('menu.delete')}
+          <MenuItem
+            onClick={() => {
+              setSettingsOpen(true);
+              handleMenuClose();
+            }}
+            className="app-menu-item"
+          >
+            {t('settings.title') || '⚙️ Configurações'}
           </MenuItem>
           <MenuItem
             onClick={() => {
               handleMenuClose();
+              window.electron?.window?.close();
             }}
             className="app-menu-item"
           >
             {t('menu.exit')}
           </MenuItem>
         </Menu>
+        <SettingsDialog
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+        />
       </Toolbar>
     </MuiAppBar>
   );

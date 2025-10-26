@@ -53,6 +53,7 @@ export default function Editor() {
   const { t } = useTranslation();
   const [fileDialogOpen, setFileDialogOpen] = useState<boolean>(false);
   const [isRestoringTabs, setIsRestoringTabs] = useState<boolean>(true);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(true);
   const [pendingEncryptedFiles, setPendingEncryptedFiles] = useState<
     PendingEncryptedFile[]
   >([]);
@@ -76,6 +77,12 @@ export default function Editor() {
     const restoreTabs = async () => {
       try {
         const config = await fileSystemService.readConfig();
+
+        // Carregar configuração de autoSave
+        if (config && config.autoSave !== undefined) {
+          setAutoSaveEnabled(config.autoSave);
+        }
+
         if (config && config.openTabs && Array.isArray(config.openTabs)) {
           const managedEncryptedTabs: FileTab[] = [];
           const manualEncryptedFiles: PendingEncryptedFile[] = [];
@@ -580,6 +587,21 @@ export default function Editor() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [activeTab, tabs, saveFile]);
+
+  // Auto-save quando conteúdo muda
+  useEffect(() => {
+    if (!autoSaveEnabled || !currentTab || !currentTab.isDirty) {
+      return undefined;
+    }
+
+    const timer = setTimeout(() => {
+      saveFile(currentTab.id);
+    }, 1500); // Salva após 1.5 segundos de inatividade
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [currentTab, saveFile, autoSaveEnabled]);
 
   // Função para abrir dialog de criação de arquivo
   const handleCreateFile = () => {
