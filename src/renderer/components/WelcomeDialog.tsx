@@ -11,6 +11,9 @@ import {
   Divider,
   Alert,
   IconButton,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -28,6 +31,9 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
   const [defaultPath, setDefaultPath] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [browsing, setBrowsing] = useState<boolean>(false);
+  const [keyStorageType, setKeyStorageType] = useState<'system' | 'folder'>(
+    'system',
+  );
 
   const loadConfig = async () => {
     try {
@@ -35,6 +41,9 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
       const config = await fileSystemService.readConfig();
       if (config && config.defaultPath) {
         setDefaultPath(config.defaultPath);
+      }
+      if (config && config.keyStorageType) {
+        setKeyStorageType(config.keyStorageType);
       }
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -69,9 +78,10 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
 
   const handleConfirm = async () => {
     try {
-      // Update config with the chosen path and mark firstRun as false
+      // Update config with the chosen path, key storage type and mark firstRun as false
       const success = await fileSystemService.updateConfig({
         defaultPath: defaultPath.trim(),
+        keyStorageType,
         firstRun: false,
       });
 
@@ -214,6 +224,113 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
           {t('welcome.infoMessage') ||
             'Esta pasta será criada automaticamente se não existir. Você sempre pode mudar esse local nas configurações do aplicativo.'}
         </Alert>
+
+        <Divider sx={{ my: 3, ...dialogStyles.divider }} />
+
+        {/* Key Storage Option */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              ...dialogStyles.headingText,
+              mb: 2,
+            }}
+          >
+            {t('welcome.keyStorageTitle') ||
+              'Proteção da Chave de Criptografia'}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ ...dialogStyles.secondaryText, mb: 2 }}
+          >
+            {t('welcome.keyStorageDescription') ||
+              'Escolha como proteger sua chave de criptografia gerenciada.'}
+          </Typography>
+
+          <RadioGroup
+            value={keyStorageType}
+            onChange={(e) =>
+              setKeyStorageType(e.target.value as 'system' | 'folder')
+            }
+            sx={{ ml: 1 }}
+          >
+            {/* System Option */}
+            <Box sx={{ mb: 2 }}>
+              <FormControlLabel
+                value="system"
+                control={<Radio sx={dialogStyles.checkboxRadio} />}
+                label={
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {t('welcome.keyStorageOptions.system') ||
+                        '📦 Gerenciado pelo Sistema (Padrão)'}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        color: 'var(--text-success)',
+                        mt: 0.5,
+                      }}
+                    >
+                      {t('welcome.keyStorageOptions.systemPro') ||
+                        '✓ Mais seguro - Chave armazenada no cofre seguro do Windows'}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        color: 'var(--text-error)',
+                        mt: 0.3,
+                      }}
+                    >
+                      {t('welcome.keyStorageOptions.systemCon') ||
+                        '✗ Se apagar dados do sistema, perderá acesso aos arquivos'}
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Box>
+
+            {/* Folder Option */}
+            <Box sx={{ mb: 2 }}>
+              <FormControlLabel
+                value="folder"
+                control={<Radio sx={dialogStyles.checkboxRadio} />}
+                label={
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {t('welcome.keyStorageOptions.folder') ||
+                        '📁 Salvo na Pasta'}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        color: 'var(--text-success)',
+                        mt: 0.5,
+                      }}
+                    >
+                      {t('welcome.keyStorageOptions.folderPro') ||
+                        '✓ Recuperável - Se mover a pasta, continua funcionando'}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        color: 'var(--text-error)',
+                        mt: 0.3,
+                      }}
+                    >
+                      {t('welcome.keyStorageOptions.folderCon') ||
+                        '✗ Menos seguro - Qualquer um com acesso à pasta pode descriptografar'}
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Box>
+          </RadioGroup>
+        </Box>
       </DialogContent>
 
       <DialogActions sx={dialogStyles.dialogActions}>

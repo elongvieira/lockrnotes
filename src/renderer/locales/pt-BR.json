@@ -224,6 +224,16 @@
     "pathHelper": "Caminho completo onde os arquivos serão salvos",
     "browseButton": "Procurar pasta",
     "infoMessage": "Esta pasta será criada automaticamente se não existir. Você sempre pode mudar esse local nas configurações do aplicativo.",
+    "keyStorageTitle": "Proteção da Chave de Criptografia",
+    "keyStorageDescription": "Escolha como proteger sua chave de criptografia gerenciada. Isso afeta como seus arquivos criptografados podem ser acessados.",
+    "keyStorageOptions": {
+      "system": "📦 Gerenciado pelo Sistema (Padrão)",
+      "systemPro": "✓ Mais seguro - Chave armazenada no cofre seguro do Windows",
+      "systemCon": "✗ Se apagar dados do sistema, perderá acesso aos arquivos",
+      "folder": "📁 Salvo na Pasta",
+      "folderPro": "✓ Recuperável - Se mover a pasta, continua funcionando",
+      "folderCon": "✗ Menos seguro - Qualquer um com acesso à pasta pode descriptografar"
+    },
     "getStarted": "Começar a Usar"
   }
 }

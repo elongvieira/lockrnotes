@@ -2,6 +2,7 @@ import { app, safeStorage } from 'electron';
 import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { readConfigFile } from '../config';
 
 export interface EncryptedFileData {
   type: 'lockrnotes-encrypted';
@@ -21,7 +22,7 @@ class ManagedEncryptionService {
   private readonly ivLength = 16; // 128 bits
   private readonly saltLength = 32; // 256 bits
   private readonly iterations = 100000; // PBKDF2 iterations
-  private readonly keyFileName = 'master.lockr';
+  private readonly keyFileName = '.lockrnotes_key';
 
   private masterKey: Buffer | null = null;
 
@@ -29,7 +30,35 @@ class ManagedEncryptionService {
     return crypto.randomBytes(this.keyLength);
   }
 
-  private getKeyFilePath(): string {
+  private async getKeyStorageType(): Promise<'system' | 'folder'> {
+    try {
+      const config = await readConfigFile();
+      return (config?.keyStorageType as 'system' | 'folder') || 'system';
+    } catch {
+      return 'system';
+    }
+  }
+
+  private async getKeyFilePath(): Promise<string> {
+    const storageType = await this.getKeyStorageType();
+
+    if (storageType === 'folder') {
+      // Use the defaultPath from config
+      try {
+        const config = await readConfigFile();
+        if (config?.defaultPath) {
+          const keyDir = path.join(config.defaultPath, '.lockrnotes');
+          return path.join(keyDir, this.keyFileName);
+        }
+      } catch (err) {
+        console.warn(
+          'Failed to read config for folder storage, falling back to system',
+          err,
+        );
+      }
+    }
+
+    // Default: use userData path
     const userDataPath = app.getPath('userData');
     const keyDir = path.join(userDataPath, 'encryption');
     return path.join(keyDir, this.keyFileName);
@@ -37,7 +66,7 @@ class ManagedEncryptionService {
 
   private async storeMasterKey(key: Buffer): Promise<void> {
     try {
-      const keyFilePath = this.getKeyFilePath();
+      const keyFilePath = await this.getKeyFilePath();
       const keyDir = path.dirname(keyFilePath);
       await fs.mkdir(keyDir, { recursive: true });
 
@@ -55,7 +84,7 @@ class ManagedEncryptionService {
       };
 
       await fs.writeFile(keyFilePath, JSON.stringify(keyData, null, 2));
-      // Master key stored securely
+      // Master key stored securely in configured location
     } catch (error) {
       console.error('Failed to store master key:', error);
       throw new Error('Could not store encryption key');
@@ -64,7 +93,7 @@ class ManagedEncryptionService {
 
   private async retrieveMasterKey(): Promise<Buffer | null> {
     try {
-      const keyFilePath = this.getKeyFilePath();
+      const keyFilePath = await this.getKeyFilePath();
       const keyDataStr = await fs.readFile(keyFilePath, 'utf8');
       const keyData = JSON.parse(keyDataStr);
 
@@ -251,7 +280,7 @@ class ManagedEncryptionService {
 
   async resetEncryption(): Promise<void> {
     try {
-      const keyFilePath = this.getKeyFilePath();
+      const keyFilePath = await this.getKeyFilePath();
       await fs.unlink(keyFilePath);
       this.masterKey = null;
       console.log(

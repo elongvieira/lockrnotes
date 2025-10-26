@@ -224,6 +224,16 @@
     "pathHelper": "Full path where files will be saved",
     "browseButton": "Browse folder",
     "infoMessage": "This folder will be created automatically if it doesn't exist. You can always change this location in the application settings.",
+    "keyStorageTitle": "Encryption Key Protection",
+    "keyStorageDescription": "Choose how to protect your managed encryption key. This affects how your encrypted files can be accessed.",
+    "keyStorageOptions": {
+      "system": "📦 Managed by System (Default)",
+      "systemPro": "✓ More secure - Key stored in Windows secure vault",
+      "systemCon": "✗ If you delete system data, you'll lose access to files",
+      "folder": "📁 Saved in Folder",
+      "folderPro": "✓ Recoverable - If you move the folder, it still works",
+      "folderCon": "✗ Less secure - Anyone with folder access can decrypt files"
+    },
     "getStarted": "Get Started"
   }
 }
