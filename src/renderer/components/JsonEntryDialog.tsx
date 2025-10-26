@@ -87,9 +87,9 @@ export default function JsonEntryDialog({
           setPassword((editingEntry as TitleTwoValuesPasswordEntry).password);
         }
       } else if (duplicateData) {
-        // Pre-fill from duplicated entry (but NO title, so user creates a "new" distinct entry)
+        // Pre-fill from duplicated entry (including title, so user can modify it)
         setEntryType(duplicateData.type);
-        setTitle('');
+        setTitle(duplicateData.title);
         if (duplicateData.type === 'keyValue') {
           setValue((duplicateData as KeyValueEntry).value);
           setValue1('');
