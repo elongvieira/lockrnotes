@@ -68,7 +68,13 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
   async createFile(
     targetPath: string,
     fileData: FileCreationData,
-  ): Promise<{ success: boolean; filename?: string; filePath?: string }> {
+  ): Promise<{
+    success: boolean;
+    filename?: string;
+    filePath?: string;
+    password?: string;
+    originalExtension?: string;
+  }> {
     try {
       // Validate input
       if (!targetPath || !fileData.filename.trim()) {
@@ -114,8 +120,34 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
           throw new Error('Failed to encrypt file');
         }
       } else if (fileData.encrypted && fileData.encryptionType === 'manual') {
-        // TODO: Implementar criptografia manual com senha do usuário
-        throw new Error('Manual encryption not yet implemented');
+        // Manual encryption with user password
+        if (!fileData.password) {
+          throw new Error('Password is required for manual encryption');
+        }
+
+        try {
+          // Keep the encrypted extension for manual encryption
+          const encryptedExtension =
+            this.getEncryptedExtension(originalExtension);
+          filename = `${cleanFilename}${encryptedExtension}`;
+
+          // Encrypt content with user password
+          const result = await window.manualEncryptionAPI.encryptContent(
+            content,
+            fileData.password,
+            originalExtension,
+          );
+
+          if (!result.success || !result.data) {
+            throw new Error(result.error || 'Encryption failed');
+          }
+
+          // Content becomes JSON with encrypted data
+          content = JSON.stringify(result.data, null, 2);
+        } catch (error) {
+          console.error('Manual encryption failed:', error);
+          throw new Error('Failed to encrypt file with password');
+        }
       }
 
       // Create file path
@@ -128,7 +160,16 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
         throw new Error('Failed to create file');
       }
 
-      return { success: true, filename, filePath };
+      return {
+        success: true,
+        filename,
+        filePath,
+        password:
+          fileData.encrypted && fileData.encryptionType === 'manual'
+            ? fileData.password
+            : undefined,
+        originalExtension,
+      };
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error in FileCreationServiceImpl.createFile:', error);

@@ -98,7 +98,8 @@
       "delete": "Excluir",
       "add": "Adicionar",
       "save": "Salvar",
-      "move": "Mover"
+      "move": "Mover",
+      "unlock": "Desbloquear"
     },
     "confirm": {
       "title": "Confirmação",
@@ -135,6 +136,12 @@
         "failed": "Falha ao mover o item",
         "fileExists": "Já existe um item com esse nome no destino"
       }
+    },
+    "password": {
+      "title": "Arquivo Protegido",
+      "message": "Este arquivo está protegido por senha. Digite a senha para abrir:",
+      "passwordLabel": "Senha",
+      "wrongPassword": "Senha incorreta. Tente novamente."
     }
   },
   "jsonEditor": {

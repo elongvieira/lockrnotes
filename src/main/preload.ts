@@ -3,6 +3,7 @@
 import { contextBridge } from 'electron';
 import { filesystemApi, windowApi, systemApi } from './preload/index';
 import './preload/encryptionApi';
+import './preload/manualEncryptionApi';
 
 const electronHandler = {
   // Window controls exposed for a frameless window

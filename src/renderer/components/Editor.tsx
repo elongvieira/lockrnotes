@@ -10,10 +10,12 @@ import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
 import { useTranslation } from 'react-i18next';
 import FileCreationDialog from './FileCreationDialog';
+import PasswordDialog from './PasswordDialog';
 import JsonEditor from './JsonEditor';
 import { fileCreationService } from '../services/fileCreationService';
 import type { FileCreationData } from '../types/fileCreation';
 import { fileSystemService } from '../services/fileSystemService';
+import { sessionKeyService } from '../services/sessionKeyService';
 import { useAppContext } from '../contexts/AppContext';
 import './Editor.css';
 
@@ -25,6 +27,12 @@ interface FileTab {
   isEncrypted: boolean;
   originalExtension?: string;
   filePath: string;
+  encryptedPassword?: string; // Senha criptografada com chave de sessão
+}
+
+interface PendingEncryptedFile {
+  savedTab: any;
+  rawContent: string;
 }
 
 export default function Editor() {
@@ -45,6 +53,23 @@ export default function Editor() {
   const { t } = useTranslation();
   const [fileDialogOpen, setFileDialogOpen] = useState<boolean>(false);
   const [isRestoringTabs, setIsRestoringTabs] = useState<boolean>(true);
+  const [pendingEncryptedFiles, setPendingEncryptedFiles] = useState<
+    PendingEncryptedFile[]
+  >([]);
+  const [currentPendingFile, setCurrentPendingFile] =
+    useState<PendingEncryptedFile | null>(null);
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<string>('');
+  const [restoredTabs, setRestoredTabs] = useState<FileTab[]>([]);
+
+  // Initialize session key on mount
+  useEffect(() => {
+    sessionKeyService.initialize();
+    return () => {
+      // Clear session key on unmount
+      sessionKeyService.clear();
+    };
+  }, []);
 
   // Carregar abas salvas ao montar o componente
   useEffect(() => {
@@ -52,93 +77,243 @@ export default function Editor() {
       try {
         const config = await fileSystemService.readConfig();
         if (config && config.openTabs && Array.isArray(config.openTabs)) {
-          // Carregar todos os arquivos em paralelo
-          const tabPromises = config.openTabs.map(async (savedTab: any) => {
-            try {
-              const fileContent = await fileSystemService.readFile(
-                savedTab.filePath,
-              );
-              if (fileContent !== null) {
-                let content = fileContent;
-                const isEncrypted = savedTab.isEncrypted || false;
+          const managedEncryptedTabs: FileTab[] = [];
+          const manualEncryptedFiles: PendingEncryptedFile[] = [];
 
-                // If file is encrypted, decrypt it
-                if (isEncrypted) {
-                  try {
-                    const isContentEncrypted =
-                      await window.encryptionAPI.isContentEncrypted(
-                        fileContent,
-                      );
-
-                    if (isContentEncrypted) {
-                      const encryptedData = JSON.parse(fileContent);
-                      const decrypted =
-                        await window.encryptionAPI.decryptContent(
-                          encryptedData,
-                          savedTab.filePath,
-                        );
-                      content = decrypted;
-                    }
-                  } catch (decryptErr) {
-                    // eslint-disable-next-line no-console
-                    console.warn(
-                      `Failed to decrypt tab: ${savedTab.filename}`,
-                      decryptErr,
+          // Process each saved tab
+          const tabResults = await Promise.all(
+            config.openTabs.map(async (savedTab: any) => {
+              try {
+                const fileContent = await fileSystemService.readFile(
+                  savedTab.filePath,
+                );
+                if (fileContent !== null) {
+                  // Check if manually encrypted
+                  const isManuallyEncrypted =
+                    await window.manualEncryptionAPI.isManuallyEncrypted(
+                      fileContent,
                     );
-                    // Return null to skip this tab
-                    return null;
+
+                  if (isManuallyEncrypted) {
+                    return {
+                      type: 'manual',
+                      savedTab,
+                      rawContent: fileContent,
+                    };
                   }
+
+                  let content = fileContent;
+                  const isEncrypted = savedTab.isEncrypted || false;
+
+                  // If file is managed encrypted, decrypt it
+                  if (isEncrypted) {
+                    try {
+                      const isContentEncrypted =
+                        await window.encryptionAPI.isContentEncrypted(
+                          fileContent,
+                        );
+
+                      if (isContentEncrypted) {
+                        const encryptedData = JSON.parse(fileContent);
+                        const decrypted =
+                          await window.encryptionAPI.decryptContent(
+                            encryptedData,
+                            savedTab.filePath,
+                          );
+                        content = decrypted;
+                      }
+                    } catch (decryptErr) {
+                      // eslint-disable-next-line no-console
+                      console.warn(
+                        `Failed to decrypt tab: ${savedTab.filename}`,
+                        decryptErr,
+                      );
+                      return null;
+                    }
+                  }
+
+                  return {
+                    type: 'managed',
+                    tab: {
+                      id: savedTab.id,
+                      filename: savedTab.filename,
+                      content,
+                      isDirty: false,
+                      isEncrypted,
+                      originalExtension: savedTab.originalExtension,
+                      filePath: savedTab.filePath,
+                    },
+                  };
                 }
-
-                return {
-                  id: savedTab.id,
-                  filename: savedTab.filename,
-                  content,
-                  isDirty: false,
-                  isEncrypted,
-                  originalExtension: savedTab.originalExtension,
-                  filePath: savedTab.filePath,
-                };
+              } catch (err) {
+                // eslint-disable-next-line no-console
+                console.warn(
+                  `Failed to restore tab: ${savedTab.filename}`,
+                  err,
+                );
               }
-            } catch (err) {
-              // eslint-disable-next-line no-console
-              console.warn(`Failed to restore tab: ${savedTab.filename}`, err);
-            }
-            return null;
-          });
-
-          const results = await Promise.all(tabPromises);
-          const restoredTabs = results.filter(
-            (tab): tab is FileTab => tab !== null,
+              return null;
+            }),
           );
 
-          if (restoredTabs.length > 0) {
-            setTabs(restoredTabs);
-            // Restaurar aba ativa
+          // Separate managed and manual encrypted files
+          tabResults.forEach((result) => {
+            if (result) {
+              if (result.type === 'manual') {
+                manualEncryptedFiles.push({
+                  savedTab: result.savedTab,
+                  rawContent: result.rawContent,
+                });
+              } else if (result.type === 'managed' && result.tab) {
+                managedEncryptedTabs.push(result.tab);
+              }
+            }
+          });
+
+          // Set tabs that were successfully loaded (non-manually encrypted)
+          setRestoredTabs(managedEncryptedTabs);
+          setTabs(managedEncryptedTabs);
+
+          // Set active tab if any were loaded
+          if (managedEncryptedTabs.length > 0) {
             if (config.activeTabId) {
-              const activeExists = restoredTabs.find(
+              const activeExists = managedEncryptedTabs.find(
                 (tab) => tab.id === config.activeTabId,
               );
               if (activeExists) {
                 setActiveTab(config.activeTabId);
               } else {
-                setActiveTab(restoredTabs[0].id);
+                setActiveTab(managedEncryptedTabs[0].id);
               }
             } else {
-              setActiveTab(restoredTabs[0].id);
+              setActiveTab(managedEncryptedTabs[0].id);
             }
           }
+
+          // Queue manually encrypted files for password prompts
+          if (manualEncryptedFiles.length > 0) {
+            setPendingEncryptedFiles(manualEncryptedFiles);
+            setCurrentPendingFile(manualEncryptedFiles[0]);
+            setPasswordDialogOpen(true);
+          } else {
+            setIsRestoringTabs(false);
+          }
+        } else {
+          setIsRestoringTabs(false);
         }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Failed to restore tabs:', error);
-      } finally {
         setIsRestoringTabs(false);
       }
     };
 
     restoreTabs();
   }, [setTabs, setActiveTab]);
+
+  // Handle password confirmation for manually encrypted files during restoration
+  const handlePasswordConfirm = useCallback(
+    async (password: string) => {
+      if (!currentPendingFile) return;
+
+      try {
+        setPasswordError('');
+
+        // Decrypt the file
+        const encryptedData = JSON.parse(currentPendingFile.rawContent);
+        const result = await window.manualEncryptionAPI.decryptContent(
+          encryptedData,
+          password,
+        );
+
+        if (!result.success || !result.data) {
+          throw new Error(result.error || 'Decryption failed');
+        }
+
+        // Encrypt password with session key for storage in memory
+        const encryptedPassword =
+          await sessionKeyService.encryptPassword(password);
+
+        // Create tab for decrypted file
+        const newTab: FileTab = {
+          id: currentPendingFile.savedTab.id,
+          filename: currentPendingFile.savedTab.filename,
+          content: result.data,
+          isDirty: false,
+          isEncrypted: currentPendingFile.savedTab.isEncrypted || false,
+          originalExtension: currentPendingFile.savedTab.originalExtension,
+          filePath: currentPendingFile.savedTab.filePath,
+          encryptedPassword, // Store encrypted password in memory
+        };
+
+        // Add tab to existing tabs
+        setTabs((prev) => [...prev, newTab]);
+        setRestoredTabs((prev) => [...prev, newTab]);
+
+        // Move to next file in queue
+        const currentIndex = pendingEncryptedFiles.findIndex(
+          (f) => f.savedTab.filePath === currentPendingFile.savedTab.filePath,
+        );
+
+        if (currentIndex < pendingEncryptedFiles.length - 1) {
+          // More files to process
+          setCurrentPendingFile(pendingEncryptedFiles[currentIndex + 1]);
+          setPasswordError('');
+        } else {
+          // All files processed
+          setPasswordDialogOpen(false);
+          setCurrentPendingFile(null);
+          setPendingEncryptedFiles([]);
+          setIsRestoringTabs(false);
+
+          // Set active tab after all files are restored
+          const allTabs = [...restoredTabs, newTab];
+          if (allTabs.length > 0) {
+            setActiveTab(allTabs[0].id);
+          }
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to decrypt file:', error);
+        setPasswordError(t('passwordDialog.wrongPassword'));
+      }
+    },
+    [
+      currentPendingFile,
+      pendingEncryptedFiles,
+      restoredTabs,
+      setTabs,
+      setActiveTab,
+      t,
+    ],
+  );
+
+  // Handle password dialog cancel
+  const handlePasswordCancel = useCallback(() => {
+    // Move to next file in queue or finish restoration
+    const currentIndex = pendingEncryptedFiles.findIndex(
+      (f) =>
+        currentPendingFile &&
+        f.savedTab.filePath === currentPendingFile.savedTab.filePath,
+    );
+
+    if (currentIndex < pendingEncryptedFiles.length - 1) {
+      // More files to process
+      setCurrentPendingFile(pendingEncryptedFiles[currentIndex + 1]);
+      setPasswordError('');
+    } else {
+      // All files processed (or skipped)
+      setPasswordDialogOpen(false);
+      setCurrentPendingFile(null);
+      setPendingEncryptedFiles([]);
+      setIsRestoringTabs(false);
+
+      // Set active tab if any tabs were restored
+      if (restoredTabs.length > 0) {
+        setActiveTab(restoredTabs[0].id);
+      }
+    }
+  }, [currentPendingFile, pendingEncryptedFiles, restoredTabs, setActiveTab]);
 
   // Salvar abas sempre que mudarem (depois da restauração inicial)
   useEffect(() => {
@@ -169,13 +344,20 @@ export default function Editor() {
 
   // Função para abrir um novo arquivo em uma aba
   const openFile = useCallback(
-    (
+    async (
       filePath: string,
       filename: string,
-      originalExtension?: string,
-      content = '',
-      isEncrypted = false,
+      originalExtension: string | undefined,
+      content: string,
+      isEncrypted: boolean,
+      password?: string,
     ) => {
+      // If password is provided, encrypt it with session key
+      let encryptedPassword: string | undefined;
+      if (password) {
+        encryptedPassword = await sessionKeyService.encryptPassword(password);
+      }
+
       setTabs((prev) => {
         // If file is already open, focus existing tab and optionally update content
         const existing = prev.find((tabItem) => tabItem.filePath === filePath);
@@ -183,7 +365,9 @@ export default function Editor() {
           // If provided content differs, update the tab content but keep isDirty as false
           if (content && existing.content !== content) {
             const updated = prev.map((tabItem) =>
-              tabItem.filePath === filePath ? { ...tabItem, content } : tabItem,
+              tabItem.filePath === filePath
+                ? { ...tabItem, content, encryptedPassword }
+                : tabItem,
             );
             // focus existing
             setActiveTab(existing.id);
@@ -203,6 +387,7 @@ export default function Editor() {
           isEncrypted,
           originalExtension,
           filePath,
+          encryptedPassword,
         };
 
         // focus new tab
@@ -251,12 +436,86 @@ export default function Editor() {
       if (!targetTab) return;
 
       try {
-        const success = await fileSystemService.saveFileWithEncryption(
-          targetTab.filePath,
-          targetTab.content,
-          targetTab.isEncrypted,
-          targetTab.originalExtension,
-        );
+        let success = false;
+
+        // Check if file has a password (manual encryption)
+        if (targetTab.encryptedPassword) {
+          // eslint-disable-next-line no-console
+          console.log(
+            'Saving manually encrypted file:',
+            targetTab.filename,
+            'Password stored:',
+            !!targetTab.encryptedPassword,
+          );
+
+          // Decrypt the password from memory
+          let password: string;
+          try {
+            password = await sessionKeyService.decryptPassword(
+              targetTab.encryptedPassword,
+            );
+            // eslint-disable-next-line no-console
+            console.log('Password decrypted successfully');
+          } catch (decryptErr) {
+            // eslint-disable-next-line no-console
+            console.error(
+              'Failed to decrypt password from memory:',
+              decryptErr,
+            );
+            throw new Error('Failed to retrieve stored password');
+          }
+
+          // Get original extension
+          const originalExt = targetTab.originalExtension || '.txt';
+          // eslint-disable-next-line no-console
+          console.log('Original extension:', originalExt);
+
+          // Encrypt content with password
+          const encryptResult = await window.manualEncryptionAPI.encryptContent(
+            targetTab.content,
+            password,
+            originalExt,
+          );
+
+          // eslint-disable-next-line no-console
+          console.log('Encryption result:', encryptResult.success);
+
+          if (encryptResult.success && encryptResult.data) {
+            // Save encrypted content
+            const encryptedContent = JSON.stringify(
+              encryptResult.data,
+              null,
+              2,
+            );
+            // eslint-disable-next-line no-console
+            console.log(
+              'Saving to disk:',
+              targetTab.filePath,
+              'Content length:',
+              encryptedContent.length,
+            );
+
+            success = await fileSystemService.saveFile(
+              targetTab.filePath,
+              encryptedContent,
+            );
+            // eslint-disable-next-line no-console
+            console.log('File saved to disk:', targetTab.filename, success);
+          } else {
+            throw new Error(encryptResult.error || 'Encryption failed');
+          }
+        } else {
+          // eslint-disable-next-line no-console
+          console.log('Saving managed encrypted file:', targetTab.filename);
+
+          // Use standard save with managed encryption
+          success = await fileSystemService.saveFileWithEncryption(
+            targetTab.filePath,
+            targetTab.content,
+            targetTab.isEncrypted,
+            targetTab.originalExtension,
+          );
+        }
 
         if (success) {
           // Marcar aba como não modificada
@@ -340,12 +599,13 @@ export default function Editor() {
 
       if (result.success && result.filename && result.filePath) {
         // Abrir o arquivo criado no editor com o nome completo (incluindo extensão)
-        openFile(
+        await openFile(
           result.filePath,
           result.filename,
-          undefined,
+          result.originalExtension,
           '',
           fileData.encrypted,
+          result.password, // Pass the password if manual encryption was used
         );
 
         // Atualizar contexto
@@ -470,6 +730,14 @@ export default function Editor() {
         open={fileDialogOpen}
         onClose={handleFileDialogClose}
         onConfirm={handleFileDialogConfirm}
+      />
+
+      <PasswordDialog
+        open={passwordDialogOpen}
+        filename={currentPendingFile?.savedTab.filename || ''}
+        onConfirm={handlePasswordConfirm}
+        onClose={handlePasswordCancel}
+        error={passwordError}
       />
     </Box>
   );

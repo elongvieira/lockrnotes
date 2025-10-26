@@ -98,7 +98,8 @@
       "delete": "Delete",
       "add": "Add",
       "save": "Save",
-      "move": "Move"
+      "move": "Move",
+      "unlock": "Unlock"
     },
     "confirm": {
       "title": "Confirmation",
@@ -135,6 +136,12 @@
         "failed": "Failed to move item",
         "fileExists": "An item with that name already exists in the destination"
       }
+    },
+    "password": {
+      "title": "Protected File",
+      "message": "This file is password protected. Enter the password to open:",
+      "passwordLabel": "Password",
+      "wrongPassword": "Wrong password. Please try again."
     }
   },
   "jsonEditor": {

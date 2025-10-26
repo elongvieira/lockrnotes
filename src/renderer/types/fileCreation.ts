@@ -15,7 +15,13 @@ export interface FileCreationService {
   createFile(
     targetPath: string,
     fileData: FileCreationData,
-  ): Promise<{ success: boolean; filename?: string; filePath?: string }>;
+  ): Promise<{
+    success: boolean;
+    filename?: string;
+    filePath?: string;
+    password?: string;
+    originalExtension?: string;
+  }>;
   getEncryptedExtension(originalExtension: string): string;
   getAvailableTypes(): string[];
   getTemplate(type: string): FileTemplate | undefined;

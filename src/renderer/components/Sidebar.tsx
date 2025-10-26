@@ -32,6 +32,7 @@ import FileCreationDialog from './FileCreationDialog';
 import RenameDialog from './RenameDialog';
 import MoveDialog from './MoveDialog';
 import ConfirmDialog from './ConfirmDialog';
+import PasswordDialog from './PasswordDialog';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function Sidebar() {
@@ -73,6 +74,16 @@ export default function Sidebar() {
   // Copy dialog state
   const [copyDialogOpen, setCopyDialogOpen] = useState<boolean>(false);
   const [itemToCopy, setItemToCopy] = useState<FileSystemItem | null>(null);
+
+  // Password dialog state for manual encryption
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState<boolean>(false);
+  const [pendingFileData, setPendingFileData] = useState<{
+    absolutePath: string;
+    item: FileSystemItem;
+    rawContent: string;
+    originalExtension: string;
+  } | null>(null);
+  const [passwordError, setPasswordError] = useState<string>('');
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -267,28 +278,49 @@ export default function Sidebar() {
       // If file is encrypted, decrypt it
       if (isEncrypted) {
         try {
+          // Check if it's managed encryption
           const looksEncrypted =
             await window.encryptionAPI.isContentEncrypted(rawContent);
 
-          if (!looksEncrypted) {
+          if (looksEncrypted) {
+            // Managed encryption
+            const encryptedData = JSON.parse(rawContent);
+            const decrypted = await window.encryptionAPI.decryptContent(
+              encryptedData,
+              absolutePath,
+            );
+
+            content = decrypted;
+            isFileEncrypted = true;
+
+            if (encryptedData && encryptedData.originalExtension) {
+              originalExtension = encryptedData.originalExtension;
+            }
+          }
+
+          // Check if it's manual encryption
+          const isManuallyEncrypted =
+            await window.manualEncryptionAPI.isManuallyEncrypted(rawContent);
+
+          if (isManuallyEncrypted) {
+            // Manual encryption - need password
+            setPendingFileData({
+              absolutePath,
+              item,
+              rawContent,
+              originalExtension: originalExtension || '.txt',
+            });
+            setPasswordError('');
+            setPasswordDialogOpen(true);
+            return; // Wait for password input
+          }
+
+          if (!looksEncrypted && !isManuallyEncrypted) {
             showNotification(
               'File is marked encrypted but payload is invalid',
               'error',
             );
             return;
-          }
-
-          const encryptedData = JSON.parse(rawContent);
-          const decrypted = await window.encryptionAPI.decryptContent(
-            encryptedData,
-            absolutePath,
-          );
-
-          content = decrypted;
-          isFileEncrypted = true;
-
-          if (encryptedData && encryptedData.originalExtension) {
-            originalExtension = encryptedData.originalExtension;
           }
         } catch (decryptError: any) {
           const msg =
@@ -311,6 +343,61 @@ export default function Sidebar() {
       console.error('Error opening file:', error);
       showNotification('Error opening file', 'error');
     }
+  };
+
+  // Handle password confirmation for manually encrypted files
+  const handlePasswordConfirm = async (password: string) => {
+    if (!pendingFileData) return;
+
+    try {
+      const encryptedData = JSON.parse(pendingFileData.rawContent);
+      const result = await window.manualEncryptionAPI.decryptContent(
+        encryptedData,
+        password,
+      );
+
+      if (!result.success) {
+        setPasswordError(
+          t('dialog.password.wrongPassword') ||
+            'Wrong password. Please try again.',
+        );
+        return; // Keep dialog open for retry
+      }
+
+      // Success! Close dialog and open file
+      setPasswordDialogOpen(false);
+      setPendingFileData(null);
+      setPasswordError('');
+
+      // Get original extension from encrypted data
+      const originalExt =
+        (await window.manualEncryptionAPI.getOriginalExtension(
+          pendingFileData.rawContent,
+        )) || pendingFileData.originalExtension;
+
+      // Open in editor
+      openFileInEditor(
+        pendingFileData.absolutePath,
+        pendingFileData.item.name,
+        originalExt,
+        result.data || '',
+        true, // isEncrypted
+        password, // Pass the password to be stored encrypted in memory
+      );
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error decrypting with password:', error);
+      setPasswordError(
+        t('dialog.password.wrongPassword') ||
+          'Wrong password. Please try again.',
+      );
+    }
+  };
+
+  const handlePasswordDialogClose = () => {
+    setPasswordDialogOpen(false);
+    setPendingFileData(null);
+    setPasswordError('');
   };
 
   // Handle context menu (right-click)
@@ -465,11 +552,12 @@ export default function Sidebar() {
       const openTab = tabs.find((tab) => tab.filePath === path);
       if (openTab) {
         setTabs((prev) => prev.filter((tab) => tab.filePath !== path));
-        // Se o arquivo deletado for o activeTab, setar activeTab para null
+        // If the deleted file was the activeTab, clear the activeTab.
+        // setActiveTab expects a string argument, so set to empty string to clear selection.
         if (typeof setActiveTab === 'function' && openTab.id) {
-          setActiveTab((prevActive) =>
-            prevActive === openTab.id ? null : prevActive,
-          );
+          if (activeTab === openTab.id) {
+            setActiveTab('');
+          }
         }
       }
 
@@ -998,6 +1086,14 @@ export default function Sidebar() {
         cancelLabel={t('dialog.actions.cancel')}
         onConfirm={handleDeleteConfirmProceed}
         onClose={handleDeleteConfirmCancel}
+      />
+
+      <PasswordDialog
+        open={passwordDialogOpen}
+        onClose={handlePasswordDialogClose}
+        onConfirm={handlePasswordConfirm}
+        filename={pendingFileData?.item.name}
+        error={passwordError}
       />
     </aside>
   );

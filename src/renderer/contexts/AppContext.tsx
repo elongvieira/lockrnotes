@@ -14,6 +14,7 @@ interface FileTab {
   isEncrypted: boolean;
   originalExtension?: string;
   filePath: string;
+  encryptedPassword?: string; // Senha criptografada com chave de sessão
 }
 
 interface AppContextType {
@@ -35,17 +36,19 @@ interface AppContextType {
   openFileInEditor: (
     filePath: string,
     filename: string,
-    originalExtension?: string,
-    content?: string,
-    isEncrypted?: boolean,
+    originalExtension: string | undefined,
+    content: string,
+    isEncrypted: boolean,
+    password?: string,
   ) => void;
   setOpenFileInEditor: (
     fn: (
       filePath: string,
       filename: string,
-      originalExtension?: string,
-      content?: string,
-      isEncrypted?: boolean,
+      originalExtension: string | undefined,
+      content: string,
+      isEncrypted: boolean,
+      password?: string,
     ) => void,
   ) => void;
 
@@ -90,9 +93,10 @@ export function AppProvider({ children }: AppProviderProps) {
     (
       filePath: string,
       filename: string,
-      originalExtension?: string,
-      content?: string,
-      isEncrypted?: boolean,
+      originalExtension: string | undefined,
+      content: string,
+      isEncrypted: boolean,
+      password?: string,
     ) => void
   >(() => () => {});
 
