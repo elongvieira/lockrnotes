@@ -5,7 +5,11 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuIcon from '@mui/icons-material/Menu';
+import DownloadIcon from '@mui/icons-material/Download';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
 import './AppBar.css';
@@ -47,6 +51,87 @@ export default function AppBar() {
 
   const handleClose = () => {
     window.electron?.window?.close();
+  };
+
+  const handleExport = async () => {
+    handleMenuClose();
+
+    try {
+      // Show in-progress notification
+      window.dispatchEvent(
+        new CustomEvent('show-notification', {
+          detail: {
+            message:
+              t('notifications.exportInProgress') || 'Exporting files...',
+            severity: 'info',
+          },
+        }),
+      );
+
+      // Select folder
+      const folderResult = await window.exportAPI.selectFolder();
+
+      if (folderResult.canceled || !folderResult.folderPath) {
+        window.dispatchEvent(
+          new CustomEvent('show-notification', {
+            detail: {
+              message:
+                t('notifications.exportNoFolder') ||
+                'No folder selected for export',
+              severity: 'warning',
+            },
+          }),
+        );
+        return;
+      }
+
+      // Export all files
+      const exportResult = await window.exportAPI.exportAll(
+        folderResult.folderPath,
+      );
+
+      if (exportResult.success && exportResult.zipPath) {
+        window.dispatchEvent(
+          new CustomEvent('show-notification', {
+            detail: {
+              message:
+                t('notifications.exportSuccess', {
+                  count: exportResult.filesExported || 0,
+                  path: exportResult.zipPath,
+                }) ||
+                `Export completed! ${exportResult.filesExported} files exported`,
+              severity: 'success',
+            },
+          }),
+        );
+      } else {
+        window.dispatchEvent(
+          new CustomEvent('show-notification', {
+            detail: {
+              message:
+                t('notifications.exportError', {
+                  error: exportResult.error || 'Unknown error',
+                }) || `Error exporting files: ${exportResult.error}`,
+              severity: 'error',
+            },
+          }),
+        );
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Export error:', error);
+      window.dispatchEvent(
+        new CustomEvent('show-notification', {
+          detail: {
+            message:
+              t('notifications.exportError', {
+                error: error instanceof Error ? error.message : 'Unknown error',
+              }) || 'Error exporting files',
+            severity: 'error',
+          },
+        }),
+      );
+    }
   };
 
   return (
@@ -150,7 +235,16 @@ export default function AppBar() {
             }}
             className="app-menu-item"
           >
+            <ListItemIcon className="app-menu-icon">
+              <SettingsIcon fontSize="small" />
+            </ListItemIcon>
             {t('settings.title') || '⚙️ Configurações'}
+          </MenuItem>
+          <MenuItem onClick={handleExport} className="app-menu-item">
+            <ListItemIcon className="app-menu-icon">
+              <DownloadIcon fontSize="small" />
+            </ListItemIcon>
+            {t('menu.export') || '📦 Exportar tudo'}
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -159,6 +253,9 @@ export default function AppBar() {
             }}
             className="app-menu-item"
           >
+            <ListItemIcon className="app-menu-icon">
+              <LogoutIcon fontSize="small" />
+            </ListItemIcon>
             {t('menu.exit')}
           </MenuItem>
         </Menu>

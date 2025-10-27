@@ -6,6 +6,7 @@
     "new": "New Note",
     "save": "Save",
     "delete": "Delete",
+    "export": "Export All",
     "exit": "Exit"
   },
   "editor": {
@@ -214,7 +215,11 @@
     "fileDeleted": "File deleted successfully",
     "fileDeleteError": "Error deleting file",
     "fileDecrypted": "File decrypted successfully",
-    "fileDecryptError": "Error decrypting file"
+    "fileDecryptError": "Error decrypting file",
+    "exportSuccess": "Export completed! {{count}} files exported to {{path}}",
+    "exportError": "Error exporting files: {{error}}",
+    "exportNoFolder": "No folder selected for export",
+    "exportInProgress": "Exporting files..."
   },
   "status": {
     "saved": "Saved",

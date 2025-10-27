@@ -6,6 +6,7 @@
     "new": "Nova nota",
     "save": "Salvar",
     "delete": "Excluir",
+    "export": "Exportar tudo",
     "exit": "Sair"
   },
   "editor": {
@@ -214,7 +215,11 @@
     "fileDeleted": "Arquivo excluído com sucesso",
     "fileDeleteError": "Erro ao excluir arquivo",
     "fileDecrypted": "Arquivo descriptografado com sucesso",
-    "fileDecryptError": "Erro ao descriptografar arquivo"
+    "fileDecryptError": "Erro ao descriptografar arquivo",
+    "exportSuccess": "Exportação concluída! {{count}} arquivos exportados para {{path}}",
+    "exportError": "Erro ao exportar arquivos: {{error}}",
+    "exportNoFolder": "Nenhuma pasta selecionada para exportação",
+    "exportInProgress": "Exportando arquivos..."
   },
   "status": {
     "saved": "Salvo",

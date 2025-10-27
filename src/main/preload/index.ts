@@ -2,6 +2,7 @@ export { filesystemApi } from './filesystemApi';
 export { windowApi } from './windowApi';
 export { EncryptionAPI } from './encryptionApi';
 export { systemApi } from './systemApi';
+export { exportApi } from './exportApi';
 
 // Import the encryption API to register it
 import './encryptionApi';

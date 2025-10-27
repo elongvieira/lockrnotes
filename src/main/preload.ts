@@ -1,7 +1,12 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge } from 'electron';
-import { filesystemApi, windowApi, systemApi } from './preload/index';
+import {
+  filesystemApi,
+  windowApi,
+  systemApi,
+  exportApi,
+} from './preload/index';
 import './preload/encryptionApi';
 import './preload/manualEncryptionApi';
 
@@ -15,5 +20,6 @@ const electronHandler = {
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
+contextBridge.exposeInMainWorld('exportAPI', exportApi);
 
 export type ElectronHandler = typeof electronHandler;
