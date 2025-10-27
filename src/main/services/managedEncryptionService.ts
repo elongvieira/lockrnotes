@@ -142,12 +142,12 @@ class ManagedEncryptionService {
 
   private deriveFileKey(
     masterKey: Buffer,
-    filePath: string,
+    _filePath: string, // mantido para compatibilidade de assinatura
     salt: Buffer,
   ): Buffer {
-    const fileIdentifier = `${path.resolve(filePath)}`;
+    // Deriva a chave apenas do masterKey e salt, sem path
     return crypto.pbkdf2Sync(
-      Buffer.concat([masterKey, Buffer.from(fileIdentifier)]),
+      masterKey,
       salt,
       this.iterations,
       this.keyLength,
@@ -160,17 +160,11 @@ class ManagedEncryptionService {
     filePath: string,
     originalExtension: string,
   ): Promise<EncryptedFileData> {
-    const resolved = path.resolve(filePath);
-    // File path for encryption (raw): ${filePath}
-    // File path for encryption (resolved): ${resolved}
-    // Original extension: ${originalExtension}
-    // Content length: ${content.length}
-
     const masterKey = await this.getMasterKey();
     const salt = crypto.randomBytes(this.saltLength);
     const iv = crypto.randomBytes(this.ivLength);
 
-    const fileKey = this.deriveFileKey(masterKey, resolved, salt);
+    const fileKey = this.deriveFileKey(masterKey, '', salt);
 
     const cipher = crypto.createCipheriv(this.algorithm, fileKey, iv);
     let encrypted = cipher.update(content, 'utf8', 'base64');
@@ -197,18 +191,6 @@ class ManagedEncryptionService {
     encryptedData: EncryptedFileData,
     filePath: string,
   ): Promise<string> {
-    const resolved = path.resolve(filePath);
-    const normalized = path.normalize(filePath);
-    const attempts = Array.from(
-      new Set([
-        filePath,
-        resolved,
-        normalized,
-        path.join(process.cwd(), filePath),
-      ]),
-    );
-    // Decryption attempts will use: ${attempts}
-
     if (
       encryptedData.type !== 'lockrnotes-encrypted' ||
       encryptedData.algorithm !== this.algorithm
@@ -222,36 +204,22 @@ class ManagedEncryptionService {
     const iv = Buffer.from(encryptedData.iv, 'base64');
     const authTag = Buffer.from(encryptedData.authTag, 'base64');
 
-    for (const attemptPath of attempts) {
-      try {
-        // Trying derivation with path
-        const fileKey = this.deriveFileKey(masterKey, attemptPath, salt);
-
-        const decipher = crypto.createDecipheriv(this.algorithm, fileKey, iv);
-        decipher.setAuthTag(authTag);
-        let decrypted = decipher.update(
-          encryptedData.encrypted,
-          'base64',
-          'utf8',
-        );
-        decrypted += decipher.final('utf8');
-
-        // Decryption succeeded with path
-        return decrypted;
-      } catch (innerErr: any) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          'Decryption attempt failed for path:',
-          attemptPath,
-          (innerErr && innerErr.message) || innerErr,
-        );
-        // try next
-      }
+    try {
+      const fileKey = this.deriveFileKey(masterKey, '', salt);
+      const decipher = crypto.createDecipheriv(this.algorithm, fileKey, iv);
+      decipher.setAuthTag(authTag);
+      let decrypted = decipher.update(
+        encryptedData.encrypted,
+        'base64',
+        'utf8',
+      );
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    } catch (error: any) {
+      throw new Error(
+        `Failed to decrypt content: ${error?.message || 'unknown error'}`,
+      );
     }
-
-    throw new Error(
-      'Failed to decrypt content - file may be corrupted or path mismatch',
-    );
   }
 
   isContentEncrypted(content: string): boolean {
