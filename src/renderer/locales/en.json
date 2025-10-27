@@ -155,7 +155,9 @@
     "showAll": "Show All",
     "hideAll": "Hide All",
     "createNewFromCurrent": "Create new file from current",
+    "search": "Search records...",
     "empty": "No records yet. Click \"Add Record\" to create one.",
+    "noSearchResults": "No search results found.",
     "types": {
       "keyValue": "Title + Value",
       "titleTwoValues": "Title + Value 1 + Value 2",

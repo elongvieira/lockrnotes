@@ -155,7 +155,9 @@
     "showAll": "Mostrar Tudo",
     "hideAll": "Ocultar Tudo",
     "createNewFromCurrent": "Criar novo arquivo baseado no atual",
+    "search": "Pesquisar registros...",
     "empty": "Nenhum registro ainda. Clique em \"Adicionar Registro\" para criar um.",
+    "noSearchResults": "Nenhum resultado encontrado para a pesquisa.",
     "types": {
       "keyValue": "Título + Valor",
       "titleTwoValues": "Título + Valor 1 + Valor 2",

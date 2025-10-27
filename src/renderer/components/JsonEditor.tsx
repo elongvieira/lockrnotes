@@ -15,6 +15,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
@@ -45,6 +46,7 @@ import {
 } from '../types/jsonEntry';
 import JsonEntryDialog from './JsonEntryDialog';
 import ConfirmDialog from './ConfirmDialog';
+import { dialogStyles } from '../styles/dialogStyles';
 import './JsonEditor.css';
 
 interface JsonEditorProps {
@@ -58,6 +60,7 @@ export default function JsonEditor({
 }: JsonEditorProps) {
   const { t } = useTranslation();
   const [entries, setEntries] = useState<JsonEntry[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [editingEntry, setEditingEntry] = useState<JsonEntry | null>(null);
   const [duplicateData, setDuplicateData] = useState<JsonEntry | null>(null);
@@ -91,6 +94,19 @@ export default function JsonEditor({
     const maskedPart = '••••••';
     return maskedPart + visiblePart;
   };
+
+  // Função para filtrar entradas baseado na pesquisa
+  const filteredEntries = entries.filter((entry) => {
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+
+    if ('title' in entry && entry.title.toLowerCase().includes(query)) {
+      return true;
+    }
+
+    return false;
+  });
 
   // Parse content on mount or when content changes externally
   useEffect(() => {
@@ -638,7 +654,25 @@ export default function JsonEditor({
         <Typography variant="h6" className="json-editor-title">
           {t('jsonEditor.title') || 'JSON Entries'}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            gap: 2,
+          }}
+        >
+          {/* Search field */}
+          {entries.length > 0 && (
+            <TextField
+              size="small"
+              placeholder={t('jsonEditor.search') || 'Pesquisar...'}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ width: 250, ml: 2, ...dialogStyles.textField }}
+            />
+          )}
+
           {/* Spacer to push the controls to the right */}
           <Box sx={{ flex: 1 }} />
 
@@ -713,14 +747,25 @@ export default function JsonEditor({
         </MenuItem>
       </Menu>
 
-      {entries.length === 0 ? (
+      {entries.length === 0 && (
         <Box className="json-editor-empty">
           <Typography>
             {t('jsonEditor.empty') ||
               'No entries yet. Click "Add Entry" to create one.'}
           </Typography>
         </Box>
-      ) : (
+      )}
+
+      {entries.length > 0 && filteredEntries.length === 0 && (
+        <Box className="json-editor-empty">
+          <Typography>
+            {t('jsonEditor.noSearchResults') ||
+              'Nenhum resultado encontrado para a pesquisa.'}
+          </Typography>
+        </Box>
+      )}
+
+      {filteredEntries.length > 0 && (
         <TableContainer
           component={Paper}
           className="app-scroll json-editor-table-container"
@@ -743,7 +788,7 @@ export default function JsonEditor({
               </TableRow>
             </TableHead>
             <TableBody>
-              {entries.map((entry) => (
+              {filteredEntries.map((entry) => (
                 <TableRow key={entry.id} className="json-editor-row">
                   <TableCell className="json-editor-cell json-editor-order-cell">
                     <Box className="json-editor-order-buttons">
