@@ -691,6 +691,7 @@ export default function Editor() {
                   </Box>
                 }
                 value={tab.id}
+                title={tab.filePath}
               />
             ))}
           </Tabs>
