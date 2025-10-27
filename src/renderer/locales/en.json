@@ -183,7 +183,11 @@
     "deleteConfirm": {
       "title": "Delete Record",
       "message": "Are you sure you want to delete this record?"
-    }
+    },
+    "switchToRaw": "Edit as raw text",
+    "switchToStructured": "Edit as structured",
+    "rawPlaceholder": "Edit JSON as text...",
+    "parseError": "Invalid JSON format"
   },
   "contextMenu": {
     "open": "Open",

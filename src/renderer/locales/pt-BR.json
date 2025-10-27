@@ -183,7 +183,11 @@
     "deleteConfirm": {
       "title": "Excluir Registro",
       "message": "Tem certeza de que deseja excluir este registro?"
-    }
+    },
+    "switchToRaw": "Editar como texto",
+    "switchToStructured": "Editar como estruturado",
+    "rawPlaceholder": "Edite o JSON como texto...",
+    "parseError": "Formato JSON inválido"
   },
   "contextMenu": {
     "open": "Abrir",

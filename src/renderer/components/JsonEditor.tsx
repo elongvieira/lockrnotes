@@ -29,6 +29,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import CodeIcon from '@mui/icons-material/Code';
+import TableChartIcon from '@mui/icons-material/TableChart';
 import { useTranslation } from 'react-i18next';
 import { fileSystemService } from '../services/fileSystemService';
 import { joinPath } from '../utils/pathUtil';
@@ -74,6 +76,8 @@ export default function JsonEditor({
   const [showAll, setShowAll] = useState<boolean>(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(menuAnchorEl);
+  const [editMode, setEditMode] = useState<'structured' | 'raw'>('structured');
+  const [rawJsonText, setRawJsonText] = useState<string>('');
   const { refreshSidebar, showNotification } = useAppContext();
 
   // Função para mascarar um valor.
@@ -309,6 +313,32 @@ export default function JsonEditor({
           t('notifications.fileCreationError') || 'Error creating file',
           'error',
         );
+    }
+  };
+
+  const toggleEditMode = () => {
+    if (editMode === 'structured') {
+      // Switch to raw mode: serialize current entries to JSON text
+      const jsonText = serializeJsonContent(entries);
+      setRawJsonText(jsonText);
+      setEditMode('raw');
+    } else {
+      // Switch to structured mode: parse raw JSON text
+      try {
+        const parsed = parseJsonContent(rawJsonText);
+        setEntries(parsed);
+        onContentChange(rawJsonText);
+        setEditMode('structured');
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error parsing JSON:', error);
+        if (showNotification) {
+          showNotification(
+            t('jsonEditor.parseError') || 'Invalid JSON format',
+            'error',
+          );
+        }
+      }
     }
   };
 
@@ -662,8 +692,8 @@ export default function JsonEditor({
             gap: 2,
           }}
         >
-          {/* Search field */}
-          {entries.length > 0 && (
+          {/* Search field - only show in structured mode */}
+          {entries.length > 0 && editMode === 'structured' && (
             <TextField
               size="small"
               placeholder={t('jsonEditor.search') || 'Pesquisar...'}
@@ -678,15 +708,17 @@ export default function JsonEditor({
 
           {/* Right: Add (first in this group), eye (penultimate) and menu (last) */}
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddEntry}
-              className="json-editor-add-btn"
-            >
-              {t('jsonEditor.addEntry') || 'Add Entry'}
-            </Button>
-            {entries.length > 0 && (
+            {editMode === 'structured' && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAddEntry}
+                className="json-editor-add-btn"
+              >
+                {t('jsonEditor.addEntry') || 'Add Entry'}
+              </Button>
+            )}
+            {entries.length > 0 && editMode === 'structured' && (
               <IconButton
                 onClick={toggleShowAll}
                 title={
@@ -704,6 +736,23 @@ export default function JsonEditor({
                 {showAll ? <VisibilityOffIcon /> : <VisibilityIcon />}
               </IconButton>
             )}
+
+            <IconButton
+              onClick={toggleEditMode}
+              title={
+                editMode === 'structured'
+                  ? t('jsonEditor.switchToRaw') || 'Edit as raw text'
+                  : t('jsonEditor.switchToStructured') || 'Edit as structured'
+              }
+              sx={{
+                color: 'var(--text-primary)',
+                '&:hover': {
+                  backgroundColor: 'rgba(33, 150, 243, 0.12)',
+                },
+              }}
+            >
+              {editMode === 'structured' ? <CodeIcon /> : <TableChartIcon />}
+            </IconButton>
 
             {entries.length > 0 && (
               <IconButton
@@ -747,115 +796,160 @@ export default function JsonEditor({
         </MenuItem>
       </Menu>
 
-      {entries.length === 0 && (
-        <Box className="json-editor-empty">
-          <Typography>
-            {t('jsonEditor.empty') ||
-              'No entries yet. Click "Add Entry" to create one.'}
-          </Typography>
-        </Box>
-      )}
+      {editMode === 'structured' ? (
+        <>
+          {entries.length === 0 && (
+            <Box className="json-editor-empty">
+              <Typography>
+                {t('jsonEditor.empty') ||
+                  'No entries yet. Click "Add Entry" to create one.'}
+              </Typography>
+            </Box>
+          )}
 
-      {entries.length > 0 && filteredEntries.length === 0 && (
-        <Box className="json-editor-empty">
-          <Typography>
-            {t('jsonEditor.noSearchResults') ||
-              'Nenhum resultado encontrado para a pesquisa.'}
-          </Typography>
-        </Box>
-      )}
+          {entries.length > 0 && filteredEntries.length === 0 && (
+            <Box className="json-editor-empty">
+              <Typography>
+                {t('jsonEditor.noSearchResults') ||
+                  'Nenhum resultado encontrado para a pesquisa.'}
+              </Typography>
+            </Box>
+          )}
 
-      {filteredEntries.length > 0 && (
-        <TableContainer
-          component={Paper}
-          className="app-scroll json-editor-table-container"
+          {filteredEntries.length > 0 && (
+            <TableContainer
+              component={Paper}
+              className="app-scroll json-editor-table-container"
+            >
+              <Table stickyHeader className="json-editor-table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell className="json-editor-table-head json-editor-order-col">
+                      {/* Order column */}
+                    </TableCell>
+                    <TableCell className="json-editor-table-head">
+                      {t('jsonEditor.fields.title') || 'Title'}
+                    </TableCell>
+                    <TableCell className="json-editor-table-head">
+                      {t('jsonEditor.fields.value') || 'Value'}
+                    </TableCell>
+                    <TableCell align="right" className="json-editor-table-head">
+                      {t('jsonEditor.actions') || 'Actions'}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredEntries.map((entry) => (
+                    <TableRow key={entry.id} className="json-editor-row">
+                      <TableCell className="json-editor-cell json-editor-order-cell">
+                        <Box className="json-editor-order-buttons">
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              moveEntry(entries.indexOf(entry), 'up')
+                            }
+                            className="move-up-btn"
+                            disabled={entries.indexOf(entry) === 0}
+                          >
+                            <ArrowUpwardIcon fontSize="inherit" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              moveEntry(entries.indexOf(entry), 'down')
+                            }
+                            className="move-down-btn"
+                            disabled={
+                              entries.indexOf(entry) === entries.length - 1
+                            }
+                          >
+                            <ArrowDownwardIcon fontSize="inherit" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                      <TableCell className="json-editor-cell">
+                        {entry.title}
+                      </TableCell>
+                      <TableCell className="json-editor-cell">
+                        {renderEntryValue(entry)}
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        className="json-editor-cell json-editor-actions"
+                      >
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDuplicateEntry(entry)}
+                          className="duplicate-btn"
+                          title={t('jsonEditor.duplicate') || 'Duplicate entry'}
+                          sx={{
+                            color: 'var(--primary-blue)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(33, 150, 243, 0.12)',
+                            },
+                          }}
+                        >
+                          <CopyAllIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEditEntry(entry)}
+                          className="edit-btn"
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDeleteEntry(entry)}
+                          className="delete-btn"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </>
+      ) : (
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            p: 2,
+          }}
         >
-          <Table stickyHeader className="json-editor-table">
-            <TableHead>
-              <TableRow>
-                <TableCell className="json-editor-table-head json-editor-order-col">
-                  {/* Order column */}
-                </TableCell>
-                <TableCell className="json-editor-table-head">
-                  {t('jsonEditor.fields.title') || 'Title'}
-                </TableCell>
-                <TableCell className="json-editor-table-head">
-                  {t('jsonEditor.fields.value') || 'Value'}
-                </TableCell>
-                <TableCell align="right" className="json-editor-table-head">
-                  {t('jsonEditor.actions') || 'Actions'}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredEntries.map((entry) => (
-                <TableRow key={entry.id} className="json-editor-row">
-                  <TableCell className="json-editor-cell json-editor-order-cell">
-                    <Box className="json-editor-order-buttons">
-                      <IconButton
-                        size="small"
-                        onClick={() => moveEntry(entries.indexOf(entry), 'up')}
-                        className="move-up-btn"
-                        disabled={entries.indexOf(entry) === 0}
-                      >
-                        <ArrowUpwardIcon fontSize="inherit" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          moveEntry(entries.indexOf(entry), 'down')
-                        }
-                        className="move-down-btn"
-                        disabled={entries.indexOf(entry) === entries.length - 1}
-                      >
-                        <ArrowDownwardIcon fontSize="inherit" />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                  <TableCell className="json-editor-cell">
-                    {entry.title}
-                  </TableCell>
-                  <TableCell className="json-editor-cell">
-                    {renderEntryValue(entry)}
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    className="json-editor-cell json-editor-actions"
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDuplicateEntry(entry)}
-                      className="duplicate-btn"
-                      title={t('jsonEditor.duplicate') || 'Duplicate entry'}
-                      sx={{
-                        color: 'var(--primary-blue)',
-                        '&:hover': {
-                          backgroundColor: 'rgba(33, 150, 243, 0.12)',
-                        },
-                      }}
-                    >
-                      <CopyAllIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditEntry(entry)}
-                      className="edit-btn"
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteEntry(entry)}
-                      className="delete-btn"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+          <TextField
+            multiline
+            fullWidth
+            value={rawJsonText}
+            onChange={(e) => {
+              setRawJsonText(e.target.value);
+              onContentChange(e.target.value);
+            }}
+            sx={{
+              flex: 1,
+              '& .MuiInputBase-root': {
+                height: '100%',
+                alignItems: 'flex-start',
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+              },
+              '& .MuiInputBase-input': {
+                height: '100% !important',
+                overflow: 'auto !important',
+              },
+              ...dialogStyles.textField,
+            }}
+            className="json-editor-raw-textfield"
+            placeholder={
+              t('jsonEditor.rawPlaceholder') || 'Edit JSON as text...'
+            }
+          />
+        </Box>
       )}
 
       <JsonEntryDialog

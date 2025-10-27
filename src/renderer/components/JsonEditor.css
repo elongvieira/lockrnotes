@@ -177,3 +177,30 @@
 .move-down-btn .MuiSvgIcon-root {
   font-size: 16px;
 }
+
+/* Raw JSON editor TextField scrollbar styles (matching Editor.tsx) */
+.json-editor-raw-textfield .MuiOutlinedInput-input::-webkit-scrollbar {
+  width: 10px;
+}
+
+.json-editor-raw-textfield .MuiOutlinedInput-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.json-editor-raw-textfield .MuiOutlinedInput-input::-webkit-scrollbar-thumb {
+  background: rgba(88, 166, 255, 0.12);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.json-editor-raw-textfield
+  .MuiOutlinedInput-input::-webkit-scrollbar-thumb:hover {
+  background: rgba(88, 166, 255, 0.18);
+}
+
+/* Firefox scrollbar */
+.json-editor-raw-textfield .MuiOutlinedInput-input {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(88, 166, 255, 0.12) transparent;
+}
