@@ -19,6 +19,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
@@ -453,6 +454,40 @@ export default function Sidebar() {
       setCopyDialogOpen(true);
     }
     handleContextMenuClose();
+  };
+
+  const handleContextMenuDecrypt = async () => {
+    if (!contextMenu?.item) return;
+
+    const { path: filePath } = contextMenu.item;
+    handleContextMenuClose();
+
+    try {
+      const result = await fileSystemService.decryptFile(filePath);
+
+      if (result.success) {
+        showNotification(
+          `${t('contextMenu.decryptSuccess') || 'File decrypted successfully'}: ${result.fileName}`,
+          'success',
+        );
+        // Refresh the directory to show the new decrypted file
+        await loadDirectory(currentPath);
+      } else {
+        showNotification(
+          result.error ||
+            t('contextMenu.decryptError') ||
+            'Failed to decrypt file',
+          'error',
+        );
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error decrypting file:', error);
+      showNotification(
+        t('contextMenu.decryptError') || 'Failed to decrypt file',
+        'error',
+      );
+    }
   };
 
   const handleRenameDialogClose = () => {
@@ -1040,6 +1075,17 @@ export default function Sidebar() {
           </ListItemIcon>
           <ListItemText>{t('contextMenu.copy')}</ListItemText>
         </MenuItem>
+        {contextMenu?.item?.type === 'file' && (
+          <MenuItem
+            onClick={handleContextMenuDecrypt}
+            className="app-menu-item"
+          >
+            <ListItemIcon className="app-menu-icon">
+              <LockOpenIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('contextMenu.decrypt') || 'Decrypt'}</ListItemText>
+          </MenuItem>
+        )}
         <MenuItem onClick={handleContextMenuDelete} className="app-menu-item">
           <ListItemIcon className="app-menu-icon">
             <DeleteIcon fontSize="small" />

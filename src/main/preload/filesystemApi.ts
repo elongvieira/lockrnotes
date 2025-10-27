@@ -54,4 +54,13 @@ export const filesystemApi = {
   getDefaultNotesDirectory(): Promise<string> {
     return ipcRenderer.invoke('fs-get-default-notes-directory');
   },
+
+  decryptFile(filePath: string): Promise<{
+    success: boolean;
+    filePath?: string;
+    fileName?: string;
+    error?: string;
+  }> {
+    return ipcRenderer.invoke('fs-decrypt-file', filePath);
+  },
 };

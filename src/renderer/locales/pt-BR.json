@@ -15,30 +15,30 @@
       "message": "Clique em um arquivo na barra lateral para abri-lo em uma nova aba, ou crie um novo arquivo para começar a escrever."
     }
   },
-  "sidebar":{
-    "tabs":{
-      "aria":"Abas da barra lateral",
-      "local":"Local",
-      "files":"Arquivos",
-      "remote":"Remoto"
+  "sidebar": {
+    "tabs": {
+      "aria": "Abas da barra lateral",
+      "local": "Local",
+      "files": "Arquivos",
+      "remote": "Remoto"
     },
-    "local":{
-      "content":"Esta é a área de notas locais. Selecione ou crie uma nota para começar a editar."
+    "local": {
+      "content": "Esta é a área de notas locais. Selecione ou crie uma nota para começar a editar."
     },
-    "tree":{
-      "aria":"Árvore de notas",
-      "root":"Notas",
-      "loading":"Carregando...",
-      "empty":"Nenhum arquivo encontrado"
+    "tree": {
+      "aria": "Árvore de notas",
+      "root": "Notas",
+      "loading": "Carregando...",
+      "empty": "Nenhum arquivo encontrado"
     },
-    "actions":{
-      "createFolder":"Criar pasta",
-      "createFile":"Criar arquivo",
-      "refresh":"Atualizar"
+    "actions": {
+      "createFolder": "Criar pasta",
+      "createFile": "Criar arquivo",
+      "refresh": "Atualizar"
     },
-    "prompts":{
-      "folderName":"Digite o nome da pasta:",
-      "fileName":"Digite o nome do arquivo (com extensão):"
+    "prompts": {
+      "folderName": "Digite o nome da pasta:",
+      "fileName": "Digite o nome do arquivo (com extensão):"
     }
   },
   "dialog": {
@@ -86,8 +86,8 @@
         "weakPassword": "Senha deve ter pelo menos 6 caracteres",
         "passwordMismatch": "Senhas não coincidem",
         "passwordTooLong": "Senha é muito longa (máximo 128 caracteres)",
-        "passwordSpecialChars": "Senha deve conter pelo menos um caractere especial"
-        ,"fileExists": "Já existe um arquivo com esse nome"
+        "passwordSpecialChars": "Senha deve conter pelo menos um caractere especial",
+        "fileExists": "Já existe um arquivo com esse nome"
       }
     },
     "actions": {
@@ -145,7 +145,7 @@
     }
   },
   "jsonEditor": {
-  "title": "Registros",
+    "title": "Registros",
     "addEntry": "Adicionar Registro",
     "editEntry": "Editar Registro",
     "duplicate": "Duplicar Registro",
@@ -166,12 +166,12 @@
       "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha"
     },
     "fields": {
-  "title": "Título",
-  "value": "Valor",
-  "value1": "Valor 1",
-  "value2": "Valor 2",
-  "password": "Senha",
-  "type": "Tipo"
+      "title": "Título",
+      "value": "Valor",
+      "value1": "Valor 1",
+      "value2": "Valor 2",
+      "password": "Senha",
+      "type": "Tipo"
     },
     "errors": {
       "emptyTitle": "Título é obrigatório",
@@ -190,7 +190,8 @@
     "rename": "Renomear",
     "move": "Mover",
     "copy": "Copiar",
-    "delete": "Excluir"
+    "delete": "Excluir",
+    "decrypt": "Descriptografar"
   },
   "notifications": {
     "fileCreated": "Arquivo criado com sucesso",
@@ -207,9 +208,10 @@
     "fileCopyError": "Erro ao copiar item",
     "copyFolderNotSupported": "Cópia de pasta ainda não é suportada",
     "fileDeleted": "Arquivo excluído com sucesso",
-    "fileDeleteError": "Erro ao excluir arquivo"
-  }
-  ,
+    "fileDeleteError": "Erro ao excluir arquivo",
+    "fileDecrypted": "Arquivo descriptografado com sucesso",
+    "fileDecryptError": "Erro ao descriptografar arquivo"
+  },
   "status": {
     "saved": "Salvo",
     "unsaved": "Não salvo",

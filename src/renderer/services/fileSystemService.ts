@@ -216,6 +216,28 @@ class FileSystemServiceImpl implements FileSystemService {
       return false;
     }
   }
+
+  /**
+   * Decrypt an encrypted file and save as new file
+   */
+  async decryptFile(
+    filePath: string,
+  ): Promise<{ success: boolean; fileName?: string; error?: string }> {
+    try {
+      const result = await this.fs.decryptFile(filePath);
+      return {
+        success: result.success,
+        fileName: result.fileName,
+        error: result.error,
+      };
+    } catch (error) {
+      console.error('Failed to decrypt file:', error);
+      return {
+        success: false,
+        error: String(error),
+      };
+    }
+  }
 }
 
 // Export singleton instance

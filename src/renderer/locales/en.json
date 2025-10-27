@@ -15,30 +15,30 @@
       "message": "Click a file in the sidebar to open it in a new tab, or create a new file to start writing."
     }
   },
-  "sidebar":{
-    "tabs":{
-      "aria":"Sidebar Tabs",
-      "local":"Local",
-      "files":"Files",
-      "remote":"Remote"
+  "sidebar": {
+    "tabs": {
+      "aria": "Sidebar Tabs",
+      "local": "Local",
+      "files": "Files",
+      "remote": "Remote"
     },
-    "local":{
-      "content":"This is the local notes area. Select or create a note to start editing."
+    "local": {
+      "content": "This is the local notes area. Select or create a note to start editing."
     },
-    "tree":{
-      "aria":"Notes tree",
-      "root":"Notes",
-      "loading":"Loading...",
-      "empty":"No files found"
+    "tree": {
+      "aria": "Notes tree",
+      "root": "Notes",
+      "loading": "Loading...",
+      "empty": "No files found"
     },
-    "actions":{
-      "createFolder":"Create folder",
-      "createFile":"Create file",
-      "refresh":"Refresh"
+    "actions": {
+      "createFolder": "Create folder",
+      "createFile": "Create file",
+      "refresh": "Refresh"
     },
-    "prompts":{
-      "folderName":"Enter folder name:",
-      "fileName":"Enter file name (with extension):"
+    "prompts": {
+      "folderName": "Enter folder name:",
+      "fileName": "Enter file name (with extension):"
     }
   },
   "dialog": {
@@ -86,8 +86,8 @@
         "weakPassword": "Password must be at least 6 characters",
         "passwordMismatch": "Passwords do not match",
         "passwordTooLong": "Password is too long (maximum 128 characters)",
-        "passwordSpecialChars": "Password must contain at least one special character"
-        ,"fileExists": "A file with that name already exists"
+        "passwordSpecialChars": "Password must contain at least one special character",
+        "fileExists": "A file with that name already exists"
       }
     },
     "actions": {
@@ -145,7 +145,7 @@
     }
   },
   "jsonEditor": {
-  "title": "Records",
+    "title": "Records",
     "addEntry": "Add Record",
     "editEntry": "Edit Record",
     "duplicate": "Duplicate Record",
@@ -166,12 +166,12 @@
       "titleTwoValuesPassword": "Title + Value 1 + Value 2 + Password"
     },
     "fields": {
-  "title": "Title",
-  "value": "Value",
-  "value1": "Value 1",
-  "value2": "Value 2",
-  "password": "Password",
-  "type": "Type"
+      "title": "Title",
+      "value": "Value",
+      "value1": "Value 1",
+      "value2": "Value 2",
+      "password": "Password",
+      "type": "Type"
     },
     "errors": {
       "emptyTitle": "Title is required",
@@ -190,7 +190,8 @@
     "rename": "Rename",
     "move": "Move",
     "copy": "Copy",
-    "delete": "Delete"
+    "delete": "Delete",
+    "decrypt": "Decrypt"
   },
   "notifications": {
     "fileCreated": "File created successfully",
@@ -207,9 +208,10 @@
     "fileCopyError": "Error copying item",
     "copyFolderNotSupported": "Folder copy not yet supported",
     "fileDeleted": "File deleted successfully",
-    "fileDeleteError": "Error deleting file"
-  }
-  ,
+    "fileDeleteError": "Error deleting file",
+    "fileDecrypted": "File decrypted successfully",
+    "fileDecryptError": "Error decrypting file"
+  },
   "status": {
     "saved": "Saved",
     "unsaved": "Unsaved",

@@ -272,6 +272,66 @@ export function setupFilesystemHandlers() {
     }
   });
 
+  // Decrypt file and save as new file with _decrypted suffix
+  ipcMain.handle('fs-decrypt-file', async (event, filePath: string) => {
+    try {
+      // Read the encrypted file
+      const fileContent = await fs.promises.readFile(filePath, 'utf8');
+
+      // Check if file is encrypted
+      if (!managedEncryptionService.isContentEncrypted(fileContent)) {
+        return {
+          success: false,
+          error: 'File is not encrypted',
+        };
+      }
+
+      try {
+        // Parse encrypted data
+        const encryptedData = JSON.parse(fileContent);
+
+        // Decrypt content
+        const decryptedContent = await managedEncryptionService.decryptContent(
+          encryptedData,
+          filePath,
+        );
+
+        // Get original extension
+        const originalExtension = encryptedData.originalExtension || '.txt';
+
+        // Generate output filename with _decrypted suffix
+        const parsed = path.parse(filePath);
+        const decryptedFileName = `${parsed.name}_decrypted${originalExtension}`;
+        const decryptedFilePath = path.join(parsed.dir, decryptedFileName);
+
+        // Save decrypted content
+        await fs.promises.writeFile(
+          decryptedFilePath,
+          decryptedContent,
+          'utf8',
+        );
+
+        return {
+          success: true,
+          filePath: decryptedFilePath,
+          fileName: decryptedFileName,
+        };
+      } catch (decryptError) {
+        console.error('Error decrypting file:', decryptError);
+        return {
+          success: false,
+          error: `Failed to decrypt file: ${String(decryptError)}`,
+        };
+      }
+    } catch (error) {
+      console.error('Error processing file:', error);
+      return {
+        success: false,
+        error: String(error),
+      };
+    }
+  });
+
   // System utilities
   ipcMain.handle('system:get-path-separator', async () => {
     try {
