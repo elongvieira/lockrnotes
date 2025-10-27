@@ -28,4 +28,5 @@ export interface FileSystemService {
   readConfig(): Promise<any | null>;
   updateConfig(updates: any): Promise<boolean>;
   getDefaultNotesDirectory(): Promise<string>;
+  copyFolderContent(sourceDir: string, destDir: string): Promise<boolean>;
 }

@@ -63,4 +63,11 @@ export const filesystemApi = {
   }> {
     return ipcRenderer.invoke('fs-decrypt-file', filePath);
   },
+
+  copyDirectory(
+    sourceDir: string,
+    destDir: string,
+  ): Promise<{ success: boolean; error?: string }> {
+    return ipcRenderer.invoke('fs-copy-directory', sourceDir, destDir);
+  },
 };

@@ -238,6 +238,22 @@ class FileSystemServiceImpl implements FileSystemService {
       };
     }
   }
+
+  /**
+   * Copy directory contents recursively
+   */
+  async copyFolderContent(
+    sourceDir: string,
+    destDir: string,
+  ): Promise<boolean> {
+    try {
+      const result = await this.fs.copyDirectory(sourceDir, destDir);
+      return result.success;
+    } catch (error) {
+      console.error('Failed to copy folder:', error);
+      return false;
+    }
+  }
 }
 
 // Export singleton instance

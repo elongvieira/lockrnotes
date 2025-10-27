@@ -2,7 +2,7 @@ import { app, safeStorage } from 'electron';
 import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { readConfigFile } from '../config';
+import { readConfigFile, updateConfigFile } from '../config';
 
 export interface EncryptedFileData {
   type: 'lockrnotes-encrypted';
@@ -74,7 +74,9 @@ class ManagedEncryptionService {
         throw new Error('System encryption is not available');
       }
 
+      console.log('Storing master key to:', keyFilePath);
       const encryptedKey = safeStorage.encryptString(key.toString('base64'));
+      console.log('Key encrypted successfully');
 
       const keyData = {
         type: 'lockrnotes-master-key',
@@ -84,6 +86,7 @@ class ManagedEncryptionService {
       };
 
       await fs.writeFile(keyFilePath, JSON.stringify(keyData, null, 2));
+      console.log('Master key file written successfully');
       // Master key stored securely in configured location
     } catch (error) {
       console.error('Failed to store master key:', error);
@@ -94,6 +97,8 @@ class ManagedEncryptionService {
   private async retrieveMasterKey(): Promise<Buffer | null> {
     try {
       const keyFilePath = await this.getKeyFilePath();
+      console.log('Retrieving master key from:', keyFilePath);
+
       const keyDataStr = await fs.readFile(keyFilePath, 'utf8');
       const keyData = JSON.parse(keyDataStr);
 
@@ -109,11 +114,14 @@ class ManagedEncryptionService {
       }
 
       const encryptedBuffer = Buffer.from(keyData.encrypted, 'base64');
+      console.log('Attempting to decrypt master key');
       const decrypted = safeStorage.decryptString(encryptedBuffer);
+      console.log('Master key decrypted successfully');
       return Buffer.from(decrypted, 'base64');
     } catch (error: any) {
       if (error.code === 'ENOENT') {
         // Master key file not found, will generate new one
+        console.log('Master key file not found - will generate new one');
         return null;
       }
       console.error('Failed to retrieve master key:', error);
@@ -256,6 +264,82 @@ class ManagedEncryptionService {
       );
     } catch (error) {
       console.warn('Could not delete master key file:', error);
+    }
+  }
+
+  async migrateKeyStorage(newStorageType: string): Promise<void> {
+    if (newStorageType !== 'system' && newStorageType !== 'folder') {
+      throw new Error('Invalid storage type');
+    }
+
+    try {
+      // Get the current storage type
+      const currentStorageType = await this.getKeyStorageType();
+      console.log(
+        'Migrating encryption key from',
+        currentStorageType,
+        'to',
+        newStorageType,
+      );
+
+      // If same type, nothing to do
+      if (currentStorageType === newStorageType) {
+        console.log('Storage type is already set to', newStorageType);
+        return;
+      }
+
+      // Get the master key from current location BEFORE changing config
+      console.log('Reading master key from current location...');
+      const masterKey = await this.getMasterKey();
+      if (!masterKey) {
+        throw new Error('No master key found to migrate');
+      }
+      console.log('Master key loaded successfully');
+
+      // Update the config to new storage type
+      console.log('Updating config to use', newStorageType);
+      await updateConfigFile({ keyStorageType: newStorageType });
+
+      // Reset the cached master key so it will be treated as not yet stored
+      this.masterKey = null;
+
+      // Now store the same master key in the new location
+      console.log('Storing master key in new location...');
+      await this.storeMasterKey(masterKey);
+
+      // Delete the old key file
+      if (currentStorageType === 'folder' && newStorageType === 'system') {
+        try {
+          const config = await readConfigFile();
+          if (config?.defaultPath) {
+            const oldKeyDir = path.join(config.defaultPath, '.lockrnotes');
+            console.log('Deleting old key directory:', oldKeyDir);
+            // Remove the .lockrnotes directory
+            await fs.rm(oldKeyDir, { recursive: true, force: true });
+            console.log('Deleted local key directory:', oldKeyDir);
+          }
+        } catch (deleteErr) {
+          console.warn('Could not delete local key directory:', deleteErr);
+          // Don't throw - migration still succeeded
+        }
+      } else if (
+        currentStorageType === 'system' &&
+        newStorageType === 'folder'
+      ) {
+        // When migrating from system to folder, the system key will be left behind
+        // but that's okay - it won't be used anymore
+        console.log('Migrated from system to folder storage');
+      }
+
+      console.log(
+        'Key storage migration completed from',
+        currentStorageType,
+        'to',
+        newStorageType,
+      );
+    } catch (error) {
+      console.error('Error migrating key storage:', error);
+      throw new Error(`Failed to migrate key storage: ${String(error)}`);
     }
   }
 }

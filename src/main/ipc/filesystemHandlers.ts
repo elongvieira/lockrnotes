@@ -288,6 +288,42 @@ export function setupFilesystemHandlers() {
       };
     }
   });
+  // Copy directory recursively
+  ipcMain.handle(
+    'fs-copy-directory',
+    async (event, sourceDir: string, destDir: string) => {
+      try {
+        // Helper function to recursively copy a directory
+        const copyDirRecursive = async (src: string, dest: string) => {
+          // Create destination directory if it doesn't exist
+          await fs.promises.mkdir(dest, { recursive: true });
+
+          const items = await fs.promises.readdir(src, {
+            withFileTypes: true,
+          });
+
+          for (const item of items) {
+            const srcPath = path.join(src, item.name);
+            const destPath = path.join(dest, item.name);
+
+            if (item.isDirectory()) {
+              // Recursively copy subdirectories
+              await copyDirRecursive(srcPath, destPath);
+            } else {
+              // Copy file
+              await fs.promises.copyFile(srcPath, destPath);
+            }
+          }
+        };
+
+        await copyDirRecursive(sourceDir, destDir);
+        return { success: true };
+      } catch (error) {
+        console.error('Error copying directory:', error);
+        return { success: false, error: String(error) };
+      }
+    },
+  );
 
   // System utilities
   ipcMain.handle('system:get-path-separator', async () => {

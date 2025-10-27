@@ -250,8 +250,18 @@
   "settings": {
     "title": "⚙️ Settings",
     "editor": "Editor",
+    "storage": "Storage",
+    "security": "Security",
     "autoSave": "Auto-save",
-    "autoSaveDescription": "Automatically saves files after 1.5 seconds of inactivity"
+    "autoSaveDescription": "Automatically saves files after 1.5 seconds of inactivity",
+    "securityWarning": "Changing the key storage type may prevent access to existing encrypted files.",
+    "keyStorageMigrationError": "Failed to migrate key storage type. Please try again.",
+    "changeButton": "Change",
+    "copyContentTitle": "Copy Content",
+    "copyContentMessage": "Do you want to copy the content from the previous folder to the new location?",
+    "copyContentHelper": "This will copy all files from one folder to the other.",
+    "copyYes": "Copy",
+    "copyNo": "Don't Copy"
   },
   "common": {
     "cancel": "Cancel",

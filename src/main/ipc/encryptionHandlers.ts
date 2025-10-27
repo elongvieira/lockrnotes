@@ -77,5 +77,19 @@ export function setupEncryptionHandlers(): void {
     }
   });
 
+  // Migrar chave de criptografia entre tipos de armazenamento
+  ipcMain.handle(
+    'encryption:migrateKeyStorage',
+    async (_, newStorageType: string) => {
+      try {
+        await managedEncryptionService.migrateKeyStorage(newStorageType);
+        return { success: true };
+      } catch (error: any) {
+        console.error('IPC migrate key storage error:', error);
+        return { success: false, error: error.message };
+      }
+    },
+  );
+
   // Encryption IPC handlers registered
 }

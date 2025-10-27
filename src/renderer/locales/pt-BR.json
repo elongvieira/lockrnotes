@@ -250,8 +250,18 @@
   "settings": {
     "title": "⚙️ Configurações",
     "editor": "Editor",
+    "storage": "Armazenamento",
+    "security": "Segurança",
     "autoSave": "Salvar automaticamente",
-    "autoSaveDescription": "Salva os arquivos automaticamente após 1.5 segundos de inatividade"
+    "autoSaveDescription": "Salva os arquivos automaticamente após 1.5 segundos de inatividade",
+    "securityWarning": "Alterar o tipo de armazenamento de chave pode impedir o acesso a arquivos criptografados existentes.",
+    "keyStorageMigrationError": "Erro ao migrar o tipo de armazenamento de chave. Por favor, tente novamente.",
+    "changeButton": "Alterar",
+    "copyContentTitle": "Copiar Conteúdo",
+    "copyContentMessage": "Deseja copiar o conteúdo da pasta anterior para a nova localização?",
+    "copyContentHelper": "Isto vai copiar todos os arquivos de uma pasta para a outra.",
+    "copyYes": "Copiar",
+    "copyNo": "Não Copiar"
   },
   "common": {
     "cancel": "Cancelar",
