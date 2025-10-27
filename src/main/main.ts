@@ -13,7 +13,7 @@ import { app, BrowserWindow, shell } from 'electron';
 import fs from 'fs';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import { ensureConfigFile } from './config';
+import { ensureConfigFile, updateConfigFile } from './config';
 import { resolveHtmlPath } from './util';
 import { setupIpcHandlers } from './ipc';
 
@@ -65,10 +65,25 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  // Read saved window size from config
+  const config = require('./config');
+  let windowWidth = 1024;
+  let windowHeight = 900;
+
+  try {
+    const savedConfig = await config.readConfigFile();
+    if (savedConfig?.windowSize?.width && savedConfig?.windowSize?.height) {
+      windowWidth = savedConfig.windowSize.width;
+      windowHeight = savedConfig.windowSize.height;
+    }
+  } catch (err) {
+    console.log('Using default window size');
+  }
+
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 900,
+    width: windowWidth,
+    height: windowHeight,
     icon: getAssetPath('logo_lock_a.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -104,6 +119,16 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  // Save window size on resize
+  mainWindow.on('resized', () => {
+    if (mainWindow) {
+      const size = mainWindow.getSize();
+      updateConfigFile({
+        windowSize: { width: size[0], height: size[1] },
+      }).catch((err) => console.error('Failed to save window size:', err));
+    }
   });
 
   // Setup all IPC handlers

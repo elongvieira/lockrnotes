@@ -32,6 +32,7 @@ export async function ensureConfigFile(): Promise<void> {
       firstRun: true,
       openTabs: [],
       activeTabId: null,
+      windowSize: { width: 1200, height: 800 }, // Window size
     };
 
     // Write atomically: write to a temp file then rename
