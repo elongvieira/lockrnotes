@@ -376,7 +376,8 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
                   variant="body1"
                   sx={{ ...dialogStyles.primaryText }}
                 >
-                  {t('welcome.keyStorageOptions.folder') || '📁 Salvo na Pasta'}
+                  {t('welcome.keyStorageOptions.folder') ||
+                    '📁 Salvo na pasta do LockrNote'}
                 </Typography>
                 <Typography
                   variant="caption"

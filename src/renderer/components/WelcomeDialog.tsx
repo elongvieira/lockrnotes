@@ -331,7 +331,7 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
                   <Box>
                     <Typography variant="body1" sx={{ fontWeight: 600 }}>
                       {t('welcome.keyStorageOptions.folder') ||
-                        '📁 Salvo na Pasta'}
+                        '📁 Salvo na pasta do LockrNote'}
                     </Typography>
                     <Typography
                       variant="caption"

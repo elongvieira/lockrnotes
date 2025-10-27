@@ -238,7 +238,7 @@
       "system": "📦 Gerenciado pelo Sistema (Padrão)",
       "systemPro": "✓ Mais seguro - Chave armazenada no cofre seguro do Windows",
       "systemCon": "✗ Se apagar dados do sistema, perderá acesso aos arquivos",
-      "folder": "📁 Salvo na Pasta",
+    "folder": "📁 Salvo na pasta do LockrNote",
       "folderPro": "✓ Recuperável - Se mover a pasta, continua funcionando",
       "folderCon": "✗ Menos seguro - Qualquer um com acesso à pasta pode descriptografar"
     },
