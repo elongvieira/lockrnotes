@@ -19,6 +19,7 @@ body {
 .app-container {
   display: flex;
   height: calc(100vh - 32px); /* Reserve space for status bar */
+  margin-top: 12px;
   margin-bottom: 32px; /* Height of status bar */
 }
 

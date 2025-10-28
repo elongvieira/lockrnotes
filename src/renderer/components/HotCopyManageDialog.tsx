@@ -87,13 +87,13 @@ export default function HotCopyManageDialog({
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: dialogStyles.dialogPaper,
+        sx: { ...dialogStyles.dialogPaper, marginTop: '16px' },
       }}
     >
-      <DialogTitle sx={dialogStyles.dialogTitle}>
+      <DialogTitle sx={{ ...dialogStyles.dialogTitle, marginBottom: '8px' }}>
         {t('hotcopy.manage') || 'Manage Hot Copy Slots'}
       </DialogTitle>
-      <DialogContent sx={dialogStyles.dialogContent}>
+      <DialogContent sx={{ ...dialogStyles.dialogContent, paddingTop: '12px' }}>
         {items.length === 0 ? (
           <Box sx={{ py: 4, textAlign: 'center' }}>
             <Typography sx={dialogStyles.secondaryText}>
@@ -110,7 +110,7 @@ export default function HotCopyManageDialog({
                   sx={{
                     border: '1px solid var(--border-primary)',
                     borderRadius: 'var(--border-radius-sm)',
-                    mb: 1,
+                    mb: 2,
                     flexDirection: 'column',
                     alignItems: 'stretch',
                     backgroundColor: 'rgba(255, 255, 255, 0.02)',
