@@ -27,6 +27,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import CodeIcon from '@mui/icons-material/Code';
@@ -48,17 +49,20 @@ import {
 } from '../types/jsonEntry';
 import JsonEntryDialog from './JsonEntryDialog';
 import ConfirmDialog from './ConfirmDialog';
+import HotCopyDialog from './HotCopyDialog';
 import { dialogStyles } from '../styles/dialogStyles';
 import './JsonEditor.css';
 
 interface JsonEditorProps {
   content: string;
   onContentChange: (newContent: string) => void;
+  filePath?: string;
 }
 
 export default function JsonEditor({
   content,
   onContentChange,
+  filePath: currentFilePath = '',
 }: JsonEditorProps) {
   const { t } = useTranslation();
   const [entries, setEntries] = useState<JsonEntry[]>([]);
@@ -79,6 +83,14 @@ export default function JsonEditor({
   const [editMode, setEditMode] = useState<'structured' | 'raw'>('structured');
   const [rawJsonText, setRawJsonText] = useState<string>('');
   const { refreshSidebar, showNotification } = useAppContext();
+
+  // HotCopy state
+  const [hotCopyDialogOpen, setHotCopyDialogOpen] = useState<boolean>(false);
+  const [hotCopyData, setHotCopyData] = useState<{
+    entryIndex: number;
+    fieldName: string;
+    value: string;
+  } | null>(null);
 
   // Função para mascarar um valor.
   // - visible: se true, mostra o valor completo
@@ -269,6 +281,58 @@ export default function JsonEditor({
     }
   };
 
+  const handleAddToHotCopy = (
+    entryIndex: number,
+    fieldName: string,
+    value: string,
+  ) => {
+    if (!currentFilePath) {
+      showNotification(
+        t('hotcopy.noFileError') || 'Cannot add: file not saved',
+        'error',
+      );
+      return;
+    }
+    setHotCopyData({ entryIndex, fieldName, value });
+    setHotCopyDialogOpen(true);
+  };
+
+  const handleHotCopyConfirm = async (position: number, label?: string) => {
+    if (!hotCopyData) return;
+
+    try {
+      const result = await window.hotCopyAPI?.addItem(
+        currentFilePath,
+        hotCopyData.entryIndex,
+        hotCopyData.fieldName,
+        position,
+        label,
+      );
+
+      if (result?.success) {
+        showNotification(
+          t('hotcopy.added') || 'Added to quick copy!',
+          'success',
+        );
+        // Notify HotCopyBar to reload
+        window.dispatchEvent(new Event('hotcopy-updated'));
+      } else {
+        showNotification(
+          t('hotcopy.addError') || 'Failed to add to quick copy',
+          'error',
+        );
+      }
+    } catch {
+      showNotification(
+        t('hotcopy.addError') || 'Failed to add to quick copy',
+        'error',
+      );
+    }
+
+    setHotCopyDialogOpen(false);
+    setHotCopyData(null);
+  };
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
@@ -342,7 +406,7 @@ export default function JsonEditor({
     }
   };
 
-  const renderEntryValue = (entry: JsonEntry) => {
+  const renderEntryValue = (entry: JsonEntry, entryIndex: number) => {
     switch (entry.type) {
       case 'keyValue': {
         const kvEntry = entry as KeyValueEntry;
@@ -376,6 +440,19 @@ export default function JsonEditor({
               ) : (
                 <ContentCopyIcon fontSize="small" />
               )}
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() =>
+                handleAddToHotCopy(entryIndex, 'value', kvEntry.value)
+              }
+              sx={{
+                color: 'var(--text-secondary)',
+                '&:hover': { color: 'var(--primary-blue)' },
+              }}
+              title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+            >
+              <BookmarkAddIcon fontSize="small" />
             </IconButton>
           </Box>
         );
@@ -418,6 +495,19 @@ export default function JsonEditor({
                   <ContentCopyIcon fontSize="small" />
                 )}
               </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'value1', ttEntry.value1)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
@@ -448,6 +538,19 @@ export default function JsonEditor({
                 ) : (
                   <ContentCopyIcon fontSize="small" />
                 )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'value2', ttEntry.value2)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
               </IconButton>
             </Box>
           </Box>
@@ -486,6 +589,19 @@ export default function JsonEditor({
               ) : (
                 <ContentCopyIcon fontSize="small" />
               )}
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() =>
+                handleAddToHotCopy(entryIndex, 'password', tpEntry.password)
+              }
+              sx={{
+                color: 'var(--text-secondary)',
+                '&:hover': { color: 'var(--primary-blue)' },
+              }}
+              title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+            >
+              <BookmarkAddIcon fontSize="small" />
             </IconButton>
           </Box>
         );
@@ -527,6 +643,19 @@ export default function JsonEditor({
                   <ContentCopyIcon fontSize="small" />
                 )}
               </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'value', tvpEntry.value)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
@@ -560,6 +689,19 @@ export default function JsonEditor({
                 ) : (
                   <ContentCopyIcon fontSize="small" />
                 )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'password', tvpEntry.password)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
               </IconButton>
             </Box>
           </Box>
@@ -603,6 +745,19 @@ export default function JsonEditor({
                   <ContentCopyIcon fontSize="small" />
                 )}
               </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'value1', ttpEntry.value1)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
             </Box>
             <Box
               sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
@@ -634,6 +789,19 @@ export default function JsonEditor({
                 ) : (
                   <ContentCopyIcon fontSize="small" />
                 )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'value2', ttpEntry.value2)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
               </IconButton>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -668,6 +836,19 @@ export default function JsonEditor({
                 ) : (
                   <ContentCopyIcon fontSize="small" />
                 )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'password', ttpEntry.password)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
               </IconButton>
             </Box>
           </Box>
@@ -839,7 +1020,7 @@ export default function JsonEditor({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredEntries.map((entry) => (
+                  {filteredEntries.map((entry, index) => (
                     <TableRow key={entry.id} className="json-editor-row">
                       <TableCell className="json-editor-cell json-editor-order-cell">
                         <Box className="json-editor-order-buttons">
@@ -871,7 +1052,7 @@ export default function JsonEditor({
                         {entry.title}
                       </TableCell>
                       <TableCell className="json-editor-cell">
-                        {renderEntryValue(entry)}
+                        {renderEntryValue(entry, index)}
                       </TableCell>
                       <TableCell
                         align="right"
@@ -972,6 +1153,21 @@ export default function JsonEditor({
         onConfirm={handleDeleteConfirm}
         onClose={handleDeleteCancel}
       />
+
+      {hotCopyData && (
+        <HotCopyDialog
+          open={hotCopyDialogOpen}
+          onClose={() => {
+            setHotCopyDialogOpen(false);
+            setHotCopyData(null);
+          }}
+          onConfirm={handleHotCopyConfirm}
+          filePath={currentFilePath}
+          entryIndex={hotCopyData.entryIndex}
+          fieldName={hotCopyData.fieldName}
+          currentValue={hotCopyData.value}
+        />
+      )}
     </Box>
   );
 }

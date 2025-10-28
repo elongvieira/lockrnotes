@@ -12,11 +12,16 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
+import HotCopyBar from './HotCopyBar';
+import HotCopyManageDialog from './HotCopyManageDialog';
+import { HotCopyItem } from '../types/hotcopy';
 import './AppBar.css';
 
 export default function AppBar() {
   const { t, i18n } = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [hotCopyManageOpen, setHotCopyManageOpen] = useState(false);
+  const [hotCopyItems, setHotCopyItems] = useState<HotCopyItem[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
 
@@ -134,6 +139,22 @@ export default function AppBar() {
     }
   };
 
+  const loadHotCopyItems = async () => {
+    try {
+      const config = await window.electron?.filesystem?.readConfig();
+      if (config?.hotCopy?.items) {
+        setHotCopyItems(config.hotCopy.items);
+      }
+    } catch (error) {
+      console.error('Failed to load hot copy items:', error);
+    }
+  };
+
+  const handleManageHotCopy = () => {
+    loadHotCopyItems();
+    setHotCopyManageOpen(true);
+  };
+
   return (
     <MuiAppBar
       position="static"
@@ -159,6 +180,9 @@ export default function AppBar() {
             style={{ height: 28, objectFit: 'contain' }}
           />
         </div>
+
+        {/* HotCopy Bar in the center */}
+        <HotCopyBar onManage={handleManageHotCopy} />
 
         {/* central drag area */}
         <div className="appbar-drag" />
@@ -262,6 +286,12 @@ export default function AppBar() {
         <SettingsDialog
           open={settingsOpen}
           onClose={() => setSettingsOpen(false)}
+        />
+        <HotCopyManageDialog
+          open={hotCopyManageOpen}
+          onClose={() => setHotCopyManageOpen(false)}
+          items={hotCopyItems}
+          onUpdate={loadHotCopyItems}
         />
       </Toolbar>
     </MuiAppBar>

@@ -270,6 +270,27 @@
   },
   "common": {
     "cancel": "Cancelar",
-    "save": "Salvar"
+    "save": "Salvar",
+    "add": "Adicionar",
+    "close": "Fechar"
+  },
+  "hotcopy": {
+    "selectPosition": "Adicionar à Cópia Rápida",
+    "file": "Arquivo",
+    "path": "Caminho JSON",
+    "currentValue": "Valor Atual",
+    "selectSlot": "Selecione o slot",
+    "customLabel": "Rótulo personalizado (opcional)",
+    "copied": "{{label}} copiado!",
+    "copyError": "Erro ao copiar valor",
+    "clickToCopy": "Clique para copiar",
+    "emptySlot": "Slot vazio - clique para adicionar",
+    "addToHotCopy": "Adicionar à cópia rápida",
+    "added": "Adicionado à cópia rápida!",
+    "addError": "Erro ao adicionar à cópia rápida",
+    "noFileError": "Não é possível adicionar: arquivo não salvo",
+    "manage": "Gerenciar slots",
+    "noItems": "Nenhum item configurado",
+    "entry": "Entrada"
   }
 }

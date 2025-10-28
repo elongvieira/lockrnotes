@@ -711,6 +711,7 @@ export default function Editor() {
                 onContentChange={(newContent) =>
                   updateTabContent(currentTab.id, newContent)
                 }
+                filePath={currentTab.filePath}
               />
             ) : (
               <TextField

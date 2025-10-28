@@ -270,6 +270,27 @@
   },
   "common": {
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "add": "Add",
+    "close": "Close"
+  },
+  "hotcopy": {
+    "selectPosition": "Add to Quick Copy",
+    "file": "File",
+    "path": "JSON Path",
+    "currentValue": "Current Value",
+    "selectSlot": "Select slot",
+    "customLabel": "Custom label (optional)",
+    "copied": "{{label}} copied!",
+    "copyError": "Failed to copy value",
+    "clickToCopy": "Click to copy",
+    "emptySlot": "Empty slot - click to add",
+    "addToHotCopy": "Add to quick copy",
+    "added": "Added to quick copy!",
+    "addError": "Failed to add to quick copy",
+    "noFileError": "Cannot add: file not saved",
+    "manage": "Manage slots",
+    "noItems": "No items configured",
+    "entry": "Entry"
   }
 }

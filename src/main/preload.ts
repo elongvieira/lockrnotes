@@ -7,6 +7,7 @@ import {
   systemApi,
   exportApi,
 } from './preload/index';
+import { hotCopyApi } from './preload/hotcopyApi';
 import './preload/encryptionApi';
 import './preload/manualEncryptionApi';
 
@@ -21,5 +22,6 @@ const electronHandler = {
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('exportAPI', exportApi);
+contextBridge.exposeInMainWorld('hotCopyAPI', hotCopyApi);
 
 export type ElectronHandler = typeof electronHandler;

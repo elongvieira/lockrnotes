@@ -4,6 +4,7 @@ import { setupWindowHandlers } from './windowHandlers';
 import { setupEncryptionHandlers } from './encryptionHandlers';
 import { registerManualEncryptionHandlers } from './manualEncryptionHandlers';
 import { registerExportHandlers } from './exportHandlers';
+import { registerHotCopyHandlers } from './hotcopyHandlers';
 
 /**
  * Setup all IPC handlers
@@ -14,6 +15,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   setupEncryptionHandlers();
   registerManualEncryptionHandlers();
   registerExportHandlers();
+  registerHotCopyHandlers();
 }
 
 export * from './filesystemHandlers';

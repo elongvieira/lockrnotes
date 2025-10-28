@@ -1,0 +1,66 @@
+.hotcopy-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 100%;
+}
+
+.hotcopy-slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  min-width: 60px;
+  height: 28px;
+  border: 1px solid var(--border-primary);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.hotcopy-slot.first-slot {
+  margin-left: 24px;
+}
+
+.hotcopy-slot.filled {
+  background-color: var(--primary-blue-light);
+  border-color: var(--primary-blue);
+}
+
+.hotcopy-slot.filled:hover {
+  background-color: var(--primary-blue-medium);
+  transform: translateY(-1px);
+}
+
+.hotcopy-slot.empty {
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+.hotcopy-slot.empty:hover {
+  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.hotcopy-icon {
+  font-size: 16px;
+  color: var(--primary-blue);
+}
+
+.hotcopy-label {
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+  font-size: 11px;
+}
+
+.hotcopy-slot.empty .hotcopy-label {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
