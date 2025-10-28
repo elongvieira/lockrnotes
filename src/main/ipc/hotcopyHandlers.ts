@@ -46,7 +46,7 @@ export function registerHotCopyHandlers() {
         const jsonData = JSON.parse(content);
 
         // Navigate to entries array and get the specific entry
-        const entries = jsonData.entries;
+        const { entries } = jsonData;
         if (!Array.isArray(entries)) {
           console.error('entries is not an array in file:', filePath);
           return null;

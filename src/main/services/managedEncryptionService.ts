@@ -18,10 +18,15 @@ export interface EncryptedFileData {
 
 class ManagedEncryptionService {
   private readonly algorithm = 'aes-256-gcm';
+
   private readonly keyLength = 32; // 256 bits
+
   private readonly ivLength = 16; // 128 bits
+
   private readonly saltLength = 32; // 256 bits
+
   private readonly iterations = 100000; // PBKDF2 iterations
+
   private readonly keyFileName = '.lockrnotes_key';
 
   private masterKey: Buffer | null = null;

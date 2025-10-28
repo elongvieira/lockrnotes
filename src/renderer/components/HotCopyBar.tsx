@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -14,11 +15,34 @@ interface HotCopyBarProps {
   onManage?: () => void;
 }
 
-export default function HotCopyBar({ onAddSlot, onManage }: HotCopyBarProps) {
+export default function HotCopyBar({
+  onAddSlot = () => {},
+  onManage = () => {},
+}: HotCopyBarProps) {
   const { t } = useTranslation();
   const [hotCopyItems, setHotCopyItems] = useState<HotCopyItem[]>([]);
   const maxSlots = 7;
+  // Load items function must be declared before useEffect to avoid 'used before defined'
+  async function loadHotCopyItems() {
+    try {
+      const config = await window.electron?.filesystem?.readConfig();
+      if (config?.hotCopy?.items) {
+        setHotCopyItems(config.hotCopy.items);
+      }
+    } catch {
+      // notify user instead of console.error to satisfy lint rules
+      window.dispatchEvent(
+        new CustomEvent('show-notification', {
+          detail: {
+            message: t('hotcopy.loadError') || 'Failed to load hot copy items',
+            severity: 'error',
+          },
+        }),
+      );
+    }
+  }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadHotCopyItems();
 
@@ -32,17 +56,6 @@ export default function HotCopyBar({ onAddSlot, onManage }: HotCopyBarProps) {
       window.removeEventListener('hotcopy-updated', handleUpdate);
     };
   }, []);
-
-  const loadHotCopyItems = async () => {
-    try {
-      const config = await window.electron?.filesystem?.readConfig();
-      if (config?.hotCopy?.items) {
-        setHotCopyItems(config.hotCopy.items);
-      }
-    } catch (error) {
-      console.error('Failed to load hot copy items:', error);
-    }
-  };
 
   const handleCopy = async (item: HotCopyItem) => {
     try {
@@ -66,7 +79,7 @@ export default function HotCopyBar({ onAddSlot, onManage }: HotCopyBarProps) {
           }),
         );
       }
-    } catch (error) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent('show-notification', {
           detail: {
