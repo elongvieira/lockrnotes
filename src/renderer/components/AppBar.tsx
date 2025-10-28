@@ -174,11 +174,7 @@ export default function AppBar() {
         </IconButton>
 
         <div className="appbar-left">
-          <img
-            src={logo}
-            alt="Lockr Notes"
-            style={{ height: 28, objectFit: 'contain' }}
-          />
+          <img src={logo} alt="Lockr Notes" className="appbar-logo" />
         </div>
 
         {/* HotCopy Bar in the center */}

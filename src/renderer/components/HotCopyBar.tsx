@@ -85,9 +85,10 @@ export default function HotCopyBar({ onAddSlot, onManage }: HotCopyBarProps) {
 
       if (item) {
         const displayLabel = item.label || item.fieldName;
-        const shouldEllipsis = displayLabel.length > 7;
+        // reduce ellipsis threshold to make labels shorter in the top bar
+        const shouldEllipsis = displayLabel.length > 6;
         const truncatedLabel = shouldEllipsis
-          ? `${displayLabel.substring(0, 7)}...`
+          ? `${displayLabel.substring(0, 6)}...`
           : displayLabel;
 
         slots.push(
@@ -127,15 +128,9 @@ export default function HotCopyBar({ onAddSlot, onManage }: HotCopyBarProps) {
         <IconButton
           size="small"
           onClick={onManage}
-          sx={{
-            color: 'var(--text-secondary)',
-            marginLeft: '8px',
-            '&:hover': {
-              color: 'var(--primary-blue)',
-            },
-          }}
+          className="hotcopy-manage-btn"
         >
-          <SettingsIcon fontSize="small" />
+          <SettingsIcon fontSize="inherit" />
         </IconButton>
       </Tooltip>
     </Box>

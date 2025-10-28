@@ -69,3 +69,9 @@
 .appbar .lang-btn:hover {
   background: rgba(255, 255, 255, 0.04);
 }
+
+/* Logo image styles */
+.appbar-logo {
+  height: 28px;
+  object-fit: contain;
+}

@@ -93,7 +93,15 @@ export default function HotCopyManageDialog({
       <DialogTitle sx={{ ...dialogStyles.dialogTitle, marginBottom: '8px' }}>
         {t('hotcopy.manage') || 'Manage Hot Copy Slots'}
       </DialogTitle>
-      <DialogContent sx={{ ...dialogStyles.dialogContent, paddingTop: '12px' }}>
+      <DialogContent
+        sx={{
+          ...dialogStyles.dialogContent,
+          ...dialogStyles.scrollbar,
+          paddingTop: '12px',
+          maxHeight: '70vh',
+          overflowY: 'auto',
+        }}
+      >
         {items.length === 0 ? (
           <Box sx={{ py: 4, textAlign: 'center' }}>
             <Typography sx={dialogStyles.secondaryText}>

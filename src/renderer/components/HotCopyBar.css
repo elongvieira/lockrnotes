@@ -1,28 +1,28 @@
 .hotcopy-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 6px;
+  padding: 0 8px;
   height: 100%;
 }
 
 .hotcopy-slot {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 4px;
+  padding: 3px 8px;
   border-radius: var(--border-radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 12px;
-  min-width: 60px;
-  height: 28px;
+  transition: all 0.15s ease;
+  font-size: 11px;
+  min-width: 52px;
+  height: 24px;
   border: 1px solid var(--border-primary);
   background-color: rgba(255, 255, 255, 0.02);
 }
 
 .hotcopy-slot.first-slot {
-  margin-left: 24px;
+  margin-left: 20px;
 }
 
 .hotcopy-slot.filled {
@@ -46,7 +46,7 @@
 }
 
 .hotcopy-icon {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--primary-blue);
 }
 
@@ -56,11 +56,23 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 80px;
-  font-size: 11px;
+  max-width: 60px;
+  font-size: 10px;
 }
 
 .hotcopy-slot.empty .hotcopy-label {
   color: var(--text-secondary);
   font-weight: 400;
+}
+
+/* Settings/manage icon button styles */
+.hotcopy-manage-btn {
+  color: var(--text-secondary) !important;
+  margin-left: -2px !important;
+  padding: 4px !important;
+  font-size: 18px !important;
+}
+
+.hotcopy-manage-btn:hover {
+  color: var(--primary-blue) !important;
 }
