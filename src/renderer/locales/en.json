@@ -257,6 +257,7 @@
     "editor": "Editor",
     "storage": "Storage",
     "security": "Security",
+    "language": "Language",
     "autoSave": "Auto-save",
     "autoSaveDescription": "Automatically saves files after 1.5 seconds of inactivity",
     "securityWarning": "Changing the key storage type may prevent access to existing encrypted files.",

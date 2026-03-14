@@ -257,6 +257,7 @@
     "editor": "Editor",
     "storage": "Armazenamento",
     "security": "Segurança",
+    "language": "Idioma",
     "autoSave": "Salvar automaticamente",
     "autoSaveDescription": "Salva os arquivos automaticamente após 1.5 segundos de inatividade",
     "securityWarning": "Alterar o tipo de armazenamento de chave pode impedir o acesso a arquivos criptografados existentes.",

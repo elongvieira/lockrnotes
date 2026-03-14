@@ -20,15 +20,17 @@ import {
   Alert,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { fileSystemService } from '../services/fileSystemService';
 import { dialogStyles } from '../styles/dialogStyles';
+import LanguageSelector from './LanguageSelector';
 
 interface SettingsDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-type SettingsSection = 'editor' | 'storage' | 'security';
+type SettingsSection = 'editor' | 'storage' | 'security' | 'language';
 
 export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   const { t } = useTranslation();
@@ -39,6 +41,7 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   const [oldDefaultPath, setOldDefaultPath] = useState<string>('');
   const [keyStorageType, setKeyStorageType] = useState<string>('system');
   const [loading, setLoading] = useState<boolean>(false);
+  const [language, setLanguage] = useState<string>('pt-BR');
   const [showCopyDialog, setShowCopyDialog] = useState<boolean>(false);
   const [selectedNewPath, setSelectedNewPath] = useState<string>('');
 
@@ -59,6 +62,9 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
             }
             if (config.keyStorageType) {
               setKeyStorageType(config.keyStorageType);
+            }
+            if (config.language) {
+              setLanguage(config.language);
             }
           }
         } catch (error) {
@@ -145,7 +151,9 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
         autoSave,
         defaultPath,
         keyStorageType,
+        language,
       });
+      i18n.changeLanguage(language);
       setLoading(false);
       onClose();
       // Force page reload to apply settings
@@ -288,6 +296,16 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
             'Caminho completo onde os arquivos serão salvos'}
         </Typography>
       </Box>
+    </Box>
+  );
+
+  const renderLanguageSettings = () => (
+    <Box>
+      <LanguageSelector
+        value={language}
+        onChange={setLanguage}
+        useDefaultSystemLanguage={false}
+      />
     </Box>
   );
 
@@ -458,15 +476,6 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
               <ListItemButton
                 selected={selectedSection === 'editor'}
                 onClick={() => setSelectedSection('editor')}
-                sx={{
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(33, 150, 243, 0.12)',
-                    borderRight: '2px solid var(--primary-blue)',
-                  },
-                  '&:hover': {
-                    backgroundColor: 'rgba(33, 150, 243, 0.08)',
-                  },
-                }}
               >
                 <ListItemText
                   primary={t('settings.editor') || 'Editor'}
@@ -480,15 +489,6 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
               <ListItemButton
                 selected={selectedSection === 'storage'}
                 onClick={() => setSelectedSection('storage')}
-                sx={{
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(33, 150, 243, 0.12)',
-                    borderRight: '2px solid var(--primary-blue)',
-                  },
-                  '&:hover': {
-                    backgroundColor: 'rgba(33, 150, 243, 0.08)',
-                  },
-                }}
               >
                 <ListItemText
                   primary={t('settings.storage') || 'Armazenamento'}
@@ -502,18 +502,22 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
               <ListItemButton
                 selected={selectedSection === 'security'}
                 onClick={() => setSelectedSection('security')}
-                sx={{
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(33, 150, 243, 0.12)',
-                    borderRight: '2px solid var(--primary-blue)',
-                  },
-                  '&:hover': {
-                    backgroundColor: 'rgba(33, 150, 243, 0.08)',
-                  },
-                }}
               >
                 <ListItemText
                   primary={t('settings.security') || 'Segurança'}
+                  primaryTypographyProps={{
+                    sx: { ...dialogStyles.primaryText },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={selectedSection === 'language'}
+                onClick={() => setSelectedSection('language')}
+              >
+                <ListItemText
+                  primary={t('settings.language') || 'Idioma'}
                   primaryTypographyProps={{
                     sx: { ...dialogStyles.primaryText },
                   }}
@@ -535,6 +539,7 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
           {selectedSection === 'editor' && renderEditorSettings()}
           {selectedSection === 'storage' && renderStorageSettings()}
           {selectedSection === 'security' && renderSecuritySettings()}
+          {selectedSection === 'language' && renderLanguageSettings()}
         </Box>
       </DialogContent>
 

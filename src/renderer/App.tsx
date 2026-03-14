@@ -8,6 +8,7 @@ import Main from './pages/Main';
 import theme from './theme';
 import WelcomeDialog from './components/WelcomeDialog';
 import { fileSystemService } from './services/fileSystemService';
+import i18n from './i18n';
 
 export default function App() {
   const [welcomeOpen, setWelcomeOpen] = useState<boolean>(false);
@@ -16,6 +17,11 @@ export default function App() {
   const checkFirstRun = async () => {
     try {
       const config = await fileSystemService.readConfig();
+
+      // Apply saved language preference
+      if (config?.language) {
+        i18n.changeLanguage(config.language);
+      }
 
       // Show welcome dialog if firstRun is true or config doesn't exist
       if (!config || config.firstRun === true) {
