@@ -295,11 +295,26 @@ export default function JsonEditor({
       return;
     }
     setHotCopyData({ entryIndex, fieldName, value });
-    // Load occupied positions before opening dialog
+    // Load occupied positions and check for duplicates before opening dialog
     window.hotCopyAPI?.getItems().then((items) => {
-      setHotCopyOccupied((items || []).map((item: any) => item.position));
+      const safeItems = items || [];
+      const duplicate = safeItems.some(
+        (item: any) =>
+          item.filePath === currentFilePath &&
+          item.entryIndex === entryIndex &&
+          item.fieldName === fieldName,
+      );
+      if (duplicate) {
+        showNotification(
+          t('hotcopy.alreadyAdded') ||
+            'This field is already in a quick copy slot',
+          'warning',
+        );
+        return;
+      }
+      setHotCopyOccupied(safeItems.map((item: any) => item.position));
+      setHotCopyDialogOpen(true);
     });
-    setHotCopyDialogOpen(true);
   };
 
   const handleHotCopyConfirm = async (position: number, label?: string) => {

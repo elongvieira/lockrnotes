@@ -290,6 +290,7 @@
     "added": "Adicionado à cópia rápida!",
     "addError": "Erro ao adicionar à cópia rápida",
     "noFileError": "Não é possível adicionar: arquivo não salvo",
+    "alreadyAdded": "Este campo já está em um slot de cópia rápida",
     "manage": "Gerenciar slots",
     "noItems": "Nenhum item configurado",
     "entry": "Entrada"

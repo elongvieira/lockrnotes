@@ -290,6 +290,7 @@
     "added": "Added to quick copy!",
     "addError": "Failed to add to quick copy",
     "noFileError": "Cannot add: file not saved",
+    "alreadyAdded": "This field is already in a quick copy slot",
     "manage": "Manage slots",
     "noItems": "No items configured",
     "entry": "Entry"
