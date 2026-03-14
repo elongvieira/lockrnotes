@@ -701,6 +701,12 @@ export default function Editor() {
                 }
                 value={tab.id}
                 title={tab.filePath}
+                onMouseDown={(e) => {
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    closeTab(tab.id);
+                  }
+                }}
               />
             ))}
           </Tabs>
