@@ -91,6 +91,7 @@ export default function JsonEditor({
     fieldName: string;
     value: string;
   } | null>(null);
+  const [hotCopyOccupied, setHotCopyOccupied] = useState<number[]>([]);
 
   // Função para mascarar um valor.
   // - visible: se true, mostra o valor completo
@@ -294,6 +295,10 @@ export default function JsonEditor({
       return;
     }
     setHotCopyData({ entryIndex, fieldName, value });
+    // Load occupied positions before opening dialog
+    window.hotCopyAPI?.getItems().then((items) => {
+      setHotCopyOccupied((items || []).map((item: any) => item.position));
+    });
     setHotCopyDialogOpen(true);
   };
 
@@ -1166,6 +1171,7 @@ export default function JsonEditor({
           entryIndex={hotCopyData.entryIndex}
           fieldName={hotCopyData.fieldName}
           currentValue={hotCopyData.value}
+          occupiedPositions={hotCopyOccupied}
         />
       )}
     </Box>
