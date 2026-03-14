@@ -674,7 +674,16 @@ export default function Editor() {
                 key={tab.id}
                 label={
                   <Box className="tab-label-box">
-                    <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontSize: '0.75rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100px',
+                      }}
+                    >
                       {tab.isDirty ? '● ' : ''}
                       {tab.filename || 'Untitled'}
                       {tab.isEncrypted && ' 🔒'}

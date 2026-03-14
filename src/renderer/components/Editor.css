@@ -24,22 +24,32 @@
   min-height: var(--tab-height);
 }
 
+.editor-tabs .MuiTabs-root {
+  min-height: var(--tab-height);
+}
+
+.editor-tabs .MuiTabs-scroller {
+  display: flex;
+  align-items: center;
+}
+
 .editor-tabs .MuiTab-root {
   min-height: var(--tab-height);
   font-weight: 500;
   text-transform: none;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--text-secondary) !important;
   transition: all 0.2s ease;
   border-radius: 6px 0 0 0;
-  padding: 6px 12px;
+  padding: 4px 8px;
+  min-width: 0;
+  max-width: 160px;
 }
 
 .editor-tabs .MuiTab-root.Mui-selected {
   background-color: transparent;
   color: var(--text-primary) !important;
   font-weight: 600;
-  margin-bottom: -1px;
 }
 
 .editor-tabs .MuiTab-root:hover {
@@ -60,9 +70,11 @@
 .tab-label-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   border-radius: 6px 0 0 0;
-  padding: 2px 6px;
+  padding: 1px 2px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .tab-close-btn {
