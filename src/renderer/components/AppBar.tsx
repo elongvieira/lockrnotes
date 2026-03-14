@@ -258,7 +258,7 @@ export default function AppBar() {
             <ListItemIcon className="app-menu-icon">
               <SettingsIcon fontSize="small" />
             </ListItemIcon>
-            {t('settings.title') || '⚙️ Configurações'}
+            {t('settings.title') || 'Configurações'}
           </MenuItem>
           <MenuItem onClick={handleExport} className="app-menu-item">
             <ListItemIcon className="app-menu-icon">
