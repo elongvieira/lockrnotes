@@ -1,0 +1,72 @@
+{
+  "defaultPath": "F:\\Docs\\Documentos\\LockrNotes",
+  "keyStorageType": "folder",
+  "language": "pt-BR",
+  "autoSave": true,
+  "firstRun": false,
+  "openTabs": [],
+  "activeTabId": null,
+  "windowSize": {
+    "width": 1155,
+    "height": 800
+  },
+  "hotCopy": {
+    "items": [
+      {
+        "id": "1761609897144-2",
+        "filePath": "F:\\Docs\\Documentos\\LockrNotes\\notes\\teste\\teste2.ljson",
+        "entryIndex": 1,
+        "fieldName": "value2",
+        "position": 2
+      },
+      {
+        "id": "1761610803566-3",
+        "filePath": "F:\\Docs\\Documentos\\LockrNotes\\notes\\teste\\teste2.ljson",
+        "entryIndex": 1,
+        "fieldName": "value1",
+        "position": 3,
+        "label": "tretretretre t"
+      },
+      {
+        "id": "1761613047384-1",
+        "filePath": "F:\\Docs\\Documentos\\LockrNotes\\notes\\teste\\teste2.ljson",
+        "entryIndex": 0,
+        "fieldName": "value",
+        "position": 1,
+        "label": "eer43r23r32r32r32"
+      },
+      {
+        "id": "1761613053863-4",
+        "filePath": "F:\\Docs\\Documentos\\LockrNotes\\notes\\teste\\teste2.ljson",
+        "entryIndex": 0,
+        "fieldName": "value",
+        "position": 4,
+        "label": "r32r32r32r32r"
+      },
+      {
+        "id": "1761613062922-5",
+        "filePath": "F:\\Docs\\Documentos\\LockrNotes\\notes\\teste\\teste2.ljson",
+        "entryIndex": 0,
+        "fieldName": "value",
+        "position": 5,
+        "label": "r32r32r32r32r32r32r32"
+      },
+      {
+        "id": "1761613070274-6",
+        "filePath": "F:\\Docs\\Documentos\\LockrNotes\\notes\\teste\\teste2.ljson",
+        "entryIndex": 0,
+        "fieldName": "value",
+        "position": 6,
+        "label": "r32r32r32r32r32"
+      },
+      {
+        "id": "1761613077489-7",
+        "filePath": "F:\\Docs\\Documentos\\LockrNotes\\notes\\teste\\teste2.ljson",
+        "entryIndex": 0,
+        "fieldName": "value",
+        "position": 7,
+        "label": "r32r32r32r23r23r23r32"
+      }
+    ]
+  }
+}

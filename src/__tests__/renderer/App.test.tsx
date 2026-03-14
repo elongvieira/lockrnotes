@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, waitFor } from '@testing-library/react';
-import App from '../renderer/App';
+import App from '../../renderer/App';
 
 // Mock window.electron for jsdom environment
 Object.defineProperty(window, 'electron', {
