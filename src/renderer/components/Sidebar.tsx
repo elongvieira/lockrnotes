@@ -305,6 +305,13 @@ export default function Sidebar() {
             await window.manualEncryptionAPI.isManuallyEncrypted(rawContent);
 
           if (isManuallyEncrypted) {
+            // If file is already open in a tab, just focus it (password already cached)
+            const existingTab = tabs.find((t) => t.filePath === absolutePath);
+            if (existingTab) {
+              setActiveTab(existingTab.id);
+              return;
+            }
+
             // Manual encryption - need password
             setPendingFileData({
               absolutePath,
