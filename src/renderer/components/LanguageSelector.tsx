@@ -65,6 +65,7 @@ export default function LanguageSelector({
           label={t('welcome.languageLabel') || 'Idioma'}
           onChange={handleChange}
           sx={dialogStyles.select}
+          MenuProps={{ PaperProps: { sx: dialogStyles.selectPaper } }}
         >
           <MenuItem value="pt-BR">Português (Brasil)</MenuItem>
           <MenuItem value="en">English</MenuItem>

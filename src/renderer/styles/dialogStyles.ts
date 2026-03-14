@@ -196,4 +196,27 @@ export const dialogStyles = {
       color: 'var(--primary-blue)',
     },
   } as SxProps<Theme>,
+
+  // Menu dropdown paper
+  selectPaper: {
+    backgroundColor: '#0d1824',
+    color: 'var(--text-primary)',
+    border: '1px solid var(--border-secondary)',
+    borderRadius: 'var(--border-radius-md)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+    '& .MuiMenuItem-root': {
+      color: '#c9d8ed',
+      '&:hover': {
+        backgroundColor: 'rgba(88, 166, 255, 0.12)',
+        color: '#e6edf3',
+      },
+      '&.Mui-selected': {
+        backgroundColor: 'rgba(88, 166, 255, 0.18)',
+        color: '#e6edf3',
+        '&:hover': {
+          backgroundColor: 'rgba(88, 166, 255, 0.25)',
+        },
+      },
+    },
+  } as SxProps<Theme>,
 };
