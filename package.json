@@ -115,7 +115,7 @@
     "i18next": "^23.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-i18next": "^13.0.0",
+    "react-i18next": "^14.0.0",
     "react-router-dom": "^7.3.0"
   },
   "devDependencies": {
