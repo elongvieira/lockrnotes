@@ -17,6 +17,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { HotCopyItem } from '../types/hotcopy';
 import { dialogStyles } from '../styles/dialogStyles';
+import { SxProps, Theme } from '@mui/material/styles';
 
 interface HotCopyManageDialogProps {
   open: boolean;
@@ -94,13 +95,15 @@ export default function HotCopyManageDialog({
         {t('hotcopy.manage') || 'Manage Hot Copy Slots'}
       </DialogTitle>
       <DialogContent
-        sx={{
-          ...dialogStyles.dialogContent,
-          ...dialogStyles.scrollbar,
-          paddingTop: '12px',
-          maxHeight: '70vh',
-          overflowY: 'auto',
-        }}
+        sx={
+          {
+            ...dialogStyles.dialogContent,
+            ...dialogStyles.scrollbar,
+            paddingTop: '12px',
+            maxHeight: '70vh',
+            overflowY: 'auto',
+          } as SxProps<Theme>
+        }
       >
         {items.length === 0 ? (
           <Box sx={{ py: 4, textAlign: 'center' }}>
