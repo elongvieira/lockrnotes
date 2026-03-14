@@ -1,11 +1,10 @@
 name: 'CodeQL'
 
+# CodeQL is disabled - requires code scanning to be enabled in GitHub repository settings
+# To re-enable: uncomment the 'on' block below and enable code scanning at:
+# https://github.com/elongvieira/lockrnotes/settings/security_analysis
 on:
-  push:
-    branches: ['main']
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: ['main']
+  workflow_dispatch: # manual trigger only
 
 jobs:
   analyze:
