@@ -1,4 +1,5 @@
 import { ipcMain, BrowserWindow, dialog } from 'electron';
+import type { OpenDialogOptions } from 'electron';
 
 /**
  * Setup window control IPC handlers
@@ -18,7 +19,7 @@ export function setupWindowHandlers(mainWindow: BrowserWindow | null) {
 
   // Toggle maximize/restore window
   ipcMain.handle('window-toggle-maximize', () => {
-    if (!mainWindow) return;
+    if (!mainWindow) return false;
     if (mainWindow.isMaximized()) {
       mainWindow.unmaximize();
     } else {
@@ -51,7 +52,7 @@ export function setupWindowHandlers(mainWindow: BrowserWindow | null) {
     if (!mainWindow) return null;
 
     try {
-      const options: Electron.OpenDialogOptions = {
+      const options: OpenDialogOptions = {
         properties: ['openDirectory'],
         title: 'Selecionar Pasta',
         message: 'Escolha onde seus arquivos serão armazenados',

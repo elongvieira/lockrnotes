@@ -1,6 +1,7 @@
 import { ipcMain, dialog } from 'electron';
 import { exportAllFiles } from '../services/exportService';
 
+// eslint-disable-next-line import/prefer-default-export
 export function registerExportHandlers() {
   ipcMain.handle('export:selectFolder', async () => {
     const result = await dialog.showOpenDialog({

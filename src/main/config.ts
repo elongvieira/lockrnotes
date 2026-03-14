@@ -17,7 +17,7 @@ export async function ensureConfigFile(): Promise<void> {
       // eslint-disable-next-line no-console
       console.log('Config file already exists at', configPath);
       return;
-    } catch (err) {
+    } catch {
       // File does not exist — proceed to create
     }
 

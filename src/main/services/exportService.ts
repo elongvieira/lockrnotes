@@ -14,6 +14,27 @@ interface ExportResult {
   filesExported?: number;
 }
 
+async function getAllFiles(dirPath: string): Promise<string[]> {
+  const files: string[] = [];
+
+  async function scan(currentPath: string) {
+    const entries = await fs.readdir(currentPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(currentPath, entry.name);
+
+      if (entry.isDirectory()) {
+        await scan(fullPath);
+      } else {
+        files.push(fullPath);
+      }
+    }
+  }
+
+  await scan(dirPath);
+  return files;
+}
+
 export async function exportAllFiles(
   destinationFolder: string,
 ): Promise<ExportResult> {
@@ -104,25 +125,4 @@ export async function exportAllFiles(
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
-}
-
-async function getAllFiles(dirPath: string): Promise<string[]> {
-  const files: string[] = [];
-
-  async function scan(currentPath: string) {
-    const entries = await fs.readdir(currentPath, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(currentPath, entry.name);
-
-      if (entry.isDirectory()) {
-        await scan(fullPath);
-      } else {
-        files.push(fullPath);
-      }
-    }
-  }
-
-  await scan(dirPath);
-  return files;
 }

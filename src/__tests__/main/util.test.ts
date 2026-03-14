@@ -1,5 +1,5 @@
-import { resolveHtmlPath, getPathSeparator } from '../../main/util';
 import path from 'path';
+import { resolveHtmlPath, getPathSeparator } from '../../main/util';
 
 describe('getPathSeparator', () => {
   it('should return the system path separator', () => {

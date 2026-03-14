@@ -54,6 +54,7 @@ export const validateFolderName = (name: string): ValidationResult => {
   }
 
   // Check for invalid characters
+  // eslint-disable-next-line no-control-regex
   const invalidChars = /[<>:"/\\|?*\x00-\x1f]/;
   if (invalidChars.test(trimmedName)) {
     return {
@@ -116,6 +117,7 @@ export const validateFileName = (name: string): ValidationResult => {
   }
 
   // Check for invalid characters
+  // eslint-disable-next-line no-control-regex
   const invalidChars = /[<>:"/\\|?*\x00-\x1f]/;
   if (invalidChars.test(trimmedName)) {
     return {
@@ -185,7 +187,7 @@ export const validatePassword = (password: string): ValidationResult => {
   }
 
   // Check for at least one special character (optional but recommended)
-  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
   if (!hasSpecialChar) {
     return {
       isValid: false,

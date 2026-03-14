@@ -202,7 +202,7 @@ class ManagedEncryptionService {
 
   async decryptContent(
     encryptedData: EncryptedFileData,
-    filePath: string,
+    _filePath: string,
   ): Promise<string> {
     if (
       encryptedData.type !== 'lockrnotes-encrypted' ||

@@ -4,6 +4,7 @@ import { managedEncryptionService } from '../services/managedEncryptionService';
 /**
  * Handlers IPC para criptografia gerenciada
  */
+// eslint-disable-next-line import/prefer-default-export
 export function setupEncryptionHandlers(): void {
   // Criptografar conteúdo
   ipcMain.handle(

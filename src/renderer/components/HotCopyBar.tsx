@@ -42,7 +42,6 @@ export default function HotCopyBar({
     }
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadHotCopyItems();
 
@@ -55,6 +54,7 @@ export default function HotCopyBar({
     return () => {
       window.removeEventListener('hotcopy-updated', handleUpdate);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCopy = async (item: HotCopyItem) => {

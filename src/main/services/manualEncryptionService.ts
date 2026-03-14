@@ -90,7 +90,7 @@ class ManualEncryptionService {
       );
       decrypted += decipher.final('utf8');
       return decrypted;
-    } catch (error) {
+    } catch {
       throw new Error('Failed to decrypt - wrong password or corrupted file');
     }
   }

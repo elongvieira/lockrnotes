@@ -10,7 +10,6 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
-import fs from 'fs';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { ensureConfigFile, updateConfigFile } from './config';
@@ -76,7 +75,7 @@ const createWindow = async () => {
       windowWidth = savedConfig.windowSize.width;
       windowHeight = savedConfig.windowSize.height;
     }
-  } catch (err) {
+  } catch {
     console.log('Using default window size');
   }
 
@@ -161,7 +160,9 @@ app
   .whenReady()
   .then(() => {
     // Ensure config file exists in the working directory before creating UI
-    ensureConfigFile().then(() => createWindow());
+    ensureConfigFile()
+      .then(() => createWindow())
+      .catch(console.log);
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

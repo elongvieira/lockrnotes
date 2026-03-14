@@ -4,43 +4,43 @@
 // Since fileCreationService is a class with private methods, we test through the public API
 // The IPC-dependent methods (createFile) are not tested here
 
-const mockFilesystem = {
-  readDirectory: jest.fn(),
-  getItem: jest.fn(),
-  createDirectory: jest.fn(),
-  createFile: jest.fn(),
-  saveFile: jest.fn(),
-  readFile: jest.fn(),
-  deleteItem: jest.fn(),
-  renameItem: jest.fn(),
-  readConfig: jest.fn(),
-  updateConfig: jest.fn(),
-  getDefaultNotesDirectory: jest.fn(),
-  itemExists: jest.fn(),
-  decryptFile: jest.fn(),
-  copyDirectory: jest.fn(),
-};
-
-const mockSystem = {
-  getPathSeparator: jest.fn().mockResolvedValue('\\'),
-};
-
-// Mock window.electron before importing
-Object.defineProperty(window, 'electron', {
-  value: { filesystem: mockFilesystem, system: mockSystem },
-  writable: true,
-});
-Object.defineProperty(window, 'encryptionAPI', {
-  value: { encryptContent: jest.fn(), decryptContent: jest.fn() },
-  writable: true,
-});
-Object.defineProperty(window, 'manualEncryptionAPI', {
-  value: { encryptContent: jest.fn(), decryptContent: jest.fn() },
-  writable: true,
-});
-
-// Now import after mocks are set
 import { fileCreationService } from '../../../renderer/services/fileCreationService';
+
+beforeAll(() => {
+  const mockFilesystem = {
+    readDirectory: jest.fn(),
+    getItem: jest.fn(),
+    createDirectory: jest.fn(),
+    createFile: jest.fn(),
+    saveFile: jest.fn(),
+    readFile: jest.fn(),
+    deleteItem: jest.fn(),
+    renameItem: jest.fn(),
+    readConfig: jest.fn(),
+    updateConfig: jest.fn(),
+    getDefaultNotesDirectory: jest.fn(),
+    itemExists: jest.fn(),
+    decryptFile: jest.fn(),
+    copyDirectory: jest.fn(),
+  };
+
+  const mockSystem = {
+    getPathSeparator: jest.fn().mockResolvedValue('\\'),
+  };
+
+  Object.defineProperty(window, 'electron', {
+    value: { filesystem: mockFilesystem, system: mockSystem },
+    writable: true,
+  });
+  Object.defineProperty(window, 'encryptionAPI', {
+    value: { encryptContent: jest.fn(), decryptContent: jest.fn() },
+    writable: true,
+  });
+  Object.defineProperty(window, 'manualEncryptionAPI', {
+    value: { encryptContent: jest.fn(), decryptContent: jest.fn() },
+    writable: true,
+  });
+});
 
 describe('fileCreationService', () => {
   describe('getEncryptedExtension', () => {

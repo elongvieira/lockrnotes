@@ -48,7 +48,7 @@ export function registerManualEncryptionHandlers() {
     async (event, content: string) => {
       try {
         return manualEncryptionService.isContentManuallyEncrypted(content);
-      } catch (error) {
+      } catch {
         return false;
       }
     },
@@ -60,7 +60,7 @@ export function registerManualEncryptionHandlers() {
     async (event, content: string) => {
       try {
         return manualEncryptionService.getOriginalExtension(content);
-      } catch (error) {
+      } catch {
         return null;
       }
     },

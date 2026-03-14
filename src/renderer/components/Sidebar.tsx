@@ -74,7 +74,7 @@ export default function Sidebar() {
   const [itemToMove, setItemToMove] = useState<FileSystemItem | null>(null);
 
   // Copy dialog state
-  const [copyDialogOpen, setCopyDialogOpen] = useState<boolean>(false);
+  const [_copyDialogOpen, setCopyDialogOpen] = useState<boolean>(false);
   const [itemToCopy, setItemToCopy] = useState<FileSystemItem | null>(null);
 
   // Password dialog state for manual encryption
