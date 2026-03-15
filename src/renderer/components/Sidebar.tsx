@@ -306,7 +306,9 @@ export default function Sidebar() {
 
           if (isManuallyEncrypted) {
             // If file is already open in a tab, just focus it (password already cached)
-            const existingTab = tabs.find((t) => t.filePath === absolutePath);
+            const existingTab = tabs.find(
+              (tab) => tab.filePath === absolutePath,
+            );
             if (existingTab) {
               setActiveTab(existingTab.id);
               return;

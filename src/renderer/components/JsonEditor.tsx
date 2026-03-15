@@ -285,7 +285,7 @@ export default function JsonEditor({
     }
   };
 
-  const handleAddToHotCopy = (
+  const handleAddToHotCopy = async (
     entryIndex: number,
     fieldName: string,
     value: string,
@@ -299,7 +299,8 @@ export default function JsonEditor({
     }
     setHotCopyData({ entryIndex, fieldName, value });
     // Load occupied positions and check for duplicates before opening dialog
-    window.hotCopyAPI?.getItems().then((items) => {
+    try {
+      const items = await window.hotCopyAPI?.getItems();
       const safeItems = items || [];
       const duplicate = safeItems.some(
         (item: any) =>
@@ -317,7 +318,12 @@ export default function JsonEditor({
       }
       setHotCopyOccupied(safeItems.map((item: any) => item.position));
       setHotCopyDialogOpen(true);
-    });
+    } catch {
+      showNotification(
+        t('hotcopy.loadError') || 'Failed to load quick copy slots',
+        'error',
+      );
+    }
   };
 
   const handleHotCopyConfirm = async (position: number, label?: string) => {

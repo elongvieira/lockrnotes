@@ -1,11 +1,11 @@
 import path from 'path';
-import { ipcMain, BrowserWindow, app } from 'electron';
+import { ipcMain, BrowserWindow, app, type WebContents } from 'electron';
 import { Client, ClientChannel } from 'ssh2';
 import { resolveHtmlPath } from '../util';
 
 const sshConnections = new Map<
   string,
-  { client: Client; stream: ClientChannel | null; sender: Electron.WebContents }
+  { client: Client; stream: ClientChannel | null; sender: WebContents }
 >();
 
 const pendingConfigs = new Map<

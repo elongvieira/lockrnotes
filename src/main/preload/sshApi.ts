@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, type IpcRendererEvent } from 'electron';
 
 export const sshApi = {
   openWindow(config: {
@@ -48,7 +48,7 @@ export const sshApi = {
 
   onData(callback: (sessionId: string, data: string) => void): () => void {
     const handler = (
-      _event: Electron.IpcRendererEvent,
+      _event: IpcRendererEvent,
       sessionId: string,
       data: string,
     ) => {
@@ -59,7 +59,7 @@ export const sshApi = {
   },
 
   onClosed(callback: (sessionId: string) => void): () => void {
-    const handler = (_event: Electron.IpcRendererEvent, sessionId: string) => {
+    const handler = (_event: IpcRendererEvent, sessionId: string) => {
       callback(sessionId);
     };
     ipcRenderer.on('ssh:closed', handler);
