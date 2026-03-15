@@ -164,7 +164,8 @@
       "titleTwoValues": "Título + Valor 1 + Valor 2",
       "titlePassword": "Título + Senha",
       "titleValuePassword": "Título + Valor + Senha",
-      "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha"
+      "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha",
+      "ssh": "SSH"
     },
     "fields": {
       "title": "Título",
@@ -172,6 +173,9 @@
       "value1": "Valor 1",
       "value2": "Valor 2",
       "password": "Senha",
+      "host": "Host",
+      "port": "Porta",
+      "user": "Usuário",
       "type": "Tipo"
     },
     "errors": {
@@ -189,6 +193,13 @@
     "switchToStructured": "Editar como estruturado",
     "rawPlaceholder": "Edite o JSON como texto...",
     "parseError": "Formato JSON inválido"
+  },
+  "ssh": {
+    "connect": "Conectar",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "disconnect": "Desconectar",
+    "error": "Erro"
   },
   "contextMenu": {
     "open": "Abrir",

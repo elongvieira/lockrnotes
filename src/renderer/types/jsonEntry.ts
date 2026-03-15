@@ -7,7 +7,8 @@ export type JsonEntryType =
   | 'titleTwoValues'
   | 'titlePassword'
   | 'titleValuePassword'
-  | 'titleTwoValuesPassword';
+  | 'titleTwoValuesPassword'
+  | 'ssh';
 
 export interface BaseEntry {
   id: string;
@@ -66,12 +67,25 @@ export interface TitleTwoValuesPasswordEntry extends BaseEntry {
   password: string;
 }
 
+/**
+ * SSH entry (title + host + user + password)
+ */
+export interface SshEntry extends BaseEntry {
+  type: 'ssh';
+  title: string;
+  host: string;
+  port?: number;
+  user: string;
+  password: string;
+}
+
 export type JsonEntry =
   | KeyValueEntry
   | TitleTwoValuesEntry
   | TitlePasswordEntry
   | TitleValuePasswordEntry
-  | TitleTwoValuesPasswordEntry;
+  | TitleTwoValuesPasswordEntry
+  | SshEntry;
 
 /**
  * Structure of a JSON file content
@@ -128,6 +142,16 @@ export function createEntry(
         value1: (data as TitleTwoValuesPasswordEntry).value1 || '',
         value2: (data as TitleTwoValuesPasswordEntry).value2 || '',
         password: (data as TitleTwoValuesPasswordEntry).password || '',
+      };
+    case 'ssh':
+      return {
+        id,
+        type: 'ssh',
+        title: (data as SshEntry).title || '',
+        host: (data as SshEntry).host || '',
+        port: (data as SshEntry).port || 22,
+        user: (data as SshEntry).user || '',
+        password: (data as SshEntry).password || '',
       };
     default:
       throw new Error(`Unknown entry type: ${type}`);

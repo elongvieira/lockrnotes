@@ -27,6 +27,7 @@ import {
   TitlePasswordEntry,
   TitleValuePasswordEntry,
   TitleTwoValuesPasswordEntry,
+  SshEntry,
 } from '../types/jsonEntry';
 
 interface JsonEntryDialogProps {
@@ -51,6 +52,10 @@ export default function JsonEntryDialog({
   const [value1, setValue1] = useState<string>('');
   const [value2, setValue2] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [sshHost, setSshHost] = useState<string>('');
+  const [sshUser, setSshUser] = useState<string>('');
+  const [sshPassword, setSshPassword] = useState<string>('');
+  const [port, setPort] = useState<string>('22');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -85,6 +90,15 @@ export default function JsonEntryDialog({
           setValue1((editingEntry as TitleTwoValuesPasswordEntry).value1);
           setValue2((editingEntry as TitleTwoValuesPasswordEntry).value2);
           setPassword((editingEntry as TitleTwoValuesPasswordEntry).password);
+        } else if (editingEntry.type === 'ssh') {
+          setValue('');
+          setValue1('');
+          setPort(String((editingEntry as SshEntry).port || 22));
+          setValue2('');
+          setPassword('');
+          setSshHost((editingEntry as SshEntry).host);
+          setSshUser((editingEntry as SshEntry).user);
+          setSshPassword((editingEntry as SshEntry).password);
         }
       } else if (duplicateData) {
         // Pre-fill from duplicated entry (including title, so user can modify it)
@@ -115,6 +129,15 @@ export default function JsonEntryDialog({
           setValue1((duplicateData as TitleTwoValuesPasswordEntry).value1);
           setValue2((duplicateData as TitleTwoValuesPasswordEntry).value2);
           setPassword((duplicateData as TitleTwoValuesPasswordEntry).password);
+        } else if (duplicateData.type === 'ssh') {
+          setValue('');
+          setValue1('');
+          setPort(String((duplicateData as SshEntry).port || 22));
+          setValue2('');
+          setPassword('');
+          setSshHost((duplicateData as SshEntry).host);
+          setSshUser((duplicateData as SshEntry).user);
+          setSshPassword((duplicateData as SshEntry).password);
         }
       } else {
         setEntryType('keyValue');
@@ -123,6 +146,10 @@ export default function JsonEntryDialog({
         setValue1('');
         setValue2('');
         setPassword('');
+        setSshHost('');
+        setSshUser('');
+        setSshPassword('');
+        setPort('22');
       }
       setError('');
       setShowPassword(false);
@@ -157,6 +184,13 @@ export default function JsonEntryDialog({
       (entryData as TitleTwoValuesPasswordEntry).value1 = value1.trim();
       (entryData as TitleTwoValuesPasswordEntry).value2 = value2.trim();
       (entryData as TitleTwoValuesPasswordEntry).password = password.trim();
+    } else if (entryType === 'ssh') {
+      (entryData as SshEntry).host = sshHost.trim();
+      (entryData as SshEntry).port = port.trim()
+        ? parseInt(port.trim(), 10)
+        : 22;
+      (entryData as SshEntry).user = sshUser.trim();
+      (entryData as SshEntry).password = sshPassword.trim();
     }
 
     onConfirm(entryData);
@@ -234,6 +268,11 @@ export default function JsonEntryDialog({
                 'Title + Value 1 + Value 2 + Password'
               }
             />
+            <FormControlLabel
+              value="ssh"
+              control={<Radio sx={dialogStyles.checkboxRadio} />}
+              label={t('jsonEditor.types.ssh') || 'SSH'}
+            />
           </RadioGroup>
         </FormControl>
 
@@ -244,6 +283,7 @@ export default function JsonEntryDialog({
           fullWidth
           variant="outlined"
           value={title}
+          autoComplete="off"
           onChange={(e) => {
             setTitle(e.target.value);
             setError('');
@@ -258,6 +298,7 @@ export default function JsonEntryDialog({
             fullWidth
             variant="outlined"
             value={value}
+            autoComplete="off"
             onChange={(e) => {
               setValue(e.target.value);
               setError('');
@@ -275,6 +316,7 @@ export default function JsonEntryDialog({
               fullWidth
               variant="outlined"
               value={value1}
+              autoComplete="off"
               onChange={(e) => {
                 setValue1(e.target.value);
                 setError('');
@@ -287,6 +329,7 @@ export default function JsonEntryDialog({
               fullWidth
               variant="outlined"
               value={value2}
+              autoComplete="off"
               onChange={(e) => {
                 setValue2(e.target.value);
                 setError('');
@@ -296,18 +339,73 @@ export default function JsonEntryDialog({
           </>
         )}
 
+        {entryType === 'ssh' && (
+          <>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField
+                margin="dense"
+                label={t('jsonEditor.fields.host') || 'Host'}
+                variant="outlined"
+                value={sshHost}
+                autoComplete="off"
+                onChange={(e) => {
+                  setSshHost(e.target.value);
+                  setError('');
+                }}
+                sx={{ ...dialogStyles.textField, flex: 1 }}
+              />
+              <TextField
+                margin="dense"
+                label={t('jsonEditor.fields.port') || 'Port'}
+                variant="outlined"
+                value={port}
+                autoComplete="off"
+                onChange={(e) => {
+                  setPort(e.target.value);
+                  setError('');
+                }}
+                inputProps={{
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
+                  autoComplete: 'off',
+                }}
+                sx={{ ...dialogStyles.textField, width: '100px' }}
+              />
+            </Box>
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.user') || 'User'}
+              fullWidth
+              variant="outlined"
+              value={sshUser}
+              autoComplete="off"
+              onChange={(e) => {
+                setSshUser(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+          </>
+        )}
+
         {(entryType === 'titlePassword' ||
           entryType === 'titleValuePassword' ||
-          entryType === 'titleTwoValuesPassword') && (
+          entryType === 'titleTwoValuesPassword' ||
+          entryType === 'ssh') && (
           <TextField
             margin="dense"
             label={t('jsonEditor.fields.password') || 'Password'}
             fullWidth
             variant="outlined"
             type={showPassword ? 'text' : 'password'}
-            value={password}
+            value={entryType === 'ssh' ? sshPassword : password}
+            autoComplete="new-password"
             onChange={(e) => {
-              setPassword(e.target.value);
+              if (entryType === 'ssh') {
+                setSshPassword(e.target.value);
+              } else {
+                setPassword(e.target.value);
+              }
               setError('');
             }}
             sx={dialogStyles.textField}

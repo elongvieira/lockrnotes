@@ -5,6 +5,7 @@ import { setupEncryptionHandlers } from './encryptionHandlers';
 import { registerManualEncryptionHandlers } from './manualEncryptionHandlers';
 import { registerExportHandlers } from './exportHandlers';
 import { registerHotCopyHandlers } from './hotcopyHandlers';
+import { setupSshHandlers } from './sshHandlers';
 
 /**
  * Setup all IPC handlers
@@ -16,6 +17,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   registerManualEncryptionHandlers();
   registerExportHandlers();
   registerHotCopyHandlers();
+  setupSshHandlers(mainWindow);
 }
 
 export * from './filesystemHandlers';

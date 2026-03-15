@@ -30,6 +30,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import TerminalIcon from '@mui/icons-material/Terminal';
 import CodeIcon from '@mui/icons-material/Code';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +44,7 @@ import {
   TitlePasswordEntry,
   TitleValuePasswordEntry,
   TitleTwoValuesPasswordEntry,
+  SshEntry,
   parseJsonContent,
   serializeJsonContent,
   createEntry,
@@ -874,6 +876,155 @@ export default function JsonEditor({
           </Box>
         );
       }
+      case 'ssh': {
+        const sshEntry = entry as SshEntry;
+        const sshPasswordVisible = visiblePasswords.has(entry.id);
+        const sshHostVisible = visibleValues.has(`${entry.id}-0`);
+        const sshUserVisible = visibleValues.has(`${entry.id}-1`);
+        return (
+          <Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.host')}:{' '}
+                {maskValue(sshEntry.host, sshHostVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {sshHostVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, sshEntry.host, 0)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 0 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'host', sshEntry.host)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.user')}:{' '}
+                {maskValue(sshEntry.user, sshUserVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 1)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {sshUserVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, sshEntry.user, 1)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 1 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'user', sshEntry.user)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'var(--text-secondary)' }}
+              >
+                {t('jsonEditor.fields.password')}:{' '}
+                {maskValue(sshEntry.password, sshPasswordVisible, true)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => togglePasswordVisibility(entry.id)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {sshPasswordVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, sshEntry.password, 2)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 2 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'password', sshEntry.password)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+        );
+      }
       default:
         return null;
     }
@@ -1078,6 +1229,33 @@ export default function JsonEditor({
                         align="right"
                         className="json-editor-cell json-editor-actions"
                       >
+                        {entry.type === 'ssh' && (
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              const sshEntry = entry as SshEntry;
+                              const { sshAPI } = window as any;
+                              if (sshAPI) {
+                                sshAPI.openWindow({
+                                  host: sshEntry.host,
+                                  port: sshEntry.port,
+                                  user: sshEntry.user,
+                                  password: sshEntry.password,
+                                  title: sshEntry.title,
+                                });
+                              }
+                            }}
+                            title={t('ssh.connect') || 'Connect'}
+                            sx={{
+                              color: '#a6e3a1',
+                              '&:hover': {
+                                backgroundColor: 'rgba(166, 227, 161, 0.12)',
+                              },
+                            }}
+                          >
+                            <TerminalIcon fontSize="small" />
+                          </IconButton>
+                        )}
                         <IconButton
                           size="small"
                           onClick={() => handleDuplicateEntry(entry)}
