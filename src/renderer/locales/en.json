@@ -165,7 +165,8 @@
       "titlePassword": "Title + Password",
       "titleValuePassword": "Title + Value + Password",
       "titleTwoValuesPassword": "Title + Value 1 + Value 2 + Password",
-      "ssh": "SSH"
+      "ssh": "SSH",
+      "rdp": "RDP"
     },
     "fields": {
       "title": "Title",
@@ -176,6 +177,7 @@
       "host": "Host",
       "port": "Port",
       "user": "User",
+      "domain": "Domain",
       "type": "Type"
     },
     "errors": {
@@ -200,6 +202,9 @@
     "disconnected": "Disconnected",
     "disconnect": "Disconnect",
     "error": "Error"
+  },
+  "rdp": {
+    "connect": "Connect RDP"
   },
   "contextMenu": {
     "open": "Open",

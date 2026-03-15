@@ -28,6 +28,7 @@ import {
   TitleValuePasswordEntry,
   TitleTwoValuesPasswordEntry,
   SshEntry,
+  RdpEntry,
 } from '../types/jsonEntry';
 
 interface JsonEntryDialogProps {
@@ -56,6 +57,11 @@ export default function JsonEntryDialog({
   const [sshUser, setSshUser] = useState<string>('');
   const [sshPassword, setSshPassword] = useState<string>('');
   const [port, setPort] = useState<string>('22');
+  const [rdpHost, setRdpHost] = useState<string>('');
+  const [rdpPort, setRdpPort] = useState<string>('3389');
+  const [rdpUser, setRdpUser] = useState<string>('');
+  const [rdpPassword, setRdpPassword] = useState<string>('');
+  const [rdpDomain, setRdpDomain] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -99,6 +105,16 @@ export default function JsonEntryDialog({
           setSshHost((editingEntry as SshEntry).host);
           setSshUser((editingEntry as SshEntry).user);
           setSshPassword((editingEntry as SshEntry).password);
+        } else if (editingEntry.type === 'rdp') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setRdpHost((editingEntry as RdpEntry).host);
+          setRdpPort(String((editingEntry as RdpEntry).port || 3389));
+          setRdpUser((editingEntry as RdpEntry).user);
+          setRdpPassword((editingEntry as RdpEntry).password);
+          setRdpDomain((editingEntry as RdpEntry).domain || '');
         }
       } else if (duplicateData) {
         // Pre-fill from duplicated entry (including title, so user can modify it)
@@ -138,6 +154,16 @@ export default function JsonEntryDialog({
           setSshHost((duplicateData as SshEntry).host);
           setSshUser((duplicateData as SshEntry).user);
           setSshPassword((duplicateData as SshEntry).password);
+        } else if (duplicateData.type === 'rdp') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setRdpHost((duplicateData as RdpEntry).host);
+          setRdpPort(String((duplicateData as RdpEntry).port || 3389));
+          setRdpUser((duplicateData as RdpEntry).user);
+          setRdpPassword((duplicateData as RdpEntry).password);
+          setRdpDomain((duplicateData as RdpEntry).domain || '');
         }
       } else {
         setEntryType('keyValue');
@@ -150,6 +176,11 @@ export default function JsonEntryDialog({
         setSshUser('');
         setSshPassword('');
         setPort('22');
+        setRdpHost('');
+        setRdpPort('3389');
+        setRdpUser('');
+        setRdpPassword('');
+        setRdpDomain('');
       }
       setError('');
       setShowPassword(false);
@@ -191,6 +222,14 @@ export default function JsonEntryDialog({
         : 22;
       (entryData as SshEntry).user = sshUser.trim();
       (entryData as SshEntry).password = sshPassword.trim();
+    } else if (entryType === 'rdp') {
+      (entryData as RdpEntry).host = rdpHost.trim();
+      (entryData as RdpEntry).port = rdpPort.trim()
+        ? parseInt(rdpPort.trim(), 10)
+        : 3389;
+      (entryData as RdpEntry).user = rdpUser.trim();
+      (entryData as RdpEntry).password = rdpPassword.trim();
+      (entryData as RdpEntry).domain = rdpDomain.trim();
     }
 
     onConfirm(entryData);
@@ -272,6 +311,11 @@ export default function JsonEntryDialog({
               value="ssh"
               control={<Radio sx={dialogStyles.checkboxRadio} />}
               label={t('jsonEditor.types.ssh') || 'SSH'}
+            />
+            <FormControlLabel
+              value="rdp"
+              control={<Radio sx={dialogStyles.checkboxRadio} />}
+              label={t('jsonEditor.types.rdp') || 'RDP'}
             />
           </RadioGroup>
         </FormControl>
@@ -424,6 +468,96 @@ export default function JsonEntryDialog({
               ),
             }}
           />
+        )}
+
+        {entryType === 'rdp' && (
+          <>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField
+                margin="dense"
+                label={t('jsonEditor.fields.host') || 'Host'}
+                variant="outlined"
+                value={rdpHost}
+                autoComplete="off"
+                onChange={(e) => {
+                  setRdpHost(e.target.value);
+                  setError('');
+                }}
+                sx={{ ...dialogStyles.textField, flex: 1 }}
+              />
+              <TextField
+                margin="dense"
+                label={t('jsonEditor.fields.port') || 'Port'}
+                variant="outlined"
+                value={rdpPort}
+                autoComplete="off"
+                onChange={(e) => {
+                  setRdpPort(e.target.value);
+                  setError('');
+                }}
+                inputProps={{
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
+                  autoComplete: 'off',
+                }}
+                sx={{ ...dialogStyles.textField, width: '100px' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField
+                margin="dense"
+                label={t('jsonEditor.fields.domain') || 'Domain'}
+                variant="outlined"
+                value={rdpDomain}
+                autoComplete="off"
+                onChange={(e) => {
+                  setRdpDomain(e.target.value);
+                  setError('');
+                }}
+                sx={{ ...dialogStyles.textField, flex: 1 }}
+              />
+              <TextField
+                margin="dense"
+                label={t('jsonEditor.fields.user') || 'User'}
+                variant="outlined"
+                value={rdpUser}
+                autoComplete="off"
+                onChange={(e) => {
+                  setRdpUser(e.target.value);
+                  setError('');
+                }}
+                sx={{ ...dialogStyles.textField, flex: 1 }}
+              />
+            </Box>
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.password') || 'Password'}
+              fullWidth
+              variant="outlined"
+              type={showPassword ? 'text' : 'password'}
+              value={rdpPassword}
+              autoComplete="new-password"
+              onChange={(e) => {
+                setRdpPassword(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleTogglePasswordVisibility}
+                      edge="end"
+                      size="small"
+                      sx={dialogStyles.passwordIcon}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </>
         )}
 
         {error && (

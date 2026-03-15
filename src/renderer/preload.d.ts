@@ -4,6 +4,7 @@ import type { ManualEncryptionAPI } from '../main/preload/manualEncryptionApi';
 import type { exportApi } from '../main/preload/exportApi';
 import type { hotCopyApi } from '../main/preload/hotcopyApi';
 import type { SshAPI } from '../main/preload/sshApi';
+import type { RdpAPI } from '../main/preload/rdpApi';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -14,6 +15,7 @@ declare global {
     exportAPI: typeof exportApi;
     hotCopyAPI: typeof hotCopyApi;
     sshAPI: SshAPI;
+    rdpAPI: RdpAPI;
   }
 
   namespace NodeJS {

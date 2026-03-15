@@ -45,6 +45,7 @@ import {
   TitleValuePasswordEntry,
   TitleTwoValuesPasswordEntry,
   SshEntry,
+  RdpEntry,
   parseJsonContent,
   serializeJsonContent,
   createEntry,
@@ -1025,6 +1026,167 @@ export default function JsonEditor({
           </Box>
         );
       }
+      case 'rdp': {
+        const rdpEntry = entry as RdpEntry;
+        const rdpPasswordVisible = visiblePasswords.has(entry.id);
+        const rdpHostVisible = visibleValues.has(`${entry.id}-0`);
+        const rdpUserVisible = visibleValues.has(`${entry.id}-1`);
+        return (
+          <Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.host')}:{' '}
+                {maskValue(rdpEntry.host, rdpHostVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {rdpHostVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, rdpEntry.host, 0)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 0 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'host', rdpEntry.host)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            {rdpEntry.domain && (
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: 'var(--text-primary)' }}
+                >
+                  {t('jsonEditor.fields.domain')}: {rdpEntry.domain}
+                </Typography>
+              </Box>
+            )}
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.user')}:{' '}
+                {maskValue(rdpEntry.user, rdpUserVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 1)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {rdpUserVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, rdpEntry.user, 1)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 1 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'user', rdpEntry.user)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'var(--text-secondary)' }}
+              >
+                {t('jsonEditor.fields.password')}:{' '}
+                {maskValue(rdpEntry.password, rdpPasswordVisible, true)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => togglePasswordVisibility(entry.id)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {rdpPasswordVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, rdpEntry.password, 2)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 2 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'password', rdpEntry.password)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+        );
+      }
       default:
         return null;
     }
@@ -1250,6 +1412,34 @@ export default function JsonEditor({
                               color: '#a6e3a1',
                               '&:hover': {
                                 backgroundColor: 'rgba(166, 227, 161, 0.12)',
+                              },
+                            }}
+                          >
+                            <TerminalIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                        {entry.type === 'rdp' && (
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              const rdpEntry = entry as RdpEntry;
+                              const { rdpAPI } = window as any;
+                              if (rdpAPI) {
+                                rdpAPI.connect({
+                                  host: rdpEntry.host,
+                                  port: rdpEntry.port,
+                                  user: rdpEntry.user,
+                                  password: rdpEntry.password,
+                                  domain: rdpEntry.domain,
+                                  title: rdpEntry.title,
+                                });
+                              }
+                            }}
+                            title={t('rdp.connect') || 'Connect RDP'}
+                            sx={{
+                              color: '#89b4fa',
+                              '&:hover': {
+                                backgroundColor: 'rgba(137, 180, 250, 0.12)',
                               },
                             }}
                           >

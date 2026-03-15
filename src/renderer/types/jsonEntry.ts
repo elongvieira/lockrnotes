@@ -8,7 +8,8 @@ export type JsonEntryType =
   | 'titlePassword'
   | 'titleValuePassword'
   | 'titleTwoValuesPassword'
-  | 'ssh';
+  | 'ssh'
+  | 'rdp';
 
 export interface BaseEntry {
   id: string;
@@ -79,13 +80,27 @@ export interface SshEntry extends BaseEntry {
   password: string;
 }
 
+/**
+ * RDP entry (title + host + user + password + domain + port)
+ */
+export interface RdpEntry extends BaseEntry {
+  type: 'rdp';
+  title: string;
+  host: string;
+  port?: number;
+  user: string;
+  password: string;
+  domain?: string;
+}
+
 export type JsonEntry =
   | KeyValueEntry
   | TitleTwoValuesEntry
   | TitlePasswordEntry
   | TitleValuePasswordEntry
   | TitleTwoValuesPasswordEntry
-  | SshEntry;
+  | SshEntry
+  | RdpEntry;
 
 /**
  * Structure of a JSON file content
@@ -152,6 +167,17 @@ export function createEntry(
         port: (data as SshEntry).port || 22,
         user: (data as SshEntry).user || '',
         password: (data as SshEntry).password || '',
+      };
+    case 'rdp':
+      return {
+        id,
+        type: 'rdp',
+        title: (data as RdpEntry).title || '',
+        host: (data as RdpEntry).host || '',
+        port: (data as RdpEntry).port || 3389,
+        user: (data as RdpEntry).user || '',
+        password: (data as RdpEntry).password || '',
+        domain: (data as RdpEntry).domain || '',
       };
     default:
       throw new Error(`Unknown entry type: ${type}`);
