@@ -284,7 +284,13 @@
     "languageTitle": "System Language",
     "languageDescription": "Choose the language that will be used in the application interface.",
     "languageLabel": "Language",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "privacyTitle": "Privacy and Security Guaranteed",
+    "privacyDescription": "Your data is encrypted with high-security algorithms directly on your device. LockrNotes has no servers, collects no data, and transmits no information over the network — everything stays 100% local and under your control.",
+    "privacyLocal": "✓ 100% Local",
+    "privacyNoServer": "✓ No servers",
+    "privacyNoTracking": "✓ Zero tracking",
+    "privacyEncrypted": "✓ Strong encryption"
   },
   "settings": {
     "title": "Settings",

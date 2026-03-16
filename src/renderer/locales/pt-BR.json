@@ -284,7 +284,13 @@
     "languageTitle": "Idioma do Sistema",
     "languageDescription": "Escolha o idioma que será usado na interface do aplicativo.",
     "languageLabel": "Idioma",
-    "getStarted": "Começar a Usar"
+    "getStarted": "Começar a Usar",
+    "privacyTitle": "Privacidade e Segurança Garantidas",
+    "privacyDescription": "Seus dados são criptografados com algoritmos de alta segurança diretamente no seu dispositivo. O LockrNotes não possui servidores, não coleta dados e não transmite informações pela rede — tudo fica 100% local e sob seu controle.",
+    "privacyLocal": "✓ 100% Local",
+    "privacyNoServer": "✓ Sem servidores",
+    "privacyNoTracking": "✓ Zero rastreamento",
+    "privacyEncrypted": "✓ Criptografia forte"
   },
   "settings": {
     "title": "Configurações",

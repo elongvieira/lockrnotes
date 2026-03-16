@@ -169,6 +169,68 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
               </>
             )}
           </Typography>
+
+          {/* Privacy & Encryption Banner */}
+          <Box
+            sx={{
+              mt: 2,
+              p: 2,
+              borderRadius: 'var(--border-radius-md)',
+              backgroundColor: 'var(--bg-tree-container)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                ...dialogStyles.primaryText,
+                fontWeight: 600,
+                mb: 0.75,
+              }}
+            >
+              🛡️{' '}
+              {t('welcome.privacyTitle') ||
+                'Privacidade e Segurança Garantidas'}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                ...dialogStyles.secondaryText,
+                lineHeight: 1.6,
+                display: 'block',
+                mb: 1,
+              }}
+            >
+              {t('welcome.privacyDescription') ||
+                'Seus dados são criptografados com algoritmos de alta segurança diretamente no seu dispositivo. O LockrNotes não possui servidores, não coleta dados e não transmite informações pela rede — tudo fica 100% local e sob seu controle.'}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Typography
+                variant="caption"
+                sx={{ color: 'var(--text-success)', fontWeight: 500 }}
+              >
+                {t('welcome.privacyLocal') || '✓ 100% Local'}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: 'var(--text-success)', fontWeight: 500 }}
+              >
+                {t('welcome.privacyNoServer') || '✓ Sem servidores'}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: 'var(--text-success)', fontWeight: 500 }}
+              >
+                {t('welcome.privacyNoTracking') || '✓ Zero rastreamento'}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: 'var(--text-success)', fontWeight: 500 }}
+              >
+                {t('welcome.privacyEncrypted') || '✓ Criptografia forte'}
+              </Typography>
+            </Box>
+          </Box>
         </Box>
 
         <Divider sx={{ my: 3, ...dialogStyles.divider }} />
