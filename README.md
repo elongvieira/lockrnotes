@@ -46,6 +46,20 @@ To package apps for the local platform:
 npm run package
 ```
 
+## Semantic Release
+
+This repository uses `semantic-release` on pushes to `main`.
+
+Use Conventional Commits so the next version can be calculated automatically:
+
+```bash
+feat: add SSH terminal shortcuts
+fix: prevent sidebar tree crash
+feat!: replace legacy import flow
+```
+
+Version bumps happen in CI after the commit reaches `main`, not at local commit time.
+
 ## Docs
 
 Visit https://lockrnotes.com for updates and docs
@@ -64,6 +78,7 @@ Este projeto foi **construído a partir do** [Electron React Boilerplate](https:
 um projeto open source licenciado sob a **MIT License**.
 
 As modificações e novas funcionalidades foram desenvolvidas por **Elon G. Vieira (2025)**.
+
 ## License
 
 MIT © 2025 Elon Gomes Vieira
