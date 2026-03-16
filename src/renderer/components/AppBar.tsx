@@ -8,20 +8,27 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuIcon from '@mui/icons-material/Menu';
 import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
 import HotCopyBar from './HotCopyBar';
 import HotCopyManageDialog from './HotCopyManageDialog';
+import ImportDialog from './ImportDialog';
 import { HotCopyItem } from '../types/hotcopy';
+import type { ImportFileInfo } from '../../main/preload/importApi';
+import { useAppContext } from '../contexts/AppContext';
 import './AppBar.css';
 
 export default function AppBar() {
   const { t, i18n } = useTranslation();
+  const { refreshSidebar } = useAppContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hotCopyManageOpen, setHotCopyManageOpen] = useState(false);
   const [hotCopyItems, setHotCopyItems] = useState<HotCopyItem[]>([]);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [filesToImport, setFilesToImport] = useState<ImportFileInfo[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
 
@@ -137,6 +144,36 @@ export default function AppBar() {
         }),
       );
     }
+  };
+
+  const handleImport = async () => {
+    handleMenuClose();
+    try {
+      const result = await window.importAPI.selectFiles();
+      if (result.canceled || result.files.length === 0) {
+        return;
+      }
+      setFilesToImport(result.files);
+      setImportDialogOpen(true);
+    } catch (error) {
+      console.error('Import select error:', error);
+      window.dispatchEvent(
+        new CustomEvent('show-notification', {
+          detail: {
+            message:
+              t('notifications.importError', {
+                error: error instanceof Error ? error.message : 'Unknown error',
+              }) || 'Erro ao selecionar arquivos para importar',
+            severity: 'error',
+          },
+        }),
+      );
+    }
+  };
+
+  const handleImportComplete = () => {
+    setImportDialogOpen(false);
+    refreshSidebar();
   };
 
   const loadHotCopyItems = async () => {
@@ -266,6 +303,12 @@ export default function AppBar() {
             </ListItemIcon>
             {t('menu.export') || '📦 Exportar tudo'}
           </MenuItem>
+          <MenuItem onClick={handleImport} className="app-menu-item">
+            <ListItemIcon className="app-menu-icon">
+              <UploadIcon fontSize="small" />
+            </ListItemIcon>
+            {t('menu.import') || '📥 Importar arquivos'}
+          </MenuItem>
           <MenuItem
             onClick={() => {
               handleMenuClose();
@@ -288,6 +331,12 @@ export default function AppBar() {
           onClose={() => setHotCopyManageOpen(false)}
           items={hotCopyItems}
           onUpdate={loadHotCopyItems}
+        />
+        <ImportDialog
+          open={importDialogOpen}
+          onClose={() => setImportDialogOpen(false)}
+          files={filesToImport}
+          onImportComplete={handleImportComplete}
         />
       </Toolbar>
     </MuiAppBar>

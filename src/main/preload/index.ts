@@ -6,6 +6,7 @@ export { windowApi } from './windowApi';
 export { EncryptionAPI } from './encryptionApi';
 export { systemApi } from './systemApi';
 export { exportApi } from './exportApi';
+export { importApi } from './importApi';
 
 // Re-export types for convenience
 export type {

@@ -7,6 +7,7 @@
     "save": "Salvar",
     "delete": "Excluir",
     "export": "Exportar tudo",
+    "import": "Importar arquivos",
     "exit": "Sair"
   },
   "editor": {
@@ -143,6 +144,20 @@
       "message": "Este arquivo está protegido por senha. Digite a senha para abrir:",
       "passwordLabel": "Senha",
       "wrongPassword": "Senha incorreta. Tente novamente."
+    },
+    "import": {
+      "title": "Importar Arquivos",
+      "filesToImport": "Arquivos selecionados",
+      "destination": "Pasta de destino",
+      "destinationPlaceholder": "Selecione a pasta de destino...",
+      "browseDestination": "Selecionar pasta",
+      "confirmButton": "Importar",
+      "importing": "Importando...",
+      "errors": {
+        "emptyDestination": "Selecione a pasta de destino",
+        "outsideRoot": "A pasta selecionada está fora da pasta de notas configurada",
+        "fileExists": "Arquivo \"{{name}}\" já existe no destino"
+      }
     }
   },
   "jsonEditor": {
@@ -235,7 +250,10 @@
     "exportSuccess": "Exportação concluída! {{count}} arquivos exportados para {{path}}",
     "exportError": "Erro ao exportar arquivos: {{error}}",
     "exportNoFolder": "Nenhuma pasta selecionada para exportação",
-    "exportInProgress": "Exportando arquivos..."
+    "exportInProgress": "Exportando arquivos...",
+    "importSuccess": "{{count}} arquivo(s) importado(s) com sucesso",
+    "importError": "Erro ao selecionar arquivos para importar: {{error}}",
+    "importPartialError": "Erros durante a importação: {{errors}}"
   },
   "status": {
     "saved": "Salvo",

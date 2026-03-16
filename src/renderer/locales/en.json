@@ -7,6 +7,7 @@
     "save": "Save",
     "delete": "Delete",
     "export": "Export All",
+    "import": "Import Files",
     "exit": "Exit"
   },
   "editor": {
@@ -143,6 +144,20 @@
       "message": "This file is password protected. Enter the password to open:",
       "passwordLabel": "Password",
       "wrongPassword": "Wrong password. Please try again."
+    },
+    "import": {
+      "title": "Import Files",
+      "filesToImport": "Selected files",
+      "destination": "Destination folder",
+      "destinationPlaceholder": "Select destination folder...",
+      "browseDestination": "Select folder",
+      "confirmButton": "Import",
+      "importing": "Importing...",
+      "errors": {
+        "emptyDestination": "Please select a destination folder",
+        "outsideRoot": "The selected folder is outside the configured notes folder",
+        "fileExists": "File \"{{name}}\" already exists in destination"
+      }
     }
   },
   "jsonEditor": {
@@ -235,7 +250,10 @@
     "exportSuccess": "Export completed! {{count}} files exported to {{path}}",
     "exportError": "Error exporting files: {{error}}",
     "exportNoFolder": "No folder selected for export",
-    "exportInProgress": "Exporting files..."
+    "exportInProgress": "Exporting files...",
+    "importSuccess": "{{count}} file(s) imported successfully",
+    "importError": "Error selecting files to import: {{error}}",
+    "importPartialError": "Errors during import: {{errors}}"
   },
   "status": {
     "saved": "Saved",

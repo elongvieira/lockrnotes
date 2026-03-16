@@ -6,6 +6,7 @@ import {
   windowApi,
   systemApi,
   exportApi,
+  importApi,
 } from './preload/index';
 import { hotCopyApi } from './preload/hotcopyApi';
 import { sshApi } from './preload/sshApi';
@@ -24,6 +25,7 @@ const electronHandler = {
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('exportAPI', exportApi);
+contextBridge.exposeInMainWorld('importAPI', importApi);
 contextBridge.exposeInMainWorld('hotCopyAPI', hotCopyApi);
 contextBridge.exposeInMainWorld('sshAPI', sshApi);
 contextBridge.exposeInMainWorld('rdpAPI', rdpApi);
