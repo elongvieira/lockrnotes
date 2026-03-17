@@ -125,7 +125,7 @@
     "react-router-dom": "^7.3.0"
   },
   "devDependencies": {
-    "@electron/rebuild": "^3.7.1",
+    "@electron/rebuild": "^4.0.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
