@@ -96,6 +96,53 @@ export default function SshTerminalPage() {
 
     term.open(terminalRef.current);
     fit.fit();
+
+    const container = terminalRef.current;
+
+    // Ctrl+C — copy selection when text is selected; otherwise SIGINT passes through
+    // Ctrl+V — suppress xterm's keydown handling (paste comes via the paste event below)
+    term.attachCustomKeyEventHandler((e: KeyboardEvent) => {
+      if (e.type !== 'keydown') return true;
+      if (e.ctrlKey && !e.shiftKey && e.code === 'KeyC') {
+        const sel = term.getSelection();
+        if (sel) {
+          navigator.clipboard.writeText(sel);
+          return false; // consumed — do not forward ^C to shell
+        }
+      }
+      if (e.ctrlKey && !e.shiftKey && e.code === 'KeyV') {
+        return false; // suppress xterm keydown; actual paste is handled by the paste event below
+      }
+      return true;
+    });
+
+    // Intercept paste events in capture phase (before xterm's textarea) to avoid double paste.
+    // Works for both Ctrl+V and right-click → paste in OS context menus.
+    const handlePaste = (ev: ClipboardEvent) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const text = ev.clipboardData?.getData('text/plain') ?? '';
+      if (text && sessionIdRef.current) {
+        sshAPI.sendInput(sessionIdRef.current, text);
+      }
+    };
+    container.addEventListener('paste', handlePaste, true /* capture */);
+
+    // Right-click → paste from clipboard (shows no context menu)
+    const handleContextMenu = (ev: MouseEvent) => {
+      ev.preventDefault();
+      navigator.clipboard
+        .readText()
+        .then((text) => {
+          if (text && sessionIdRef.current) {
+            sshAPI.sendInput(sessionIdRef.current, text);
+          }
+          return text;
+        })
+        .catch(() => {});
+    };
+    container.addEventListener('contextmenu', handleContextMenu);
+
     term.writeln(
       `\x1b[2mConnecting to \x1b[0m\x1b[1;34m${config.host}\x1b[0m\x1b[2m…\x1b[0m`,
     );
@@ -165,6 +212,8 @@ export default function SshTerminalPage() {
     window.addEventListener('resize', handleResize);
 
     return () => {
+      container.removeEventListener('paste', handlePaste, true);
+      container.removeEventListener('contextmenu', handleContextMenu);
       window.removeEventListener('resize', handleResize);
       if (removeData) removeData();
       if (removeClosed) removeClosed();
