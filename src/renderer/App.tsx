@@ -1,50 +1,63 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { Suspense, useState, useEffect } from 'react';
 import './App.css';
-
-function Hello() {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-}
+import './styles/scrollbar.css';
+import Main from './pages/Main';
+import theme from './theme';
+import WelcomeDialog from './components/WelcomeDialog';
+import { fileSystemService } from './services/fileSystemService';
+import i18n from './i18n';
 
 export default function App() {
+  const [welcomeOpen, setWelcomeOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const checkFirstRun = async () => {
+    try {
+      const config = await fileSystemService.readConfig();
+
+      // Apply saved language preference
+      if (config?.language) {
+        i18n.changeLanguage(config.language);
+      }
+
+      // Show welcome dialog if firstRun is true or config doesn't exist
+      if (!config || config.firstRun === true) {
+        setWelcomeOpen(true);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error checking first run:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkFirstRun();
+  }, []);
+
+  const handleWelcomeClose = () => {
+    setWelcomeOpen(false);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Main />} />
+          </Routes>
+        </Router>
+      </Suspense>
+      <WelcomeDialog open={welcomeOpen} onClose={handleWelcomeClose} />
+    </ThemeProvider>
   );
 }

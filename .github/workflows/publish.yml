@@ -1,28 +1,26 @@
 name: Publish
 
+# Temporarily disabled automatic triggers. This workflow now runs only manually.
+# To re-enable on push to main later, replace the 'on:' block with:
+# on:
+#   push:
+#     branches:
+#       - main
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   publish:
-    # To enable auto publishing to github, update your electron publisher
-    # config in package.json > "build" and remove the conditional below
-    if: ${{ github.repository_owner == 'electron-react-boilerplate' }}
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest]
+    # Auto publish on pushes to main
+    if: ${{ github.repository_owner == 'elongvieira' }}
+    runs-on: windows-latest
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install Node and NPM
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -44,4 +42,4 @@ jobs:
           # This is used for uploading release assets to github
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm exec electron-builder -- --publish always --win --mac --linux
+          npm exec electron-builder -- --publish always --win

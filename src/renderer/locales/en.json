@@ -1,0 +1,338 @@
+{
+  "app": {
+    "title": "Lockr Notes"
+  },
+  "menu": {
+    "new": "New Note",
+    "save": "Save",
+    "delete": "Delete",
+    "export": "Export All",
+    "import": "Import Files",
+    "exit": "Exit"
+  },
+  "editor": {
+    "placeholder": "Type your content here...",
+    "welcome": {
+      "title": "LockrNotes Editor",
+      "message": "Click a file in the sidebar to open it in a new tab, or create a new file to start writing."
+    }
+  },
+  "sidebar": {
+    "tabs": {
+      "aria": "Sidebar Tabs",
+      "local": "Local",
+      "files": "Files",
+      "remote": "Remote"
+    },
+    "local": {
+      "content": "This is the local notes area. Select or create a note to start editing."
+    },
+    "tree": {
+      "aria": "Notes tree",
+      "root": "Notes",
+      "loading": "Loading...",
+      "empty": "No files found"
+    },
+    "actions": {
+      "createFolder": "Create folder",
+      "createFile": "Create file",
+      "refresh": "Refresh"
+    },
+    "prompts": {
+      "folderName": "Enter folder name:",
+      "fileName": "Enter file name (with extension):"
+    }
+  },
+  "dialog": {
+    "folder": {
+      "title": "Create New Folder",
+      "placeholder": "Folder name",
+      "errors": {
+        "empty": "Folder name cannot be empty",
+        "invalidChars": "Folder name contains invalid characters",
+        "tooLong": "Folder name is too long (maximum 255 characters)",
+        "reservedName": "This is a reserved system name",
+        "startsWithDot": "Folder name cannot start with a dot"
+      }
+    },
+    "file": {
+      "title": "Create New File",
+      "filename": "File name",
+      "typeTitle": "File Type",
+      "previewTitle": "Preview",
+      "encryptOption": "Encrypt file",
+      "managedEncryption": "Managed by program",
+      "manualEncryption": "Manual key",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "passwordWarning": "Write down the password in a safe place. The file cannot be recovered without it.",
+      "types": {
+        "text": {
+          "name": "Text",
+          "description": "Simple text file for notes and documents.",
+          "preview": "📝 Lorem ipsum dolor sit amet...\n\nParagraph 2 with more text."
+        },
+        "keyvalue": {
+          "name": "Key/Values",
+          "description": "Structured data in key-value format.",
+          "preview": "name: System name\nuser: user123\npassword: ••••••••"
+        }
+      },
+      "errors": {
+        "emptyName": "File name is required",
+        "invalidChars": "File name contains invalid characters",
+        "tooLong": "File name is too long (maximum 255 characters)",
+        "reservedName": "This is a reserved system name",
+        "startsWithDot": "File name cannot start with a dot",
+        "emptyPassword": "Password is required",
+        "weakPassword": "Password must be at least 6 characters",
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooLong": "Password is too long (maximum 128 characters)",
+        "passwordSpecialChars": "Password must contain at least one special character",
+        "fileExists": "A file with that name already exists"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "create": "Create",
+      "confirm": "Confirm",
+      "rename": "Rename",
+      "delete": "Delete",
+      "add": "Add",
+      "save": "Save",
+      "move": "Move",
+      "unlock": "Unlock"
+    },
+    "confirm": {
+      "title": "Confirmation",
+      "message": "Are you sure you want to continue?"
+    },
+    "delete": {
+      "title": "Delete",
+      "message": "This item will be permanently deleted. Are you sure?"
+    },
+    "rename": {
+      "titleFile": "Rename File",
+      "titleFolder": "Rename Folder",
+      "placeholder": "New name",
+      "warningFileOpen": "This file is currently open. It will be saved, closed and reopened with the new name.",
+      "errors": {
+        "empty": "Name cannot be empty",
+        "invalidChars": "Name contains invalid characters",
+        "tooLong": "Name is too long (maximum 255 characters)",
+        "startsWithDot": "Name cannot start with a dot",
+        "fileExists": "A file with that name already exists"
+      }
+    },
+    "move": {
+      "titleFile": "Move File",
+      "titleFolder": "Move Folder",
+      "itemName": "Item:",
+      "currentLocation": "Current location:",
+      "destination": "Move to:",
+      "destinationPlaceholder": "Select destination folder",
+      "browse": "Browse",
+      "errors": {
+        "emptyPath": "Please select a destination folder",
+        "sameLocation": "Destination is the same as current location",
+        "failed": "Failed to move item",
+        "fileExists": "An item with that name already exists in the destination"
+      }
+    },
+    "password": {
+      "title": "Protected File",
+      "message": "This file is password protected. Enter the password to open:",
+      "passwordLabel": "Password",
+      "wrongPassword": "Wrong password. Please try again."
+    },
+    "import": {
+      "title": "Import Files",
+      "filesToImport": "Selected files",
+      "destination": "Destination folder",
+      "destinationPlaceholder": "Select destination folder...",
+      "browseDestination": "Select folder",
+      "confirmButton": "Import",
+      "importing": "Importing...",
+      "errors": {
+        "emptyDestination": "Please select a destination folder",
+        "outsideRoot": "The selected folder is outside the configured notes folder",
+        "fileExists": "File \"{{name}}\" already exists in destination"
+      }
+    }
+  },
+  "jsonEditor": {
+    "title": "Records",
+    "addEntry": "Add Record",
+    "editEntry": "Edit Record",
+    "duplicate": "Duplicate Record",
+    "entryType": "Record Type",
+    "actions": "Actions",
+    "menu": "Options",
+    "showAll": "Show All",
+    "hideAll": "Hide All",
+    "createNewFromCurrent": "Create new file from current",
+    "search": "Search records...",
+    "empty": "No records yet. Click \"Add Record\" to create one.",
+    "noSearchResults": "No search results found.",
+    "types": {
+      "keyValue": "Title + Value",
+      "titleTwoValues": "Title + Value 1 + Value 2",
+      "titlePassword": "Title + Password",
+      "titleValuePassword": "Title + Value + Password",
+      "titleTwoValuesPassword": "Title + Value 1 + Value 2 + Password",
+      "ssh": "SSH",
+      "rdp": "RDP"
+    },
+    "fields": {
+      "title": "Title",
+      "value": "Value",
+      "value1": "Value 1",
+      "value2": "Value 2",
+      "password": "Password",
+      "host": "Host",
+      "port": "Port",
+      "user": "User",
+      "domain": "Domain",
+      "type": "Type"
+    },
+    "errors": {
+      "emptyTitle": "Title is required",
+      "emptyValue": "Value is required",
+      "emptyValue1": "Entry 1 is required",
+      "emptyValue2": "Entry 2 is required",
+      "emptyPassword": "Password is required"
+    },
+    "deleteConfirm": {
+      "title": "Delete Record",
+      "message": "Are you sure you want to delete this record?"
+    },
+    "switchToRaw": "Edit as raw text",
+    "switchToStructured": "Edit as structured",
+    "rawPlaceholder": "Edit JSON as text...",
+    "parseError": "Invalid JSON format"
+  },
+  "ssh": {
+    "connect": "Connect",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "disconnect": "Disconnect",
+    "error": "Error"
+  },
+  "rdp": {
+    "connect": "Connect RDP"
+  },
+  "contextMenu": {
+    "open": "Open",
+    "rename": "Rename",
+    "move": "Move",
+    "copy": "Copy",
+    "delete": "Delete",
+    "decrypt": "Decrypt"
+  },
+  "notifications": {
+    "fileCreated": "File created successfully",
+    "fileCreationError": "Error creating file",
+    "folderCreated": "Folder created successfully",
+    "folderCreationError": "Error creating folder",
+    "fileSaved": "File saved successfully",
+    "fileSaveError": "Error saving file",
+    "fileRenamed": "File renamed successfully",
+    "fileRenameError": "Error renaming file",
+    "fileMoved": "Item moved successfully",
+    "fileMoveError": "Error moving item",
+    "fileCopied": "Item copied successfully",
+    "fileCopyError": "Error copying item",
+    "copyFolderNotSupported": "Folder copy not yet supported",
+    "fileDeleted": "File deleted successfully",
+    "fileDeleteError": "Error deleting file",
+    "fileDecrypted": "File decrypted successfully",
+    "fileDecryptError": "Error decrypting file",
+    "exportSuccess": "Export completed! {{count}} files exported to {{path}}",
+    "exportError": "Error exporting files: {{error}}",
+    "exportNoFolder": "No folder selected for export",
+    "exportInProgress": "Exporting files...",
+    "importSuccess": "{{count}} file(s) imported successfully",
+    "importError": "Error selecting files to import: {{error}}",
+    "importPartialError": "Errors during import: {{errors}}"
+  },
+  "status": {
+    "saved": "Saved",
+    "unsaved": "Unsaved",
+    "words": "{{count}} words"
+  },
+  "welcome": {
+    "title": "🔒 Welcome to LockrNotes",
+    "subtitle": "Your Secure and Encrypted Notes",
+    "description": "LockrNotes is a note-taking application focused on security and privacy. Your files can be encrypted automatically and securely, keeping your information protected.",
+    "features": "Main features:\n• Automatic managed encryption for your files\n• Support for text files (.txt) and structured JSON (.json)\n• Modern and intuitive interface with dark theme\n• Folder organization and local or remote storage",
+    "storageTitle": "Storage Location",
+    "storageDescription": "Choose where your files will be stored. By default, we use the \"LockrNotes\" folder inside your Documents. You can change this at any time in settings.",
+    "defaultPath": "Default Folder",
+    "pathHelper": "Full path where files will be saved",
+    "browseButton": "Browse folder",
+    "infoMessage": "This folder will be created automatically if it doesn't exist. You can always change this location in the application settings.",
+    "keyStorageTitle": "Encryption Key Protection",
+    "keyStorageDescription": "Choose how to protect your managed encryption key. This affects how your encrypted files can be accessed.",
+    "keyStorageOptions": {
+      "system": "📦 Managed by System (Default)",
+      "systemPro": "✓ More secure - Key stored in Windows secure vault",
+      "systemCon": "✗ If you delete system data, you'll lose access to files",
+      "folder": "📁 Saved in Folder",
+      "folderPro": "✓ Recoverable - If you move the folder, it still works",
+      "folderCon": "✗ Less secure - Anyone with folder access can decrypt files"
+    },
+    "languageTitle": "System Language",
+    "languageDescription": "Choose the language that will be used in the application interface.",
+    "languageLabel": "Language",
+    "getStarted": "Get Started",
+    "privacyTitle": "Privacy and Security Guaranteed",
+    "privacyDescription": "Your data is encrypted with high-security algorithms directly on your device. LockrNotes has no servers, collects no data, and transmits no information over the network — everything stays 100% local and under your control.",
+    "privacyLocal": "✓ 100% Local",
+    "privacyNoServer": "✓ No servers",
+    "privacyNoTracking": "✓ Zero tracking",
+    "privacyEncrypted": "✓ Strong encryption"
+  },
+  "settings": {
+    "title": "Settings",
+    "editor": "Editor",
+    "storage": "Storage",
+    "security": "Security",
+    "language": "Language",
+    "autoSave": "Auto-save",
+    "autoSaveDescription": "Automatically saves files after 1.5 seconds of inactivity",
+    "securityWarning": "Changing the key storage type may prevent access to existing encrypted files.",
+    "keyStorageMigrationError": "Failed to migrate key storage type. Please try again.",
+    "changeButton": "Change",
+    "copyContentTitle": "Copy Content",
+    "copyContentMessage": "Do you want to copy the content from the previous folder to the new location?",
+    "copyContentHelper": "This will copy all files from one folder to the other.",
+    "copyYes": "Copy",
+    "copyNo": "Don't Copy"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "close": "Close"
+  },
+  "hotcopy": {
+    "selectPosition": "Add to Quick Copy",
+    "file": "File",
+    "path": "JSON Path",
+    "currentValue": "Current Value",
+    "selectSlot": "Select slot",
+    "customLabel": "Custom label (optional)",
+    "copied": "{{label}} copied!",
+    "copyError": "Failed to copy value",
+    "clickToCopy": "Click to copy",
+    "emptySlot": "Empty slot - click to add",
+    "addToHotCopy": "Add to quick copy",
+    "added": "Added to quick copy!",
+    "addError": "Failed to add to quick copy",
+    "noFileError": "Cannot add: file not saved",
+    "alreadyAdded": "This field is already in a quick copy slot",
+    "manage": "Manage slots",
+    "noItems": "No items configured",
+    "entry": "Entry"
+  }
+}

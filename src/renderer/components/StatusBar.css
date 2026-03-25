@@ -1,0 +1,36 @@
+/* Import theme variables */
+@import '../theme.css';
+
+.status-bar {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-primary);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.status-bar .MuiTypography-root {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.save-pulse {
+  animation: savePulse 0.7s ease-in-out;
+}
+
+@keyframes savePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

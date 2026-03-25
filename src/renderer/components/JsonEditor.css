@@ -1,0 +1,206 @@
+.move-up-btn:disabled,
+.move-down-btn:disabled {
+  color: var(--text-disabled) !important;
+  cursor: not-allowed !important;
+}
+/* JsonEditor component styles (dark mode, consistent with app) */
+.json-editor-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px 0px 10px;
+}
+
+.json-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.json-editor-title {
+  color: var(--text-heading);
+}
+
+.json-editor-add-btn {
+  background-color: var(--primary-blue);
+}
+.json-editor-add-btn:hover {
+  background-color: var(--primary-blue-dark);
+}
+
+.json-editor-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.json-editor-table-container {
+  flex: 1;
+  overflow: auto;
+  background-color: var(--bg-tree-container) !important;
+  border-radius: var(--border-radius-md);
+}
+
+.json-editor-table-container .MuiPaper-root {
+  background-color: var(--bg-tree-container) !important;
+}
+
+.json-editor-table {
+  background-color: var(--bg-tree-container) !important;
+}
+
+.json-editor-table tbody {
+  background-color: var(--bg-tree-container) !important;
+}
+
+.json-editor-table thead th,
+.json-editor-table thead .MuiTableCell-root,
+.json-editor-table thead th .MuiTableCell-root,
+.json-editor-table thead tr th {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-heading) !important;
+  border-bottom: 1px solid var(--border-primary) !important;
+  font-weight: 600 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 3 !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  background-clip: padding-box !important;
+}
+
+.json-editor-row {
+  background-color: var(--bg-tree-container) !important;
+}
+
+.json-editor-row:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.json-editor-cell {
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-primary) !important;
+  background-color: transparent !important;
+}
+
+/* Column width adjustments: Order (arrows), Title, Value (largest), Actions */
+.json-editor-table {
+  table-layout: fixed;
+  width: 100%;
+}
+/* Order column (arrows) - very narrow */
+.json-editor-table thead th:nth-child(1),
+.json-editor-table tbody td:nth-child(1) {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+  padding: 4px 8px;
+}
+/* Title column */
+.json-editor-table thead th:nth-child(2),
+.json-editor-table tbody td:nth-child(2) {
+  width: 25%;
+}
+/* Value column (largest) */
+.json-editor-table thead th:nth-child(3),
+.json-editor-table tbody td:nth-child(3) {
+  width: 55%;
+}
+/* Actions column */
+.json-editor-table thead th:nth-child(4),
+.json-editor-table tbody td:nth-child(4) {
+  width: 20%;
+}
+
+.json-editor-actions .edit-btn {
+  margin-right: 4px;
+  color: var(--primary-blue);
+}
+.json-editor-actions .edit-btn:hover {
+  background-color: var(--hover-bg);
+}
+
+.json-editor-actions .delete-btn {
+  color: #ff6b6b;
+}
+.json-editor-actions .delete-btn:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.json-editor-visibility-btn {
+  color: var(--text-secondary);
+}
+.json-editor-visibility-btn:hover {
+  color: var(--primary-blue-light);
+}
+
+.json-editor-copy-btn {
+  color: var(--primary-blue) !important;
+  transition: color 0.2s;
+}
+.json-editor-copy-btn:hover {
+  color: var(--primary-blue-dark) !important;
+}
+
+/* Order column styles - vertically stacked arrows */
+.json-editor-order-col {
+  text-align: center;
+  padding: 4px 8px !important;
+}
+
+.json-editor-order-cell {
+  padding: 4px 8px !important;
+}
+
+.json-editor-order-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.move-up-btn,
+.move-down-btn {
+  color: var(--primary-blue) !important;
+  padding: 2px;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+.move-up-btn:hover,
+.move-down-btn:hover {
+  color: var(--primary-blue-dark) !important;
+}
+.move-up-btn .MuiSvgIcon-root,
+.move-down-btn .MuiSvgIcon-root {
+  font-size: 16px;
+}
+
+/* Raw JSON editor TextField scrollbar styles (matching Editor.tsx) */
+.json-editor-raw-textfield .MuiOutlinedInput-input::-webkit-scrollbar {
+  width: 10px;
+}
+
+.json-editor-raw-textfield .MuiOutlinedInput-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.json-editor-raw-textfield .MuiOutlinedInput-input::-webkit-scrollbar-thumb {
+  background: rgba(88, 166, 255, 0.12);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.json-editor-raw-textfield
+  .MuiOutlinedInput-input::-webkit-scrollbar-thumb:hover {
+  background: rgba(88, 166, 255, 0.18);
+}
+
+/* Firefox scrollbar */
+.json-editor-raw-textfield .MuiOutlinedInput-input {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(88, 166, 255, 0.12) transparent;
+}

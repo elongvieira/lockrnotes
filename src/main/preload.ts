@@ -1,29 +1,33 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-
-export type Channels = 'ipc-example';
+import { contextBridge } from 'electron';
+import {
+  filesystemApi,
+  windowApi,
+  systemApi,
+  exportApi,
+  importApi,
+} from './preload/index';
+import { hotCopyApi } from './preload/hotcopyApi';
+import { sshApi } from './preload/sshApi';
+import { rdpApi } from './preload/rdpApi';
+import './preload/encryptionApi';
+import './preload/manualEncryptionApi';
 
 const electronHandler = {
-  ipcRenderer: {
-    sendMessage(channel: Channels, ...args: unknown[]) {
-      ipcRenderer.send(channel, ...args);
-    },
-    on(channel: Channels, func: (...args: unknown[]) => void) {
-      const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
-        func(...args);
-      ipcRenderer.on(channel, subscription);
-
-      return () => {
-        ipcRenderer.removeListener(channel, subscription);
-      };
-    },
-    once(channel: Channels, func: (...args: unknown[]) => void) {
-      ipcRenderer.once(channel, (_event, ...args) => func(...args));
-    },
-  },
+  // Window controls exposed for a frameless window
+  window: windowApi,
+  // Filesystem API exposed to renderer
+  filesystem: filesystemApi,
+  // System utilities
+  system: systemApi,
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
+contextBridge.exposeInMainWorld('exportAPI', exportApi);
+contextBridge.exposeInMainWorld('importAPI', importApi);
+contextBridge.exposeInMainWorld('hotCopyAPI', hotCopyApi);
+contextBridge.exposeInMainWorld('sshAPI', sshApi);
+contextBridge.exposeInMainWorld('rdpAPI', rdpApi);
 
 export type ElectronHandler = typeof electronHandler;

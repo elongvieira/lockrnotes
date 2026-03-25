@@ -9,11 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
+import { ensureConfigFile, updateConfigFile } from './config';
 import { resolveHtmlPath } from './util';
+import { setupIpcHandlers } from './ipc';
 
 class AppUpdater {
   constructor() {
@@ -24,12 +25,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -69,19 +64,46 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  // Read saved window size from config
+  const config = require('./config');
+  let windowWidth = 1024;
+  let windowHeight = 900;
+
+  try {
+    const savedConfig = await config.readConfigFile();
+    if (savedConfig?.windowSize?.width && savedConfig?.windowSize?.height) {
+      windowWidth = savedConfig.windowSize.width;
+      windowHeight = savedConfig.windowSize.height;
+    }
+  } catch {
+    console.log('Using default window size');
+  }
+
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
-    icon: getAssetPath('icon.png'),
+    width: windowWidth,
+    height: windowHeight,
+    icon: getAssetPath('logo_lock_a.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
+    // Make the window frameless so we can render a custom title bar in the renderer
+    // Keep traffic light/titlebar behaviour on macOS by using titleBarStyle
+    frame: false,
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' } : {}),
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+  // Remove application menu (hide menu bar)
+  try {
+    // Hide the menu bar entirely
+    mainWindow.setMenu(null);
+  } catch (err) {
+    console.error('Failed to remove application menu', err);
+  }
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -98,8 +120,18 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  // Save window size on resize
+  mainWindow.on('resized', () => {
+    if (mainWindow) {
+      const size = mainWindow.getSize();
+      updateConfigFile({
+        windowSize: { width: size[0], height: size[1] },
+      }).catch((err) => console.error('Failed to save window size:', err));
+    }
+  });
+
+  // Setup all IPC handlers
+  setupIpcHandlers(mainWindow);
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -127,7 +159,10 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    createWindow();
+    // Ensure config file exists in the working directory before creating UI
+    ensureConfigFile()
+      .then(() => createWindow())
+      .catch(console.log);
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

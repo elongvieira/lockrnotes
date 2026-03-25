@@ -1,0 +1,338 @@
+{
+  "app": {
+    "title": "Lockr Notes"
+  },
+  "menu": {
+    "new": "Nova nota",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "export": "Exportar tudo",
+    "import": "Importar arquivos",
+    "exit": "Sair"
+  },
+  "editor": {
+    "placeholder": "Digite seu conteúdo aqui...",
+    "welcome": {
+      "title": "Editor LockrNotes",
+      "message": "Clique em um arquivo na barra lateral para abri-lo em uma nova aba, ou crie um novo arquivo para começar a escrever."
+    }
+  },
+  "sidebar": {
+    "tabs": {
+      "aria": "Abas da barra lateral",
+      "local": "Local",
+      "files": "Arquivos",
+      "remote": "Remoto"
+    },
+    "local": {
+      "content": "Esta é a área de notas locais. Selecione ou crie uma nota para começar a editar."
+    },
+    "tree": {
+      "aria": "Árvore de notas",
+      "root": "Notas",
+      "loading": "Carregando...",
+      "empty": "Nenhum arquivo encontrado"
+    },
+    "actions": {
+      "createFolder": "Criar pasta",
+      "createFile": "Criar arquivo",
+      "refresh": "Atualizar"
+    },
+    "prompts": {
+      "folderName": "Digite o nome da pasta:",
+      "fileName": "Digite o nome do arquivo (com extensão):"
+    }
+  },
+  "dialog": {
+    "folder": {
+      "title": "Criar Nova Pasta",
+      "placeholder": "Nome da pasta",
+      "errors": {
+        "empty": "Nome da pasta não pode estar vazio",
+        "invalidChars": "Nome da pasta contém caracteres inválidos",
+        "tooLong": "Nome da pasta é muito longo (máximo 255 caracteres)",
+        "reservedName": "Este é um nome reservado do sistema",
+        "startsWithDot": "Nome da pasta não pode começar com ponto"
+      }
+    },
+    "file": {
+      "title": "Criar Novo Arquivo",
+      "filename": "Nome do arquivo",
+      "typeTitle": "Tipo de Arquivo",
+      "previewTitle": "Exemplo",
+      "encryptOption": "Criptografar arquivo",
+      "managedEncryption": "Gerenciado pelo programa",
+      "manualEncryption": "Chave manual",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "passwordWarning": "Anote a senha em local seguro. Não será possível recuperar o arquivo sem ela.",
+      "types": {
+        "text": {
+          "name": "Texto",
+          "description": "Arquivo de texto simples para anotações e documentos.",
+          "preview": "📝 Lorem ipsum dolor sit amet...\n\nParagrafo 2 com mais texto."
+        },
+        "keyvalue": {
+          "name": "Chave/Valores",
+          "description": "Dados estruturados em formato chave-valor.",
+          "preview": "nome: Sistema XYZ\nusuário: user123\nsenha: ••••••••"
+        }
+      },
+      "errors": {
+        "emptyName": "Nome do arquivo é obrigatório",
+        "invalidChars": "Nome contém caracteres inválidos",
+        "tooLong": "Nome do arquivo é muito longo (máximo 255 caracteres)",
+        "reservedName": "Este é um nome reservado do sistema",
+        "startsWithDot": "Nome do arquivo não pode começar com ponto",
+        "emptyPassword": "Senha é obrigatória",
+        "weakPassword": "Senha deve ter pelo menos 6 caracteres",
+        "passwordMismatch": "Senhas não coincidem",
+        "passwordTooLong": "Senha é muito longa (máximo 128 caracteres)",
+        "passwordSpecialChars": "Senha deve conter pelo menos um caractere especial",
+        "fileExists": "Já existe um arquivo com esse nome"
+      }
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "create": "Criar",
+      "confirm": "Confirmar",
+      "rename": "Renomear",
+      "delete": "Excluir",
+      "add": "Adicionar",
+      "save": "Salvar",
+      "move": "Mover",
+      "unlock": "Desbloquear"
+    },
+    "confirm": {
+      "title": "Confirmação",
+      "message": "Tem certeza de que deseja continuar?"
+    },
+    "delete": {
+      "title": "Excluir",
+      "message": "Este item será excluído permanentemente. Tem certeza?"
+    },
+    "rename": {
+      "titleFile": "Renomear Arquivo",
+      "titleFolder": "Renomear Pasta",
+      "placeholder": "Novo nome",
+      "warningFileOpen": "Este arquivo está aberto. Ele será salvo, fechado e reaberto com o novo nome.",
+      "errors": {
+        "empty": "Nome não pode estar vazio",
+        "invalidChars": "Nome contém caracteres inválidos",
+        "tooLong": "Nome é muito longo (máximo 255 caracteres)",
+        "startsWithDot": "Nome não pode começar com ponto",
+        "fileExists": "Já existe um arquivo com esse nome"
+      }
+    },
+    "move": {
+      "titleFile": "Mover Arquivo",
+      "titleFolder": "Mover Pasta",
+      "itemName": "Item:",
+      "currentLocation": "Local atual:",
+      "destination": "Mover para:",
+      "destinationPlaceholder": "Selecione a pasta de destino",
+      "browse": "Procurar",
+      "errors": {
+        "emptyPath": "Selecione uma pasta de destino",
+        "sameLocation": "O destino é o mesmo que a localização atual",
+        "failed": "Falha ao mover o item",
+        "fileExists": "Já existe um item com esse nome no destino"
+      }
+    },
+    "password": {
+      "title": "Arquivo Protegido",
+      "message": "Este arquivo está protegido por senha. Digite a senha para abrir:",
+      "passwordLabel": "Senha",
+      "wrongPassword": "Senha incorreta. Tente novamente."
+    },
+    "import": {
+      "title": "Importar Arquivos",
+      "filesToImport": "Arquivos selecionados",
+      "destination": "Pasta de destino",
+      "destinationPlaceholder": "Selecione a pasta de destino...",
+      "browseDestination": "Selecionar pasta",
+      "confirmButton": "Importar",
+      "importing": "Importando...",
+      "errors": {
+        "emptyDestination": "Selecione a pasta de destino",
+        "outsideRoot": "A pasta selecionada está fora da pasta de notas configurada",
+        "fileExists": "Arquivo \"{{name}}\" já existe no destino"
+      }
+    }
+  },
+  "jsonEditor": {
+    "title": "Registros",
+    "addEntry": "Adicionar Registro",
+    "editEntry": "Editar Registro",
+    "duplicate": "Duplicar Registro",
+    "entryType": "Tipo de Registro",
+    "actions": "Ações",
+    "menu": "Opções",
+    "showAll": "Mostrar Tudo",
+    "hideAll": "Ocultar Tudo",
+    "createNewFromCurrent": "Criar novo arquivo baseado no atual",
+    "search": "Pesquisar registros...",
+    "empty": "Nenhum registro ainda. Clique em \"Adicionar Registro\" para criar um.",
+    "noSearchResults": "Nenhum resultado encontrado para a pesquisa.",
+    "types": {
+      "keyValue": "Título + Valor",
+      "titleTwoValues": "Título + Valor 1 + Valor 2",
+      "titlePassword": "Título + Senha",
+      "titleValuePassword": "Título + Valor + Senha",
+      "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha",
+      "ssh": "SSH",
+      "rdp": "RDP"
+    },
+    "fields": {
+      "title": "Título",
+      "value": "Valor",
+      "value1": "Valor 1",
+      "value2": "Valor 2",
+      "password": "Senha",
+      "host": "Host",
+      "port": "Porta",
+      "user": "Usuário",
+      "domain": "Domínio",
+      "type": "Tipo"
+    },
+    "errors": {
+      "emptyTitle": "Título é obrigatório",
+      "emptyValue": "Valor é obrigatório",
+      "emptyValue1": "Entrada 1 é obrigatória",
+      "emptyValue2": "Entrada 2 é obrigatória",
+      "emptyPassword": "Senha é obrigatória"
+    },
+    "deleteConfirm": {
+      "title": "Excluir Registro",
+      "message": "Tem certeza de que deseja excluir este registro?"
+    },
+    "switchToRaw": "Editar como texto",
+    "switchToStructured": "Editar como estruturado",
+    "rawPlaceholder": "Edite o JSON como texto...",
+    "parseError": "Formato JSON inválido"
+  },
+  "ssh": {
+    "connect": "Conectar",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "disconnect": "Desconectar",
+    "error": "Erro"
+  },
+  "rdp": {
+    "connect": "Conectar RDP"
+  },
+  "contextMenu": {
+    "open": "Abrir",
+    "rename": "Renomear",
+    "move": "Mover",
+    "copy": "Copiar",
+    "delete": "Excluir",
+    "decrypt": "Descriptografar"
+  },
+  "notifications": {
+    "fileCreated": "Arquivo criado com sucesso",
+    "fileCreationError": "Erro ao criar arquivo",
+    "folderCreated": "Pasta criada com sucesso",
+    "folderCreationError": "Erro ao criar pasta",
+    "fileSaved": "Arquivo salvo com sucesso",
+    "fileSaveError": "Erro ao salvar arquivo",
+    "fileRenamed": "Arquivo renomeado com sucesso",
+    "fileRenameError": "Erro ao renomear arquivo",
+    "fileMoved": "Item movido com sucesso",
+    "fileMoveError": "Erro ao mover item",
+    "fileCopied": "Item copiado com sucesso",
+    "fileCopyError": "Erro ao copiar item",
+    "copyFolderNotSupported": "Cópia de pasta ainda não é suportada",
+    "fileDeleted": "Arquivo excluído com sucesso",
+    "fileDeleteError": "Erro ao excluir arquivo",
+    "fileDecrypted": "Arquivo descriptografado com sucesso",
+    "fileDecryptError": "Erro ao descriptografar arquivo",
+    "exportSuccess": "Exportação concluída! {{count}} arquivos exportados para {{path}}",
+    "exportError": "Erro ao exportar arquivos: {{error}}",
+    "exportNoFolder": "Nenhuma pasta selecionada para exportação",
+    "exportInProgress": "Exportando arquivos...",
+    "importSuccess": "{{count}} arquivo(s) importado(s) com sucesso",
+    "importError": "Erro ao selecionar arquivos para importar: {{error}}",
+    "importPartialError": "Erros durante a importação: {{errors}}"
+  },
+  "status": {
+    "saved": "Salvo",
+    "unsaved": "Não salvo",
+    "words": "{{count}} palavras"
+  },
+  "welcome": {
+    "title": "🔒 Bem-vindo ao LockrNotes",
+    "subtitle": "Suas Notas Seguras e Criptografadas",
+    "description": "LockrNotes é um aplicativo de anotações com foco em segurança e privacidade. Seus arquivos podem ser criptografados de forma automática e segura, mantendo suas informações protegidas.",
+    "features": "Recursos principais:\n• Criptografia gerenciada automática para seus arquivos\n• Suporte para arquivos de texto (.txt) e JSON estruturados (.json)\n• Interface moderna e intuitiva com tema escuro\n• Organização em pastas e armazenamento local ou remoto",
+    "storageTitle": "Local de Armazenamento",
+    "storageDescription": "Escolha onde seus arquivos serão armazenados. Por padrão, usamos a pasta \"LockrNotes\" dentro de seus Documentos. Você pode alterar isso a qualquer momento nas configurações.",
+    "defaultPath": "Pasta Padrão",
+    "pathHelper": "Caminho completo onde os arquivos serão salvos",
+    "browseButton": "Procurar pasta",
+    "infoMessage": "Esta pasta será criada automaticamente se não existir. Você sempre pode mudar esse local nas configurações do aplicativo.",
+    "keyStorageTitle": "Proteção da Chave de Criptografia",
+    "keyStorageDescription": "Escolha como proteger sua chave de criptografia gerenciada. Isso afeta como seus arquivos criptografados podem ser acessados.",
+    "keyStorageOptions": {
+      "system": "📦 Gerenciado pelo Sistema (Padrão)",
+      "systemPro": "✓ Mais seguro - Chave armazenada no cofre seguro do Windows",
+      "systemCon": "✗ Se apagar dados do sistema, perderá acesso aos arquivos",
+    "folder": "📁 Salvo na pasta do LockrNote",
+      "folderPro": "✓ Recuperável - Se mover a pasta, continua funcionando",
+      "folderCon": "✗ Menos seguro - Qualquer um com acesso à pasta pode descriptografar"
+    },
+    "languageTitle": "Idioma do Sistema",
+    "languageDescription": "Escolha o idioma que será usado na interface do aplicativo.",
+    "languageLabel": "Idioma",
+    "getStarted": "Começar a Usar",
+    "privacyTitle": "Privacidade e Segurança Garantidas",
+    "privacyDescription": "Seus dados são criptografados com algoritmos de alta segurança diretamente no seu dispositivo. O LockrNotes não possui servidores, não coleta dados e não transmite informações pela rede — tudo fica 100% local e sob seu controle.",
+    "privacyLocal": "✓ 100% Local",
+    "privacyNoServer": "✓ Sem servidores",
+    "privacyNoTracking": "✓ Zero rastreamento",
+    "privacyEncrypted": "✓ Criptografia forte"
+  },
+  "settings": {
+    "title": "Configurações",
+    "editor": "Editor",
+    "storage": "Armazenamento",
+    "security": "Segurança",
+    "language": "Idioma",
+    "autoSave": "Salvar automaticamente",
+    "autoSaveDescription": "Salva os arquivos automaticamente após 1.5 segundos de inatividade",
+    "securityWarning": "Alterar o tipo de armazenamento de chave pode impedir o acesso a arquivos criptografados existentes.",
+    "keyStorageMigrationError": "Erro ao migrar o tipo de armazenamento de chave. Por favor, tente novamente.",
+    "changeButton": "Alterar",
+    "copyContentTitle": "Copiar Conteúdo",
+    "copyContentMessage": "Deseja copiar o conteúdo da pasta anterior para a nova localização?",
+    "copyContentHelper": "Isto vai copiar todos os arquivos de uma pasta para a outra.",
+    "copyYes": "Copiar",
+    "copyNo": "Não Copiar"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "add": "Adicionar",
+    "close": "Fechar"
+  },
+  "hotcopy": {
+    "selectPosition": "Adicionar à Cópia Rápida",
+    "file": "Arquivo",
+    "path": "Caminho JSON",
+    "currentValue": "Valor Atual",
+    "selectSlot": "Selecione o slot",
+    "customLabel": "Rótulo personalizado (opcional)",
+    "copied": "{{label}} copiado!",
+    "copyError": "Erro ao copiar valor",
+    "clickToCopy": "Clique para copiar",
+    "emptySlot": "Slot vazio - clique para adicionar",
+    "addToHotCopy": "Adicionar à cópia rápida",
+    "added": "Adicionado à cópia rápida!",
+    "addError": "Erro ao adicionar à cópia rápida",
+    "noFileError": "Não é possível adicionar: arquivo não salvo",
+    "alreadyAdded": "Este campo já está em um slot de cópia rápida",
+    "manage": "Gerenciar slots",
+    "noItems": "Nenhum item configurado",
+    "entry": "Entrada"
+  }
+}

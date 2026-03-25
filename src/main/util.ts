@@ -11,3 +11,11 @@ export function resolveHtmlPath(htmlFileName: string) {
   }
   return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
 }
+
+/**
+ * Retorna o separador de path do sistema operacional atual.
+ * Em Windows retorna '\\', em sistemas POSIX retorna '/'.
+ */
+export function getPathSeparator(): string {
+  return path.sep;
+}

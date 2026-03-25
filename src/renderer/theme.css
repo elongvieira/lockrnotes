@@ -1,0 +1,120 @@
+/* Theme Colors - Centralized Color System */
+:root {
+  /* Primary Colors */
+  --primary-blue: #58a6ff;
+  --primary-blue-dark: #1f6feb;
+  --primary-blue-light: rgba(88, 166, 255, 0.1);
+  --primary-blue-medium: rgba(88, 166, 255, 0.15);
+  --primary-blue-strong: rgba(88, 166, 255, 0.2);
+  --primary-blue-hover: rgba(88, 166, 255, 0.25);
+
+  /* Background Colors */
+  --bg-primary: linear-gradient(180deg, #021624 0%, #092941 100%);
+  --bg-secondary: rgba(22, 27, 34, 0.95);
+  --bg-tertiary: rgba(30, 30, 30, 0.95);
+  --bg-tree-container: #0d1117;
+
+  /* Text Colors */
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-heading: #f0f6fc;
+  --text-disabled: rgba(107, 114, 128, 0.3);
+
+  /* Border Colors */
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.15);
+
+  /* Shadow Colors */
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+  --shadow-primary: rgba(88, 166, 255, 0.3);
+
+  /* Interactive States */
+  --hover-bg: rgba(88, 166, 255, 0.1);
+  --selected-bg: rgba(88, 166, 255, 0.2);
+  --disabled-bg: rgba(107, 114, 128, 0.1);
+
+  /* Accent alternatives (lighter accents for form controls) */
+  --accent-light: rgba(88, 166, 255, 0.6);
+
+  /* Component Specific */
+  --sidebar-width: 300px;
+  --tab-height: 36px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+}
+
+/* App menus (context menu, app menu, language menu) */
+.app-menu-paper {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  min-width: 180px;
+  border-radius: var(--border-radius-sm);
+}
+.app-menu-item {
+  /* subtle hover that works on dark backgrounds */
+  transition: background-color 120ms ease-in-out;
+}
+.app-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+.app-menu-icon {
+  color: var(--primary-blue);
+  min-width: 40px; /* keep icon spacing consistent */
+}
+
+/* Stronger selectors to ensure MUI internal styles don't override our theme */
+.app-menu-paper.MuiPaper-root,
+.app-menu-paper {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 4px 12px var(--shadow-medium) !important;
+}
+.app-menu-paper .MuiMenuItem-root,
+.app-menu-item.MuiMenuItem-root,
+.app-menu-item {
+  color: var(--text-primary) !important;
+}
+.app-menu-item:hover,
+.app-menu-paper .MuiMenuItem-root:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+.app-menu-icon,
+.app-menu-icon svg {
+  color: var(--primary-blue) !important;
+}
+
+/* Light theme overrides (for future use) */
+[data-theme='light'] {
+  --primary-blue: #3b82f6;
+  --primary-blue-dark: #1d4ed8;
+  --primary-blue-light: rgba(59, 130, 246, 0.1);
+  --primary-blue-medium: rgba(59, 130, 246, 0.15);
+  --primary-blue-strong: rgba(59, 130, 246, 0.2);
+  --primary-blue-hover: rgba(59, 130, 246, 0.25);
+
+  --bg-primary: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --bg-secondary: rgba(255, 255, 255, 0.98);
+  --bg-tertiary: rgba(248, 250, 252, 0.95);
+  --bg-tree-container: #fafafa;
+
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-heading: #111827;
+  --text-disabled: rgba(107, 114, 128, 0.5);
+
+  --border-primary: rgba(0, 0, 0, 0.1);
+  --border-secondary: rgba(229, 231, 235, 0.8);
+
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+}

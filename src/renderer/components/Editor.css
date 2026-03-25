@@ -1,0 +1,321 @@
+/* Editor component specific styles */
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  border-top-left-radius: var(--border-radius-lg);
+  max-height: calc(100vh);
+}
+
+/* New classes moved from inline sx in Editor.tsx */
+.editor-tabs-container {
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
+  border-top-left-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+.editor-tabs {
+  min-height: var(--tab-height);
+}
+
+.editor-tabs .MuiTabs-root {
+  min-height: var(--tab-height);
+}
+
+.editor-tabs .MuiTabs-scroller {
+  display: flex;
+  align-items: center;
+}
+
+.editor-tabs .MuiTab-root {
+  min-height: var(--tab-height);
+  font-weight: 500;
+  text-transform: none;
+  font-size: 0.75rem;
+  color: var(--text-secondary) !important;
+  transition: all 0.2s ease;
+  border-radius: 6px 0 0 0;
+  padding: 4px 8px;
+  min-width: 0;
+  max-width: 160px;
+}
+
+.editor-tabs .MuiTab-root.Mui-selected {
+  background-color: transparent;
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+.editor-tabs .MuiTab-root:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-primary) !important;
+}
+
+.editor-tabs .MuiTabs-indicator {
+  background: linear-gradient(
+    90deg,
+    var(--primary-blue),
+    var(--primary-blue-dark)
+  );
+  height: 3px !important;
+  border-radius: 3px 0 0 0;
+}
+
+.tab-label-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px 0 0 0;
+  padding: 1px 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tab-close-btn {
+  padding: 2px !important;
+  color: var(--text-secondary) !important;
+}
+
+.tab-close-btn:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.editor-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  background: transparent;
+  box-shadow: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding-bottom: 70px;
+  background-color: var(--bg-tree-container) !important;
+}
+
+.editor-content {
+  flex: 1;
+  overflow: hidden;
+  background-color: var(--bg-tree-container);
+}
+
+.editor-textfield {
+  height: 100%;
+}
+
+.editor-textfield .MuiOutlinedInput-root {
+  height: 100%;
+  align-items: flex-start;
+  background-color: transparent;
+  color: var(--text-primary);
+  padding: var(--spacing-md) !important;
+}
+
+.editor-textfield .MuiOutlinedInput-root fieldset,
+.editor-textfield .MuiOutlinedInput-root:hover fieldset,
+.editor-textfield .MuiOutlinedInput-root.Mui-focused fieldset {
+  border: none;
+}
+
+.editor-textfield .MuiOutlinedInput-input {
+  height: 100% !important;
+  overflow: auto !important;
+  resize: none;
+  padding: var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.editor-textfield .MuiOutlinedInput-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+/* Custom scrollbar for the editor content (WebKit) */
+.editor-textfield .MuiOutlinedInput-input::-webkit-scrollbar,
+.editor-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.editor-textfield .MuiOutlinedInput-input::-webkit-scrollbar-track,
+.editor-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor-textfield .MuiOutlinedInput-input::-webkit-scrollbar-thumb,
+.editor-content::-webkit-scrollbar-thumb {
+  background: rgba(88, 166, 255, 0.12);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.editor-textfield .MuiOutlinedInput-input::-webkit-scrollbar-thumb:hover,
+.editor-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(88, 166, 255, 0.18);
+}
+
+/* Firefox scrollbar */
+.editor-textfield .MuiOutlinedInput-input {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(88, 166, 255, 0.12) transparent;
+}
+
+/* Welcome screen styles */
+.editor-welcome {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text-secondary);
+}
+
+.editor-welcome-title {
+  font-weight: 300 !important;
+  color: var(--text-heading) !important;
+}
+
+.editor-welcome-text {
+  text-align: center;
+  max-width: 400px;
+  color: var(--text-secondary) !important;
+}
+
+.editor-welcome-btn {
+  padding: var(--spacing-md) !important;
+  border-radius: var(--border-radius-md) !important;
+  background-color: var(--primary-blue-medium) !important;
+  color: var(--primary-blue) !important;
+  transition: all 0.2s ease !important;
+}
+
+.editor-welcome-btn:hover {
+  background-color: var(--primary-blue-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--shadow-primary);
+}
+
+.note-editor {
+  width: 100%;
+  height: 100%;
+  border: none;
+  resize: none;
+  font-size: 16px;
+  line-height: 1.6;
+  font-family: inherit;
+  outline: none;
+}
+
+.note-editor::placeholder {
+  color: #bdc3c7;
+}
+
+.status-bar {
+  padding: 10px 20px;
+  background-color: #ecf0f1;
+  border-top: 1px solid #bdc3c7;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #bdc3c7;
+  text-align: center;
+}
+
+.empty-state h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 30px;
+  border-radius: 8px;
+  width: 400px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  margin-bottom: 15px;
+  color: #000000;
+}
+
+.modal-content p {
+  margin-bottom: 25px;
+  color: #7f8c8d;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Scrollbar personalizada para lista de notas (quando renderizada dentro do Sidebar) */
+.notes-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.notes-list::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+.notes-list::-webkit-scrollbar-thumb {
+  background: #3498db;
+  border-radius: 4px;
+}
+
+.notes-list::-webkit-scrollbar-thumb:hover {
+  background: #2980b9;
+}
+
+@media (max-width: 768px) {
+  .editor-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .editor-actions {
+    justify-content: center;
+  }
+}

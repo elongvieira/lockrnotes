@@ -1,6 +1,7 @@
 {
-  "name": "electron-react-boilerplate",
-  "description": "A foundation for scalable desktop apps",
+  "name": "lockrnotes",
+  "version": "0.1.1",
+  "description": "Lockr Notes desktop app",
   "keywords": [
     "electron",
     "boilerplate",
@@ -12,19 +13,18 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://lockrnotes.com",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://lockrnotes.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/elongvieira/lockrnotes.git"
   },
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Lockr Notes Team",
+    "url": "https://lockrnotes.com"
   },
   "contributors": [
     {
@@ -46,10 +46,14 @@
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "prestart": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack --config ./.erb/configs/webpack.config.main.dev.ts",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
+    "dev": "npm run prestart && npm run start",
     "start:main": "concurrently -k -P \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon . -- {@}\" --",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "jest"
+    "test": "jest",
+    "release": "semantic-release",
+    "release:dry-run": "semantic-release --dry-run",
+    "version": "node ./scripts/sync-release-version.cjs"
   },
   "browserslist": [
     "extends browserslist-config-erb"
@@ -102,25 +106,42 @@
   },
   "dependencies": {
     "@electron/notarize": "^3.0.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.4",
+    "@mui/lab": "^7.0.0",
+    "@mui/material": "^7.3.4",
+    "@mui/x-tree-view": "^8.14.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "adm-zip": "^0.5.16",
     "electron-debug": "^4.1.0",
     "electron-log": "^5.3.2",
     "electron-updater": "^6.3.9",
+    "i18next": "^25.6.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^16.5.8",
     "react-router-dom": "^7.3.0"
   },
   "devDependencies": {
-    "@electron/rebuild": "^3.7.1",
+    "@electron/rebuild": "^4.0.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^13.1.5",
     "@svgr/webpack": "^8.1.0",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
+    "@types/adm-zip": "^0.5.7",
     "@types/jest": "^29.5.14",
     "@types/node": "22.13.10",
     "@types/react": "^19.0.11",
     "@types/react-dom": "^19.0.4",
     "@types/react-test-renderer": "^19.0.0",
+    "@types/ssh2": "^1.15.5",
     "@types/webpack-bundle-analyzer": "^4.7.0",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
@@ -160,6 +181,7 @@
     "rimraf": "^6.0.1",
     "sass": "^1.86.0",
     "sass-loader": "^16.0.5",
+    "semantic-release": "^25.0.3",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-jest": "^29.2.6",
@@ -175,8 +197,8 @@
     "webpack-merge": "^6.0.1"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Lockr Notes",
+    "appId": "com.lockrnotes.app",
     "asar": true,
     "afterSign": ".erb/scripts/notarize.js",
     "asarUnpack": "**\\*.{node,dll}",
@@ -186,6 +208,7 @@
       "package.json"
     ],
     "mac": {
+      "icon": "assets/icon.icns",
       "notarize": false,
       "target": {
         "target": "default",
@@ -215,11 +238,13 @@
       ]
     },
     "win": {
+      "icon": "assets/icons/icon-512x512.png",
       "target": [
         "nsis"
       ]
     },
     "linux": {
+      "icon": "assets/icons/icon-512x512.png",
       "target": [
         "AppImage"
       ],
@@ -235,12 +260,12 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "elongvieira",
+      "repo": "lockrnotes"
     }
   },
   "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
+    "url": "https://lockrnotes.com"
   },
   "devEngines": {
     "runtime": {

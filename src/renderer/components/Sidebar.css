@@ -1,0 +1,168 @@
+/* Import theme variables */
+@import '../theme.css';
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100vh;
+  max-height: 100vh; /* Ensure it doesn't exceed viewport height */
+  /* removed right border to avoid vertical line between sidebar and editor */
+  border-right: none;
+  overflow: hidden;
+}
+
+.tabs-area {
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  margin: 0 4px;
+  box-shadow: 0 2px 8px var(--shadow-light);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0; /* Prevent tabs from shrinking */
+  border: 1px solid var(--border-primary);
+}
+
+.MuiTabs-root {
+  min-height: var(--tab-height);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.MuiTab-root {
+  min-height: var(--tab-height);
+  font-weight: 500;
+  text-transform: none;
+  font-size: 0.875rem;
+  color: var(--text-secondary) !important;
+  transition: all 0.2s ease;
+}
+
+.MuiTab-root.Mui-selected {
+  background-color: transparent;
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+.MuiTab-root.Mui-disabled {
+  background-color: var(--disabled-bg);
+  color: var(--text-disabled) !important;
+}
+
+.MuiTabs-indicator {
+  background: linear-gradient(
+    90deg,
+    var(--primary-blue),
+    var(--primary-blue-dark)
+  ) !important;
+  height: 3px !important;
+  border-radius: 3px 3px 0 0;
+}
+
+.MuiTab-root:hover:not(.Mui-disabled) {
+  background-color: var(--hover-bg);
+  color: var(--text-primary) !important;
+}
+
+.files-card {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+  padding: 5px;
+  margin: 0 4px;
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  backdrop-filter: blur(10px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; /* Important for flex children to shrink */
+  max-height: calc(
+    100vh - 142px
+  ); /* Prevent overflow, accounting for tabs and margins */
+  border: 1px solid var(--border-primary);
+}
+
+.files-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 2px 10px 2px;
+}
+
+.files-card h4 {
+  color: var(--text-heading);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.header-actions .MuiIconButton-root {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  background-color: var(--primary-blue-medium);
+  color: var(--primary-blue);
+  transition: all 0.2s ease;
+}
+
+.header-actions .MuiIconButton-root:hover {
+  background-color: var(--primary-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--shadow-primary);
+}
+
+.tree-container {
+  flex: 1;
+  overflow: auto;
+  border-radius: var(--border-radius-md);
+  background-color: var(--bg-tree-container);
+  min-height: 0; /* Important for flex children to shrink */
+}
+
+.MuiTreeView-root {
+  padding: var(--spacing-sm) !important;
+  background-color: transparent !important;
+  overflow: auto !important;
+}
+
+.MuiTreeItem-root {
+  color: var(--text-primary) !important;
+}
+
+.MuiTreeItem-content {
+  padding: var(--spacing-xs) var(--spacing-sm) !important;
+  border-radius: var(--border-radius-sm) !important;
+  transition: all 0.15s ease !important;
+}
+
+.MuiTreeItem-content:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.MuiTreeItem-content.Mui-selected {
+  background-color: var(--selected-bg) !important;
+  color: var(--primary-blue) !important;
+  font-weight: 500 !important;
+}
+
+.MuiTreeItem-label {
+  font-size: 0.875rem !important;
+  padding-left: var(--spacing-xs) !important;
+}
+
+.MuiTreeItem-group {
+  margin-left: 0 !important;
+  padding-left: 24px !important;
+  border-left: 1px solid var(--border-secondary);
+  margin-top: 4px !important;
+}
+
+.MuiTreeItem-content .MuiTreeItem-iconContainer {
+  margin-right: 4px !important;
+}

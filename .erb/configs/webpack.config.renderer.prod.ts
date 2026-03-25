@@ -15,6 +15,12 @@ import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
 
+// Load version from release/app/package.json
+const appPackageJson = require(
+  path.resolve(__dirname, '../../release/app/package.json'),
+);
+const appVersion = appPackageJson.version || '0.0.0';
+
 checkNodeEnv('production');
 deleteSourceMaps();
 
@@ -109,6 +115,10 @@ const configuration: webpack.Configuration = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: false,
+    }),
+
+    new webpack.DefinePlugin({
+      'process.env.APP_VERSION': JSON.stringify(appVersion),
     }),
 
     new MiniCssExtractPlugin({
