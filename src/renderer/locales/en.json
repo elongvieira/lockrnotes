@@ -334,5 +334,25 @@
     "manage": "Manage slots",
     "noItems": "No items configured",
     "entry": "Entry"
+  },
+  "community": {
+    "notConnected": "Connect to a community server to access shared notes.",
+    "loginButton": "Connect",
+    "logout": "Logout",
+    "login": {
+      "title": "Connect to Community Server",
+      "host": "Host / IP",
+      "port": "Port",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "errors": {
+        "hostRequired": "Host is required",
+        "portInvalid": "Port must be between 1 and 65535",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required",
+        "loginFailed": "Login failed. Check your credentials."
+      }
+    }
   }
 }

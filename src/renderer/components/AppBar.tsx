@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -6,11 +6,14 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import CloudIcon from '@mui/icons-material/Cloud';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
 import HotCopyBar from './HotCopyBar';
@@ -23,7 +26,8 @@ import './AppBar.css';
 
 export default function AppBar() {
   const { t, i18n } = useTranslation();
-  const { refreshSidebar } = useAppContext();
+  const { refreshSidebar, communitySession, setCommunitySession } =
+    useAppContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hotCopyManageOpen, setHotCopyManageOpen] = useState(false);
   const [hotCopyItems, setHotCopyItems] = useState<HotCopyItem[]>([]);
@@ -31,6 +35,26 @@ export default function AppBar() {
   const [filesToImport, setFilesToImport] = useState<ImportFileInfo[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
+
+  // Load persisted community session on mount
+  useEffect(() => {
+    window.communityAuthAPI
+      ?.getSession()
+      .then((res) => {
+        if (res.success && res.session) setCommunitySession(res.session);
+        return res;
+      })
+      .catch(() => {});
+  }, [setCommunitySession]);
+
+  const handleCommunityLogout = async () => {
+    try {
+      await window.communityAuthAPI?.logout();
+      setCommunitySession(null);
+    } catch {
+      // ignore
+    }
+  };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -156,6 +180,7 @@ export default function AppBar() {
       setFilesToImport(result.files);
       setImportDialogOpen(true);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Import select error:', error);
       window.dispatchEvent(
         new CustomEvent('show-notification', {
@@ -183,6 +208,7 @@ export default function AppBar() {
         setHotCopyItems(config.hotCopy.items);
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to load hot copy items:', error);
     }
   };
@@ -254,6 +280,37 @@ export default function AppBar() {
               English
             </MenuItem>
           </Menu>
+
+          {/* Community server connection indicator */}
+          {communitySession && (
+            <Tooltip
+              title={`${communitySession.email} @ ${communitySession.host}:${communitySession.port}`}
+            >
+              <Chip
+                icon={<CloudIcon sx={{ fontSize: '20px !important' }} />}
+                onDelete={handleCommunityLogout}
+                deleteIcon={
+                  <Tooltip title={t('community.logout') || 'Logout'}>
+                    <LogoutIcon sx={{ fontSize: '16px !important' }} />
+                  </Tooltip>
+                }
+                sx={{
+                  height: 32,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: 'var(--primary-blue)',
+                  backgroundColor: 'var(--primary-blue-light)',
+                  '-webkit-app-region': 'no-drag',
+                  '& .MuiChip-icon': { color: 'var(--primary-blue)' },
+                  '& .MuiChip-deleteIcon': {
+                    color: 'var(--text-secondary)',
+                    '&:hover': { color: 'var(--text-primary)' },
+                  },
+                }}
+              />
+            </Tooltip>
+          )}
+
           <button type="button" className="window-btn" onClick={handleMinimize}>
             —
           </button>

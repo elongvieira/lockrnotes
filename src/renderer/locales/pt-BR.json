@@ -334,5 +334,25 @@
     "manage": "Gerenciar slots",
     "noItems": "Nenhum item configurado",
     "entry": "Entrada"
+  },
+  "community": {
+    "notConnected": "Conecte-se a um servidor community para acessar notas compartilhadas.",
+    "loginButton": "Conectar",
+    "logout": "Sair",
+    "login": {
+      "title": "Conectar ao Servidor Community",
+      "host": "Host / IP",
+      "port": "Porta",
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar",
+      "errors": {
+        "hostRequired": "Host é obrigatório",
+        "portInvalid": "A porta deve estar entre 1 e 65535",
+        "emailRequired": "E-mail é obrigatório",
+        "passwordRequired": "Senha é obrigatória",
+        "loginFailed": "Falha no login. Verifique suas credenciais."
+      }
+    }
   }
 }

@@ -58,6 +58,12 @@ interface AppContextType {
   isEncrypted: boolean;
   setIsEncrypted: (encrypted: boolean) => void;
 
+  // Community server session
+  communitySession: { host: string; port: number; email: string } | null;
+  setCommunitySession: (
+    s: { host: string; port: number; email: string } | null,
+  ) => void;
+
   // Notifications
   showNotification: (
     message: string,
@@ -121,6 +127,13 @@ export function AppProvider({ children }: AppProviderProps) {
     window.dispatchEvent(new CustomEvent('hide-notification'));
   };
 
+  // Community session state
+  const [communitySession, setCommunitySession] = useState<{
+    host: string;
+    port: number;
+    email: string;
+  } | null>(null);
+
   // Save pulse state
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
 
@@ -148,6 +161,8 @@ export function AppProvider({ children }: AppProviderProps) {
       hideNotification,
       lastSavedAt,
       triggerSavePulse,
+      communitySession,
+      setCommunitySession,
     }),
     [
       currentFile,
@@ -158,6 +173,7 @@ export function AppProvider({ children }: AppProviderProps) {
       wordCount,
       isEncrypted,
       lastSavedAt,
+      communitySession,
     ],
   );
 

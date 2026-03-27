@@ -23,6 +23,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
+import RemoteSidebar from './RemoteSidebar';
 import { fileSystemService } from '../services/fileSystemService';
 import { fileCreationService } from '../services/fileCreationService';
 import type { FileCreationData } from '../types/fileCreation';
@@ -957,7 +958,6 @@ export default function Sidebar() {
               label={t('sidebar.tabs.remote')}
               id="tab-remote"
               aria-controls="tabpanel-remote"
-              disabled
             />
           </Tabs>
         </Box>
@@ -968,7 +968,11 @@ export default function Sidebar() {
         hidden={value !== 0}
         id="tabpanel-local"
         aria-labelledby="tab-local"
-        style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+        style={{
+          flex: 1,
+          display: value === 0 ? 'flex' : 'none',
+          flexDirection: 'column',
+        }}
       >
         <div className="files-card">
           <div className="files-card-header">
@@ -1023,8 +1027,13 @@ export default function Sidebar() {
         hidden={value !== 1}
         id="tabpanel-remote"
         aria-labelledby="tab-remote"
+        style={{
+          flex: 1,
+          display: value === 1 ? 'flex' : 'none',
+          flexDirection: 'column',
+        }}
       >
-        {/* Remote tab content (disabled) */}
+        <RemoteSidebar />
       </div>
 
       <FolderDialog
