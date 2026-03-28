@@ -436,6 +436,43 @@
           "title": "Forçar Troca de Senha",
           "message": "O usuário {{name}} será obrigado a trocar a senha no próximo login."
         }
+      },
+      "groups": {
+        "title": "Grupos",
+        "newGroup": "Novo Grupo",
+        "empty": "Nenhum grupo encontrado.",
+        "table": {
+          "name": "Nome",
+          "actions": "Ações"
+        },
+        "form": {
+          "titleCreate": "Novo Grupo",
+          "titleEdit": "Editar Grupo",
+          "name": "Nome do Grupo",
+          "save": "Salvar",
+          "cancel": "Cancelar"
+        },
+        "members": {
+          "title": "Membros de \"{{name}}\"",
+          "empty": "Nenhum membro neste grupo.",
+          "add": "Adicionar",
+          "manage": "Gerenciar Membros",
+          "selectUser": "Usuário",            "noUsersAvailable": "Todos os usuários já são membros",          "remove": "Remover"
+        },
+        "delete": {
+          "title": "Excluir Grupo",
+          "message": "O grupo \"{{name}}\" será excluído permanentemente. Tem certeza?"
+        },
+        "errors": {
+          "loadFailed": "Falha ao carregar grupos",
+          "createFailed": "Falha ao criar grupo",
+          "updateFailed": "Falha ao atualizar grupo",
+          "deleteFailed": "Falha ao excluir grupo",
+          "nameRequired": "Nome do grupo é obrigatório",
+          "loadMembersFailed": "Falha ao carregar membros do grupo",
+          "addMemberFailed": "Falha ao adicionar membro",
+          "removeMemberFailed": "Falha ao remover membro"
+        }
       }
     }
   }

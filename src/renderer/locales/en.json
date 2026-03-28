@@ -436,6 +436,45 @@
           "emailRequired": "Email is required",
           "passwordRequired": "Password is required for new users"
         }
+      },
+      "groups": {
+        "title": "Groups",
+        "newGroup": "New Group",
+        "empty": "No groups found.",
+        "table": {
+          "name": "Name",
+          "actions": "Actions"
+        },
+        "form": {
+          "titleCreate": "New Group",
+          "titleEdit": "Edit Group",
+          "name": "Group Name",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "members": {
+          "title": "Members of \"{{name}}\"",
+          "empty": "No members in this group.",
+          "add": "Add",
+          "manage": "Manage Members",
+          "selectUser": "User",
+            "noUsersAvailable": "All users are already members",
+            "remove": "Remove"
+        },
+        "delete": {
+          "title": "Delete Group",
+          "message": "Group \"{{name}}\" will be permanently deleted. Are you sure?"
+        },
+        "errors": {
+          "loadFailed": "Failed to load groups",
+          "createFailed": "Failed to create group",
+          "updateFailed": "Failed to update group",
+          "deleteFailed": "Failed to delete group",
+          "nameRequired": "Group name is required",
+          "loadMembersFailed": "Failed to load group members",
+          "addMemberFailed": "Failed to add member",
+          "removeMemberFailed": "Failed to remove member"
+        }
       }
     }
   }

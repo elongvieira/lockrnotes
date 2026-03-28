@@ -158,4 +158,90 @@ export function registerCommunityAdminHandlers(): void {
       }
     },
   );
+
+  // ─── Groups ─────────────────────────────────────────────────────────────────
+
+  ipcMain.handle('community:groups:list', async () => {
+    try {
+      const groups = await communityRequest<any[]>('GET', 'groups');
+      return { success: true, groups };
+    } catch (err: any) {
+      return { success: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle(
+    'community:groups:create',
+    async (_event, params: { name: string }) => {
+      try {
+        const group = await communityRequest<any>('POST', 'groups', params);
+        return { success: true, group };
+      } catch (err: any) {
+        return { success: false, error: err.message || String(err) };
+      }
+    },
+  );
+
+  ipcMain.handle(
+    'community:groups:update',
+    async (_event, data: { id: string; params: { name: string } }) => {
+      try {
+        const group = await communityRequest<any>(
+          'PATCH',
+          `groups/${data.id}`,
+          data.params,
+        );
+        return { success: true, group };
+      } catch (err: any) {
+        return { success: false, error: err.message || String(err) };
+      }
+    },
+  );
+
+  ipcMain.handle('community:groups:delete', async (_event, id: string) => {
+    try {
+      await communityRequest('DELETE', `groups/${id}`);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle('community:groups:get', async (_event, id: string) => {
+    try {
+      const group = await communityRequest<any>('GET', `groups/${id}`);
+      return { success: true, group };
+    } catch (err: any) {
+      return { success: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle(
+    'community:groups:addMember',
+    async (_event, data: { groupId: string; userId: string }) => {
+      try {
+        await communityRequest('POST', `groups/${data.groupId}/members`, {
+          userId: data.userId,
+        });
+        return { success: true };
+      } catch (err: any) {
+        return { success: false, error: err.message || String(err) };
+      }
+    },
+  );
+
+  ipcMain.handle(
+    'community:groups:removeMember',
+    async (_event, data: { groupId: string; userId: string }) => {
+      try {
+        await communityRequest(
+          'DELETE',
+          `groups/${data.groupId}/members/${data.userId}`,
+        );
+        return { success: true };
+      } catch (err: any) {
+        return { success: false, error: err.message || String(err) };
+      }
+    },
+  );
 }

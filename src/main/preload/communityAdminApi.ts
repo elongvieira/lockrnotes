@@ -13,6 +13,21 @@ export interface AdminUser {
   updatedAt?: string;
 }
 
+export interface AdminGroupMember {
+  userId: string;
+  groupId: string;
+  createdAt?: string;
+}
+
+export interface AdminGroup {
+  id: string;
+  name: string;
+  encryptionKey?: string;
+  members?: AdminGroupMember[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const communityAdminApi = {
   listUsers(): Promise<{
     success: boolean;
@@ -61,6 +76,57 @@ export const communityAdminApi = {
     id: string,
   ): Promise<{ success: boolean; error?: string }> {
     return ipcRenderer.invoke('community:users:forcePasswordChange', id);
+  },
+
+  listGroups(): Promise<{
+    success: boolean;
+    groups?: AdminGroup[];
+    error?: string;
+  }> {
+    return ipcRenderer.invoke('community:groups:list');
+  },
+
+  createGroup(params: {
+    name: string;
+  }): Promise<{ success: boolean; group?: AdminGroup; error?: string }> {
+    return ipcRenderer.invoke('community:groups:create', params);
+  },
+
+  updateGroup(
+    id: string,
+    params: { name: string },
+  ): Promise<{ success: boolean; group?: AdminGroup; error?: string }> {
+    return ipcRenderer.invoke('community:groups:update', { id, params });
+  },
+
+  deleteGroup(id: string): Promise<{ success: boolean; error?: string }> {
+    return ipcRenderer.invoke('community:groups:delete', id);
+  },
+
+  getGroup(
+    id: string,
+  ): Promise<{ success: boolean; group?: AdminGroup; error?: string }> {
+    return ipcRenderer.invoke('community:groups:get', id);
+  },
+
+  addGroupMember(
+    groupId: string,
+    userId: string,
+  ): Promise<{ success: boolean; error?: string }> {
+    return ipcRenderer.invoke('community:groups:addMember', {
+      groupId,
+      userId,
+    });
+  },
+
+  removeGroupMember(
+    groupId: string,
+    userId: string,
+  ): Promise<{ success: boolean; error?: string }> {
+    return ipcRenderer.invoke('community:groups:removeMember', {
+      groupId,
+      userId,
+    });
   },
 };
 

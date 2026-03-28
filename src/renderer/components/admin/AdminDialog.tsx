@@ -29,16 +29,24 @@ import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Tooltip from '@mui/material/Tooltip';
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PeopleIcon from '@mui/icons-material/People';
+import GroupsIcon from '@mui/icons-material/Groups';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LockResetIcon from '@mui/icons-material/LockReset';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../../styles/dialogStyles';
 import ConfirmDialog from '../ConfirmDialog';
-import type { AdminUser } from '../../../main/preload/communityAdminApi';
+import type {
+  AdminUser,
+  AdminGroup,
+} from '../../../main/preload/communityAdminApi';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -54,8 +62,12 @@ function detectRole(user: AdminUser | null): string {
 const selectSx = {
   backgroundColor: 'var(--bg-tree-container)',
   color: 'var(--text-primary)',
-  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--border-secondary)' },
-  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--primary-blue)' },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--border-secondary)',
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--primary-blue)',
+  },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: 'var(--primary-blue)',
     borderWidth: '2px',
@@ -115,7 +127,9 @@ function CreateUserDialog({
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [loginType, setLoginType] = useState<'password' | 'magic_link'>('password');
+  const [loginType, setLoginType] = useState<'password' | 'magic_link'>(
+    'password',
+  );
   const [password, setPassword] = useState('');
   const [profileRole, setProfileRole] = useState<'admin' | 'user'>('user');
   const [forcePasswordChange, setForcePasswordChange] = useState(false);
@@ -150,7 +164,8 @@ function CreateUserDialog({
     setSaving(true);
     setError('');
     try {
-      const profileId = profileRole === 'admin' ? adminProfileId : userProfileId;
+      const profileId =
+        profileRole === 'admin' ? adminProfileId : userProfileId;
       const params: {
         name: string;
         email: string;
@@ -167,11 +182,15 @@ function CreateUserDialog({
 
       const createResult = await window.communityAdminAPI.createUser(params);
       if (!createResult.success) {
-        throw new Error(createResult.error || t('admin.dialog.users.errors.createFailed'));
+        throw new Error(
+          createResult.error || t('admin.dialog.users.errors.createFailed'),
+        );
       }
 
       if (forcePasswordChange && createResult.user) {
-        await window.communityAdminAPI.forcePasswordChangeUser(createResult.user.id);
+        await window.communityAdminAPI.forcePasswordChangeUser(
+          createResult.user.id,
+        );
       }
 
       onCreated();
@@ -220,19 +239,30 @@ function CreateUserDialog({
             sx={dialogStyles.textField}
           />
           <FormControl fullWidth size="small">
-            <InputLabel sx={{ color: 'var(--text-secondary)', '&.Mui-focused': { color: 'var(--primary-blue)' } }}>
+            <InputLabel
+              sx={{
+                color: 'var(--text-secondary)',
+                '&.Mui-focused': { color: 'var(--primary-blue)' },
+              }}
+            >
               {t('admin.dialog.users.form.loginType')}
             </InputLabel>
             <Select
               value={loginType}
               label={t('admin.dialog.users.form.loginType')}
-              onChange={(e) => setLoginType(e.target.value as 'password' | 'magic_link')}
+              onChange={(e) =>
+                setLoginType(e.target.value as 'password' | 'magic_link')
+              }
               disabled={saving}
               sx={selectSx}
               MenuProps={selectMenuProps}
             >
-              <MenuItem value="password">{t('admin.dialog.users.loginTypes.password')}</MenuItem>
-              <MenuItem value="magic_link">{t('admin.dialog.users.loginTypes.magicLink')}</MenuItem>
+              <MenuItem value="password">
+                {t('admin.dialog.users.loginTypes.password')}
+              </MenuItem>
+              <MenuItem value="magic_link">
+                {t('admin.dialog.users.loginTypes.magicLink')}
+              </MenuItem>
             </Select>
           </FormControl>
           {loginType === 'password' && (
@@ -248,18 +278,27 @@ function CreateUserDialog({
             />
           )}
           <FormControl fullWidth size="small">
-            <InputLabel sx={{ color: 'var(--text-secondary)', '&.Mui-focused': { color: 'var(--primary-blue)' } }}>
+            <InputLabel
+              sx={{
+                color: 'var(--text-secondary)',
+                '&.Mui-focused': { color: 'var(--primary-blue)' },
+              }}
+            >
               {t('admin.dialog.users.form.role')}
             </InputLabel>
             <Select
               value={profileRole}
               label={t('admin.dialog.users.form.role')}
-              onChange={(e) => setProfileRole(e.target.value as 'admin' | 'user')}
+              onChange={(e) =>
+                setProfileRole(e.target.value as 'admin' | 'user')
+              }
               disabled={saving || (profileRole === 'admin' && !adminProfileId)}
               sx={selectSx}
               MenuProps={selectMenuProps}
             >
-              <MenuItem value="user">{t('admin.dialog.users.roles.user')}</MenuItem>
+              <MenuItem value="user">
+                {t('admin.dialog.users.roles.user')}
+              </MenuItem>
               <MenuItem value="admin" disabled={!adminProfileId}>
                 {t('admin.dialog.users.roles.admin')}
               </MenuItem>
@@ -284,7 +323,11 @@ function CreateUserDialog({
         </Box>
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
-        <Button onClick={onClose} disabled={saving} sx={dialogStyles.cancelButton}>
+        <Button
+          onClick={onClose}
+          disabled={saving}
+          sx={dialogStyles.cancelButton}
+        >
           {t('admin.dialog.users.form.cancel')}
         </Button>
         <Button
@@ -292,7 +335,9 @@ function CreateUserDialog({
           variant="contained"
           disabled={saving}
           sx={dialogStyles.confirmButton}
-          startIcon={saving ? <CircularProgress size={14} color="inherit" /> : undefined}
+          startIcon={
+            saving ? <CircularProgress size={14} color="inherit" /> : undefined
+          }
         >
           {t('admin.dialog.users.form.save')}
         </Button>
@@ -325,7 +370,9 @@ function EditUserDialog({
   const [name, setName] = useState(() => user?.name ?? '');
   const [email, setEmail] = useState(() => user?.email ?? '');
   const [isActive, setIsActive] = useState(() => user?.isActive ?? true);
-  const [profileRole, setProfileRole] = useState<'admin' | 'user'>(() => detectRole(user) as 'admin' | 'user');
+  const [profileRole, setProfileRole] = useState<'admin' | 'user'>(
+    () => detectRole(user) as 'admin' | 'user',
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -348,7 +395,8 @@ function EditUserDialog({
     setSaving(true);
     setError('');
     try {
-      const profileId = profileRole === 'admin' ? adminProfileId : userProfileId;
+      const profileId =
+        profileRole === 'admin' ? adminProfileId : userProfileId;
       const params: {
         name: string;
         email: string;
@@ -359,7 +407,9 @@ function EditUserDialog({
 
       const result = await window.communityAdminAPI.updateUser(user.id, params);
       if (!result.success) {
-        throw new Error(result.error || t('admin.dialog.users.errors.updateFailed'));
+        throw new Error(
+          result.error || t('admin.dialog.users.errors.updateFailed'),
+        );
       }
       onUpdated();
       onClose();
@@ -407,18 +457,27 @@ function EditUserDialog({
             sx={dialogStyles.textField}
           />
           <FormControl fullWidth size="small">
-            <InputLabel sx={{ color: 'var(--text-secondary)', '&.Mui-focused': { color: 'var(--primary-blue)' } }}>
+            <InputLabel
+              sx={{
+                color: 'var(--text-secondary)',
+                '&.Mui-focused': { color: 'var(--primary-blue)' },
+              }}
+            >
               {t('admin.dialog.users.form.role')}
             </InputLabel>
             <Select
               value={profileRole}
               label={t('admin.dialog.users.form.role')}
-              onChange={(e) => setProfileRole(e.target.value as 'admin' | 'user')}
+              onChange={(e) =>
+                setProfileRole(e.target.value as 'admin' | 'user')
+              }
               disabled={saving}
               sx={selectSx}
               MenuProps={selectMenuProps}
             >
-              <MenuItem value="user">{t('admin.dialog.users.roles.user')}</MenuItem>
+              <MenuItem value="user">
+                {t('admin.dialog.users.roles.user')}
+              </MenuItem>
               <MenuItem value="admin" disabled={!adminProfileId}>
                 {t('admin.dialog.users.roles.admin')}
               </MenuItem>
@@ -443,7 +502,11 @@ function EditUserDialog({
         </Box>
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
-        <Button onClick={onClose} disabled={saving} sx={dialogStyles.cancelButton}>
+        <Button
+          onClick={onClose}
+          disabled={saving}
+          sx={dialogStyles.cancelButton}
+        >
           {t('admin.dialog.users.form.cancel')}
         </Button>
         <Button
@@ -451,7 +514,9 @@ function EditUserDialog({
           variant="contained"
           disabled={saving}
           sx={dialogStyles.confirmButton}
-          startIcon={saving ? <CircularProgress size={14} color="inherit" /> : undefined}
+          startIcon={
+            saving ? <CircularProgress size={14} color="inherit" /> : undefined
+          }
         >
           {t('admin.dialog.users.form.save')}
         </Button>
@@ -543,11 +608,21 @@ function UsersSection({
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={tableHeaderSx}>{t('admin.dialog.users.table.name')}</TableCell>
-              <TableCell sx={tableHeaderSx}>{t('admin.dialog.users.table.email')}</TableCell>
-              <TableCell sx={tableHeaderSx}>{t('admin.dialog.users.table.role')}</TableCell>
-              <TableCell sx={tableHeaderSx}>{t('admin.dialog.users.table.status')}</TableCell>
-              <TableCell sx={{ ...tableHeaderSx, width: 100, textAlign: 'right' }}>
+              <TableCell sx={tableHeaderSx}>
+                {t('admin.dialog.users.table.name')}
+              </TableCell>
+              <TableCell sx={tableHeaderSx}>
+                {t('admin.dialog.users.table.email')}
+              </TableCell>
+              <TableCell sx={tableHeaderSx}>
+                {t('admin.dialog.users.table.role')}
+              </TableCell>
+              <TableCell sx={tableHeaderSx}>
+                {t('admin.dialog.users.table.status')}
+              </TableCell>
+              <TableCell
+                sx={{ ...tableHeaderSx, width: 100, textAlign: 'right' }}
+              >
                 {t('admin.dialog.users.table.actions')}
               </TableCell>
             </TableRow>
@@ -595,7 +670,9 @@ function UsersSection({
                         backgroundColor: userIsAdmin
                           ? 'var(--primary-blue-light)'
                           : 'var(--bg-tree-container)',
-                        color: userIsAdmin ? 'var(--primary-blue)' : 'var(--text-secondary)',
+                        color: userIsAdmin
+                          ? 'var(--primary-blue)'
+                          : 'var(--text-secondary)',
                         border: 'none',
                       }}
                     />
@@ -609,26 +686,23 @@ function UsersSection({
                       }
                       size="small"
                       onClick={() => onToggleActive(user)}
-                      sx={{
-                        cursor: 'pointer',
-                        fontSize: 11,
-                        height: 20,
-                        backgroundColor: user.isActive ? '#1a3a1f' : 'var(--bg-tree-container)',
-                        color: user.isActive ? '#4caf50' : 'var(--text-secondary)',
-                        border: 'none',
-                        '&:hover': { opacity: 0.85 },
-                      }}
+                      sx={
+                        user.isActive
+                          ? dialogStyles.statusChipActive
+                          : dialogStyles.statusChipInactive
+                      }
                     />
                   </TableCell>
                   <TableCell sx={{ ...tableCellSx, textAlign: 'right' }}>
-                    <Tooltip title={t('admin.dialog.users.forcePassword.buttonTooltip')}>
+                    <Tooltip
+                      title={t(
+                        'admin.dialog.users.forcePassword.buttonTooltip',
+                      )}
+                    >
                       <IconButton
                         size="small"
                         onClick={() => onForcePassword(user)}
-                        sx={{
-                          color: 'var(--text-secondary)',
-                          '&:hover': { color: '#e8a000' },
-                        }}
+                        sx={dialogStyles.warningIconButton}
                       >
                         <LockResetIcon fontSize="small" />
                       </IconButton>
@@ -649,10 +723,7 @@ function UsersSection({
                       <IconButton
                         size="small"
                         onClick={() => onDelete(user)}
-                        sx={{
-                          color: 'var(--text-secondary)',
-                          '&:hover': { color: '#f85149' },
-                        }}
+                        sx={dialogStyles.dangerIconButton}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -668,9 +739,571 @@ function UsersSection({
   );
 }
 
+// ─── Groups Section ────────────────────────────────────────────────────────────
+
+interface GroupsSectionProps {
+  groups: AdminGroup[];
+  loading: boolean;
+  error: string;
+  onNew: () => void;
+  onEdit: (group: AdminGroup) => void;
+  onDelete: (group: AdminGroup) => void;
+  onManageMembers: (group: AdminGroup) => void;
+}
+
+function GroupsSection({
+  groups,
+  loading,
+  error,
+  onNew,
+  onEdit,
+  onDelete,
+  onManageMembers,
+}: GroupsSectionProps) {
+  const { t } = useTranslation();
+
+  const tableHeaderSx = {
+    color: 'var(--text-secondary)',
+    fontSize: 11,
+    fontWeight: 600,
+    textTransform: 'uppercase' as const,
+    borderBottom: '1px solid var(--border-primary)',
+    py: 1,
+    backgroundColor: 'transparent',
+  };
+
+  const tableCellSx = {
+    color: 'var(--text-primary)',
+    fontSize: 13,
+    borderBottom: '1px solid var(--border-primary)',
+    py: 1,
+    backgroundColor: 'transparent',
+  };
+
+  return (
+    <Box>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 2.5,
+        }}
+      >
+        <Typography variant="h6" sx={dialogStyles.headingText}>
+          {t('admin.dialog.groups.title')}
+        </Typography>
+        <Button
+          size="small"
+          variant="contained"
+          startIcon={<GroupAddIcon sx={{ fontSize: '16px !important' }} />}
+          onClick={onNew}
+          sx={{ ...dialogStyles.confirmButton, px: 1.5, fontSize: 13 }}
+        >
+          {t('admin.dialog.groups.newGroup')}
+        </Button>
+      </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2, fontSize: 13 }}>
+          {error}
+        </Alert>
+      )}
+
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <CircularProgress size={28} sx={{ color: 'var(--primary-blue)' }} />
+        </Box>
+      )}
+
+      {!loading && (
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell sx={tableHeaderSx}>
+                {t('admin.dialog.groups.table.name')}
+              </TableCell>
+              <TableCell
+                sx={{ ...tableHeaderSx, width: 120, textAlign: 'right' }}
+              >
+                {t('admin.dialog.groups.table.actions')}
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {groups.length === 0 && !error && (
+              <TableRow>
+                <TableCell
+                  colSpan={2}
+                  sx={{
+                    ...tableCellSx,
+                    textAlign: 'center',
+                    color: 'var(--text-secondary)',
+                    py: 4,
+                    border: 'none',
+                  }}
+                >
+                  {t('admin.dialog.groups.empty')}
+                </TableCell>
+              </TableRow>
+            )}
+            {groups.map((group) => (
+              <TableRow
+                key={group.id}
+                sx={{
+                  '&:hover': { backgroundColor: 'var(--hover-bg)' },
+                  '&:last-child td': { borderBottom: 'none' },
+                }}
+              >
+                <TableCell sx={tableCellSx}>{group.name}</TableCell>
+                <TableCell sx={{ ...tableCellSx, textAlign: 'right' }}>
+                  <Tooltip title={t('admin.dialog.groups.members.manage')}>
+                    <IconButton
+                      size="small"
+                      onClick={() => onManageMembers(group)}
+                      sx={{
+                        color: 'var(--text-secondary)',
+                        '&:hover': { color: 'var(--primary-blue)' },
+                      }}
+                    >
+                      <ManageAccountsIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t('dialog.actions.rename')}>
+                    <IconButton
+                      size="small"
+                      onClick={() => onEdit(group)}
+                      sx={{
+                        color: 'var(--text-secondary)',
+                        '&:hover': { color: 'var(--primary-blue)' },
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t('dialog.actions.delete')}>
+                    <IconButton
+                      size="small"
+                      onClick={() => onDelete(group)}
+                      sx={dialogStyles.dangerIconButton}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </Box>
+  );
+}
+
+// ─── Create/Edit Group Dialog ──────────────────────────────────────────────────
+
+interface GroupFormDialogProps {
+  open: boolean;
+  group: AdminGroup | null;
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function GroupFormDialog({
+  open,
+  group,
+  onClose,
+  onSaved,
+}: GroupFormDialogProps) {
+  const { t } = useTranslation();
+  const isEditing = group !== null;
+
+  const [name, setName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      setName(group?.name ?? '');
+      setError('');
+    }
+  }, [open, group]);
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      setError(t('admin.dialog.groups.errors.nameRequired'));
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      if (isEditing && group) {
+        const result = await window.communityAdminAPI.updateGroup(group.id, {
+          name: name.trim(),
+        });
+        if (!result.success)
+          throw new Error(
+            result.error || t('admin.dialog.groups.errors.updateFailed'),
+          );
+      } else {
+        const result = await window.communityAdminAPI.createGroup({
+          name: name.trim(),
+        });
+        if (!result.success)
+          throw new Error(
+            result.error || t('admin.dialog.groups.errors.createFailed'),
+          );
+      }
+      onSaved();
+      onClose();
+    } catch (err: any) {
+      setError(err.message || String(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={saving ? undefined : onClose}
+      fullWidth
+      maxWidth="xs"
+      PaperProps={{ sx: dialogStyles.dialogPaper }}
+    >
+      <DialogTitle sx={dialogStyles.dialogTitle}>
+        {isEditing
+          ? t('admin.dialog.groups.form.titleEdit')
+          : t('admin.dialog.groups.form.titleCreate')}
+      </DialogTitle>
+      <DialogContent sx={dialogStyles.dialogContent}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+          {error && (
+            <Alert severity="error" sx={{ fontSize: 13 }}>
+              {error}
+            </Alert>
+          )}
+          <TextField
+            label={t('admin.dialog.groups.form.name')}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            size="small"
+            disabled={saving}
+            autoFocus
+            sx={dialogStyles.textField}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions sx={dialogStyles.dialogActions}>
+        <Button
+          onClick={onClose}
+          disabled={saving}
+          sx={dialogStyles.cancelButton}
+        >
+          {t('admin.dialog.groups.form.cancel')}
+        </Button>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          disabled={saving}
+          sx={dialogStyles.confirmButton}
+          startIcon={
+            saving ? <CircularProgress size={14} color="inherit" /> : undefined
+          }
+        >
+          {t('admin.dialog.groups.form.save')}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ─── Manage Group Members Dialog ───────────────────────────────────────────────
+
+interface ManageGroupMembersDialogProps {
+  open: boolean;
+  group: AdminGroup | null;
+  allUsers: AdminUser[];
+  onClose: () => void;
+}
+
+function ManageGroupMembersDialog({
+  open,
+  group,
+  allUsers,
+  onClose,
+}: ManageGroupMembersDialogProps) {
+  const { t } = useTranslation();
+
+  const [members, setMembers] = useState<
+    { userId: string; groupId: string; createdAt?: string }[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
+  const loadMembers = useCallback(async () => {
+    if (!group) return;
+    setLoading(true);
+    setError('');
+    try {
+      const result = await window.communityAdminAPI.getGroup(group.id);
+      if (result.success && result.group) {
+        setMembers(result.group.members ?? []);
+      } else {
+        setError(
+          result.error || t('admin.dialog.groups.errors.loadMembersFailed'),
+        );
+      }
+    } catch (err: any) {
+      setError(err.message || String(err));
+    } finally {
+      setLoading(false);
+    }
+  }, [group, t]);
+
+  useEffect(() => {
+    if (open && group) {
+      setSelectedUser(null);
+      setError('');
+      loadMembers();
+    }
+  }, [open, group, loadMembers]);
+
+  const memberUserIds = new Set(members.map((m) => m.userId));
+
+  const nonMembers = allUsers.filter((u) => !memberUserIds.has(u.id));
+
+  const getUserById = (userId: string) => allUsers.find((u) => u.id === userId);
+
+  const handleAdd = async () => {
+    if (!group || !selectedUser) return;
+    setAdding(true);
+    setError('');
+    try {
+      const result = await window.communityAdminAPI.addGroupMember(
+        group.id,
+        selectedUser.id,
+      );
+      if (!result.success)
+        throw new Error(
+          result.error || t('admin.dialog.groups.errors.addMemberFailed'),
+        );
+      setSelectedUser(null);
+      await loadMembers();
+    } catch (err: any) {
+      setError(err.message || String(err));
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleRemove = async (userId: string) => {
+    if (!group) return;
+    setRemovingId(userId);
+    setError('');
+    try {
+      const result = await window.communityAdminAPI.removeGroupMember(
+        group.id,
+        userId,
+      );
+      if (!result.success)
+        throw new Error(
+          result.error || t('admin.dialog.groups.errors.removeMemberFailed'),
+        );
+      await loadMembers();
+    } catch (err: any) {
+      setError(err.message || String(err));
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{ sx: dialogStyles.dialogPaper }}
+    >
+      <DialogTitle sx={dialogStyles.dialogTitle}>
+        {t('admin.dialog.groups.members.title', { name: group?.name ?? '' })}
+      </DialogTitle>
+      <DialogContent sx={dialogStyles.dialogContent}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+          {error && (
+            <Alert severity="error" sx={{ fontSize: 13 }}>
+              {error}
+            </Alert>
+          )}
+
+          {/* Add member row */}
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <FormControl fullWidth size="small" disabled={adding}>
+              <InputLabel
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&.Mui-focused': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {t('admin.dialog.groups.members.selectUser')}
+              </InputLabel>
+              <Select
+                value={selectedUser?.id ?? ''}
+                label={t('admin.dialog.groups.members.selectUser')}
+                onChange={(e) => {
+                  const found = nonMembers.find((u) => u.id === e.target.value);
+                  setSelectedUser(found ?? null);
+                }}
+                sx={selectSx}
+                MenuProps={selectMenuProps}
+              >
+                {nonMembers.length === 0 && (
+                  <MenuItem value="" disabled>
+                    {t('admin.dialog.groups.members.noUsersAvailable')}
+                  </MenuItem>
+                )}
+                {nonMembers.map((u) => (
+                  <MenuItem key={u.id} value={u.id}>
+                    {u.name}
+                    <Typography
+                      component="span"
+                      sx={{
+                        color: 'var(--text-secondary)',
+                        fontSize: 12,
+                        ml: 1,
+                      }}
+                    >
+                      ({u.email})
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              variant="contained"
+              size="small"
+              disabled={!selectedUser || adding}
+              onClick={handleAdd}
+              startIcon={
+                adding ? (
+                  <CircularProgress size={14} color="inherit" />
+                ) : (
+                  <PersonAddIcon sx={{ fontSize: '16px !important' }} />
+                )
+              }
+              sx={{
+                ...dialogStyles.confirmButton,
+                whiteSpace: 'nowrap',
+                px: 1.5,
+                '&.Mui-disabled': {
+                  backgroundColor: 'var(--primary-blue-medium)',
+                  color: 'var(--text-secondary)',
+                  boxShadow: 'none',
+                },
+              }}
+            >
+              {t('admin.dialog.groups.members.add')}
+            </Button>
+          </Box>
+
+          {/* Members list */}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress
+                size={24}
+                sx={{ color: 'var(--primary-blue)' }}
+              />
+            </Box>
+          ) : (
+            <Box
+              sx={{ ...dialogStyles.backgroundContainer, overflow: 'hidden' }}
+            >
+              <List dense disablePadding>
+                {members.length === 0 && (
+                  <ListItem sx={{ py: 2 }}>
+                    <ListItemText
+                      primary={t('admin.dialog.groups.members.empty')}
+                      primaryTypographyProps={{
+                        sx: {
+                          color: 'var(--text-secondary)',
+                          fontSize: 13,
+                          textAlign: 'center',
+                        },
+                      }}
+                    />
+                  </ListItem>
+                )}
+                {members.map((member) => {
+                  const user = getUserById(member.userId);
+                  const isRemoving = removingId === member.userId;
+                  return (
+                    <ListItem
+                      key={member.userId}
+                      secondaryAction={
+                        <Tooltip
+                          title={t('admin.dialog.groups.members.remove')}
+                        >
+                          <span>
+                            <IconButton
+                              size="small"
+                              disabled={isRemoving}
+                              onClick={() => handleRemove(member.userId)}
+                              sx={dialogStyles.dangerIconButton}
+                            >
+                              {isRemoving ? (
+                                <CircularProgress size={14} />
+                              ) : (
+                                <PersonRemoveIcon fontSize="small" />
+                              )}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      }
+                      sx={{
+                        borderBottom: '1px solid var(--border-primary)',
+                        '&:last-child': { borderBottom: 'none' },
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{ minWidth: 34, color: 'var(--text-secondary)' }}
+                      >
+                        <PeopleIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={user?.name ?? member.userId}
+                        secondary={user?.email}
+                        primaryTypographyProps={{
+                          sx: { ...dialogStyles.primaryText, fontSize: 13 },
+                        }}
+                        secondaryTypographyProps={{
+                          sx: { ...dialogStyles.secondaryText, fontSize: 12 },
+                        }}
+                      />
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </Box>
+          )}
+        </Box>
+      </DialogContent>
+      <DialogActions sx={dialogStyles.dialogActions}>
+        <Button onClick={onClose} sx={dialogStyles.cancelButton}>
+          {t('common.close')}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 // ─── Main Admin Dialog ────────────────────────────────────────────────────────
 
-type AdminSection = 'users';
+type AdminSection = 'users' | 'groups';
 
 interface AdminDialogProps {
   open: boolean;
@@ -685,16 +1318,31 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
   const [loading, setLoading] = useState(false);
   const [listError, setListError] = useState('');
 
+  // Groups state
+  const [groups, setGroups] = useState<AdminGroup[]>([]);
+  const [groupsLoading, setGroupsLoading] = useState(false);
+  const [groupsError, setGroupsError] = useState('');
+  const [groupFormOpen, setGroupFormOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<AdminGroup | null>(null);
+  const [deleteGroupTarget, setDeleteGroupTarget] = useState<AdminGroup | null>(
+    null,
+  );
+  const [membersGroup, setMembersGroup] = useState<AdminGroup | null>(null);
+  const [membersOpen, setMembersOpen] = useState(false);
+
   // Sub-dialog states
   const [createOpen, setCreateOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
-  const [forcePasswordTarget, setForcePasswordTarget] = useState<AdminUser | null>(null);
+  const [forcePasswordTarget, setForcePasswordTarget] =
+    useState<AdminUser | null>(null);
 
   // Derive profile IDs from the loaded users list
-  const adminProfileId = users.find((u) => u.profile?.name === 'admin')?.profile?.id;
-  const userProfileId = users.find((u) => u.profile?.name === 'user')?.profile?.id;
+  const adminProfileId = users.find((u) => u.profile?.name === 'admin')?.profile
+    ?.id;
+  const userProfileId = users.find((u) => u.profile?.name === 'user')?.profile
+    ?.id;
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -713,9 +1361,31 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
     }
   }, [t]);
 
+  const loadGroups = useCallback(async () => {
+    setGroupsLoading(true);
+    setGroupsError('');
+    try {
+      const result = await window.communityAdminAPI.listGroups();
+      if (result.success && result.groups) {
+        setGroups(result.groups);
+      } else {
+        setGroupsError(
+          result.error || t('admin.dialog.groups.errors.loadFailed'),
+        );
+      }
+    } catch (err: any) {
+      setGroupsError(err.message || t('admin.dialog.groups.errors.loadFailed'));
+    } finally {
+      setGroupsLoading(false);
+    }
+  }, [t]);
+
   useEffect(() => {
-    if (open) loadUsers();
-  }, [open, loadUsers]);
+    if (open) {
+      loadUsers();
+      loadGroups();
+    }
+  }, [open, loadUsers, loadGroups]);
 
   const handleToggleActive = async (user: AdminUser) => {
     const fn = user.isActive
@@ -743,7 +1413,9 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
     );
     setForcePasswordTarget(null);
     if (!result.success) {
-      setListError(result.error || t('admin.dialog.users.errors.forcePasswordFailed'));
+      setListError(
+        result.error || t('admin.dialog.users.errors.forcePasswordFailed'),
+      );
     }
   };
 
@@ -755,6 +1427,21 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
       loadUsers();
     } else {
       setListError(result.error || t('admin.dialog.users.errors.deleteFailed'));
+    }
+  };
+
+  const handleDeleteGroupConfirm = async () => {
+    if (!deleteGroupTarget) return;
+    const result = await window.communityAdminAPI.deleteGroup(
+      deleteGroupTarget.id,
+    );
+    setDeleteGroupTarget(null);
+    if (result.success) {
+      loadGroups();
+    } else {
+      setGroupsError(
+        result.error || t('admin.dialog.groups.errors.deleteFailed'),
+      );
     }
   };
 
@@ -788,7 +1475,9 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
             gap: 1,
           }}
         >
-          <AdminPanelSettingsIcon sx={{ color: 'var(--primary-blue)', fontSize: 20 }} />
+          <AdminPanelSettingsIcon
+            sx={{ color: 'var(--primary-blue)', fontSize: 20 }}
+          />
           {t('admin.dialog.title')}
         </DialogTitle>
 
@@ -836,6 +1525,31 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
                   />
                 </ListItemButton>
               </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  selected={section === 'groups'}
+                  onClick={() => setSection('groups')}
+                  sx={navItemSx}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 34,
+                      color:
+                        section === 'groups'
+                          ? 'var(--primary-blue)'
+                          : 'var(--text-secondary)',
+                    }}
+                  >
+                    <GroupsIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('admin.dialog.groups.title')}
+                    primaryTypographyProps={{
+                      sx: { ...dialogStyles.primaryText, fontSize: 14 },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
             </List>
           </Box>
 
@@ -861,6 +1575,26 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
                 onDelete={setDeleteTarget}
                 onToggleActive={handleToggleActive}
                 onForcePassword={setForcePasswordTarget}
+              />
+            )}
+            {section === 'groups' && (
+              <GroupsSection
+                groups={groups}
+                loading={groupsLoading}
+                error={groupsError}
+                onNew={() => {
+                  setEditingGroup(null);
+                  setGroupFormOpen(true);
+                }}
+                onEdit={(g) => {
+                  setEditingGroup(g);
+                  setGroupFormOpen(true);
+                }}
+                onDelete={setDeleteGroupTarget}
+                onManageMembers={(g) => {
+                  setMembersGroup(g);
+                  setMembersOpen(true);
+                }}
               />
             )}
           </Box>
@@ -909,6 +1643,31 @@ export default function AdminDialog({ open, onClose }: AdminDialogProps) {
         })}
         onConfirm={handleDeleteConfirm}
         onClose={() => setDeleteTarget(null)}
+      />
+
+      <GroupFormDialog
+        key={editingGroup?.id ?? 'new-group'}
+        open={groupFormOpen}
+        group={editingGroup}
+        onClose={() => setGroupFormOpen(false)}
+        onSaved={loadGroups}
+      />
+
+      <ConfirmDialog
+        open={deleteGroupTarget !== null}
+        title={t('admin.dialog.groups.delete.title')}
+        message={t('admin.dialog.groups.delete.message', {
+          name: deleteGroupTarget?.name ?? '',
+        })}
+        onConfirm={handleDeleteGroupConfirm}
+        onClose={() => setDeleteGroupTarget(null)}
+      />
+
+      <ManageGroupMembersDialog
+        open={membersOpen}
+        group={membersGroup}
+        allUsers={users}
+        onClose={() => setMembersOpen(false)}
       />
     </>
   );
