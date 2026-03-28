@@ -59,9 +59,14 @@ interface AppContextType {
   setIsEncrypted: (encrypted: boolean) => void;
 
   // Community server session
-  communitySession: { host: string; port: number; email: string } | null;
+  communitySession: {
+    host: string;
+    port: number;
+    email: string;
+    isAdmin: boolean;
+  } | null;
   setCommunitySession: (
-    s: { host: string; port: number; email: string } | null,
+    s: { host: string; port: number; email: string; isAdmin: boolean } | null,
   ) => void;
 
   // Notifications
@@ -132,6 +137,7 @@ export function AppProvider({ children }: AppProviderProps) {
     host: string;
     port: number;
     email: string;
+    isAdmin: boolean;
   } | null>(null);
 
   // Save pulse state

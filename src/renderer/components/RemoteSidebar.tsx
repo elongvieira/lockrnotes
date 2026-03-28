@@ -22,6 +22,7 @@ export default function RemoteSidebar() {
     host: string;
     port: number;
     email: string;
+    isAdmin: boolean;
   }) => {
     setCommunitySession(session);
     setLoginOpen(false);

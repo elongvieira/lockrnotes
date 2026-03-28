@@ -277,7 +277,7 @@
       "system": "📦 Gerenciado pelo Sistema (Padrão)",
       "systemPro": "✓ Mais seguro - Chave armazenada no cofre seguro do Windows",
       "systemCon": "✗ Se apagar dados do sistema, perderá acesso aos arquivos",
-    "folder": "📁 Salvo na pasta do LockrNote",
+      "folder": "📁 Salvo na pasta do LockrNote",
       "folderPro": "✓ Recuperável - Se mover a pasta, continua funcionando",
       "folderCon": "✗ Menos seguro - Qualquer um com acesso à pasta pode descriptografar"
     },
@@ -343,7 +343,7 @@
       "title": "Conectar ao Servidor Community",
       "host": "Host / IP",
       "port": "Porta",
-      "email": "E-mail",
+      "email": "E-mail / Login",
       "password": "Senha",
       "submit": "Entrar",
       "errors": {
@@ -352,6 +352,90 @@
         "emailRequired": "E-mail é obrigatório",
         "passwordRequired": "Senha é obrigatória",
         "loginFailed": "Falha no login. Verifique suas credenciais."
+      }
+    },
+    "logout": {
+      "title": "Sair",
+      "message": "Tem certeza de que deseja desconectar do servidor community?"
+    },
+    "changePassword": {
+      "title": "Alterar Senha",
+      "message": "Você deve alterar sua senha antes de continuar.",
+      "currentPassword": "Senha Atual",
+      "newPassword": "Nova Senha",
+      "confirmPassword": "Confirmar Senha",
+      "submit": "Alterar Senha",
+      "errors": {
+        "currentRequired": "Senha atual é obrigatória",
+        "newRequired": "Nova senha é obrigatória",
+        "confirmRequired": "Confirmação de senha é obrigatória",
+        "mismatch": "As senhas não coincidem",
+        "changeFailed": "Falha ao alterar a senha",
+        "currentIncorrect": "Senha atual está incorreta"
+      }
+    }
+  },
+  "admin": {
+    "menuTitle": "Administração",
+    "dialog": {
+      "title": "Administração",
+      "users": {
+        "title": "Usuários",
+        "newUser": "Novo Usuário",
+        "empty": "Nenhum usuário encontrado.",
+        "table": {
+          "name": "Nome",
+          "email": "E-mail",
+          "role": "Perfil",
+          "actions": "Ações",
+          "status": "Status"
+        },
+        "roles": {
+          "admin": "Admin",
+          "user": "Usuário"
+        },
+        "form": {
+          "titleCreate": "Novo Usuário",
+          "titleEdit": "Editar Usuário",
+          "name": "Nome",
+          "email": "E-mail",
+          "password": "Senha",
+          "role": "Perfil",
+          "save": "Salvar",
+          "cancel": "Cancelar",
+          "loginType": "Tipo de Login",
+          "forcePasswordChange": "Forçar troca de senha no primeiro login",
+          "isActive": "Conta ativa"
+        },
+        "delete": {
+          "title": "Excluir Usuário",
+          "message": "O usuário \"{{email}}\" será excluído permanentemente. Tem certeza?"
+        },
+        "errors": {
+          "loadFailed": "Falha ao carregar usuários",
+          "createFailed": "Falha ao criar usuário",
+          "updateFailed": "Falha ao atualizar usuário",
+          "deleteFailed": "Falha ao excluir usuário",
+          "nameRequired": "Nome é obrigatório",
+          "emailRequired": "E-mail é obrigatório",
+          "passwordRequired": "Senha é obrigatória para novos usuários",
+          "activateFailed": "Falha ao ativar usuário",
+          "deactivateFailed": "Falha ao desativar usuário",
+          "forcePasswordFailed": "Falha ao forçar troca de senha"
+        },
+        "status": {
+          "active": "Ativo",
+          "inactive": "Inativo"
+        },
+        "loginTypes": {
+          "password": "Senha",
+          "magicLink": "Magic Link"
+        },
+        "forcePassword": {
+          "buttonTooltip": "Forçar Troca de Senha",
+          "title": "Forçar Troca de Senha",
+          "message": "O usuário {{name}} será obrigado a trocar a senha no próximo login."
+        }
       }
     }
   }

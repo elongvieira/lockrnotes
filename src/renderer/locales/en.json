@@ -343,7 +343,7 @@
       "title": "Connect to Community Server",
       "host": "Host / IP",
       "port": "Port",
-      "email": "Email",
+      "email": "Email / Login",
       "password": "Password",
       "submit": "Login",
       "errors": {
@@ -352,6 +352,90 @@
         "emailRequired": "Email is required",
         "passwordRequired": "Password is required",
         "loginFailed": "Login failed. Check your credentials."
+      }
+    },
+    "logout": {
+      "title": "Logout",
+      "message": "Are you sure you want to disconnect from the community server?"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "message": "You must change your password before proceeding.",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Change Password",
+      "errors": {
+        "currentRequired": "Current password is required",
+        "newRequired": "New password is required",
+        "confirmRequired": "Password confirmation is required",
+        "mismatch": "Passwords do not match",
+        "changeFailed": "Failed to change password",
+        "currentIncorrect": "Current password is incorrect"
+      }
+    }
+  },
+  "admin": {
+    "menuTitle": "Administration",
+    "dialog": {
+      "title": "Administration",
+      "users": {
+        "title": "Users",
+        "newUser": "New User",
+        "empty": "No users found.",
+        "table": {
+          "name": "Name",
+          "email": "Email",
+          "role": "Role",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "roles": {
+          "admin": "Admin",
+          "user": "User"
+        },
+        "loginTypes": {
+          "password": "Password",
+          "magicLink": "Magic Link"
+        },
+        "form": {
+          "titleCreate": "New User",
+          "titleEdit": "Edit User",
+          "name": "Name",
+          "email": "Email",
+          "password": "Password",
+          "loginType": "Login Type",
+          "role": "Profile",
+          "forcePasswordChange": "Require password change on first login",
+          "isActive": "Active account",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "forcePassword": {
+          "buttonTooltip": "Force Password Change",
+          "title": "Force Password Change",
+          "message": "User \"{{name}}\" will be required to change their password on next login."
+        },
+        "delete": {
+          "title": "Delete User",
+          "message": "User \"{{email}}\" will be permanently deleted. Are you sure?"
+        },
+        "errors": {
+          "loadFailed": "Failed to load users",
+          "createFailed": "Failed to create user",
+          "updateFailed": "Failed to update user",
+          "deleteFailed": "Failed to delete user",
+          "activateFailed": "Failed to activate user",
+          "deactivateFailed": "Failed to deactivate user",
+          "forcePasswordFailed": "Failed to set force password change",
+          "nameRequired": "Name is required",
+          "emailRequired": "Email is required",
+          "passwordRequired": "Password is required for new users"
+        }
       }
     }
   }

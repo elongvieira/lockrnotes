@@ -1,78 +1,10 @@
-import { ipcMain, app, safeStorage } from 'electron';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-
-const SESSION_FILE_NAME = '.community_session';
-
-function getSessionFilePath(): string {
-  const userDataPath = app.getPath('userData');
-  return path.join(userDataPath, 'community', SESSION_FILE_NAME);
-}
-
-async function saveSession(session: {
-  host: string;
-  port: number;
-  email: string;
-  accessToken: string;
-}): Promise<void> {
-  const filePath = getSessionFilePath();
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-
-  if (!safeStorage.isEncryptionAvailable()) {
-    throw new Error('System encryption is not available');
-  }
-
-  const encrypted = safeStorage.encryptString(JSON.stringify(session));
-  const wrapper = {
-    type: 'lockrnotes-community-session',
-    version: '1.0',
-    encrypted: encrypted.toString('base64'),
-    created: new Date().toISOString(),
-  };
-
-  await fs.writeFile(filePath, JSON.stringify(wrapper, null, 2), 'utf8');
-}
-
-async function loadSession(): Promise<{
-  host: string;
-  port: number;
-  email: string;
-  accessToken: string;
-} | null> {
-  const filePath = getSessionFilePath();
-
-  try {
-    const raw = await fs.readFile(filePath, 'utf8');
-    const wrapper = JSON.parse(raw);
-
-    if (
-      wrapper.type !== 'lockrnotes-community-session' ||
-      wrapper.version !== '1.0'
-    ) {
-      return null;
-    }
-
-    if (!safeStorage.isEncryptionAvailable()) {
-      throw new Error('System encryption is not available');
-    }
-
-    const buffer = Buffer.from(wrapper.encrypted, 'base64');
-    const decrypted = safeStorage.decryptString(buffer);
-    return JSON.parse(decrypted);
-  } catch (err: any) {
-    if (err.code === 'ENOENT') return null;
-    throw err;
-  }
-}
-
-async function deleteSession(): Promise<void> {
-  const filePath = getSessionFilePath();
-  try {
-    await fs.unlink(filePath);
-  } catch (err: any) {
-    if (err.code !== 'ENOENT') throw err;
-  }
-}
+import { ipcMain } from 'electron';
+import {
+  saveSession,
+  loadSession,
+  deleteSession,
+  extractIsAdmin,
+} from '../services/communitySessionService';
 
 export function registerCommunityAuthHandlers(): void {
   ipcMain.handle(
@@ -103,13 +35,34 @@ export function registerCommunityAuthHandlers(): void {
           return { success: false, error: message };
         }
 
-        const data = (await response.json()) as { accessToken?: string };
+        const data = (await response.json()) as {
+          accessToken?: string;
+          forcePasswordChange?: boolean;
+          user?: {
+            profile?: string;
+          };
+        };
         if (!data.accessToken) {
           return { success: false, error: 'No access token received' };
         }
 
-        await saveSession({ host, port, email, accessToken: data.accessToken });
-        return { success: true, email };
+        // Determine if user is admin from profile field
+        const isAdmin =
+          data.user?.profile?.toLowerCase() === 'admin' ||
+          extractIsAdmin(data.accessToken);
+        await saveSession({
+          host,
+          port,
+          email,
+          accessToken: data.accessToken,
+          isAdmin,
+        });
+        return {
+          success: true,
+          email,
+          isAdmin,
+          forcePasswordChange: data.forcePasswordChange ?? false,
+        };
       } catch (err: any) {
         return { success: false, error: err.message || String(err) };
       }
@@ -126,6 +79,7 @@ export function registerCommunityAuthHandlers(): void {
           host: session.host,
           port: session.port,
           email: session.email,
+          isAdmin: session.isAdmin ?? false,
           // Do not expose the accessToken to the renderer
         },
       };
@@ -142,4 +96,48 @@ export function registerCommunityAuthHandlers(): void {
       return { success: false, error: err.message || String(err) };
     }
   });
+
+  ipcMain.handle(
+    'community:change-password',
+    async (
+      _event,
+      params: { currentPassword: string; newPassword: string },
+    ) => {
+      try {
+        const { currentPassword, newPassword } = params;
+        const session = await loadSession();
+
+        if (!session) {
+          return { success: false, error: 'Not logged in' };
+        }
+
+        const url = `http://${session.host}:${session.port}/auth/change-password`;
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+          body: JSON.stringify({ currentPassword, newPassword }),
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          let message = `HTTP ${response.status}`;
+          try {
+            const parsed = JSON.parse(errorBody);
+            message = parsed.message || parsed.error || message;
+          } catch {
+            // keep default message
+          }
+          return { success: false, error: message };
+        }
+
+        return { success: true };
+      } catch (err: any) {
+        return { success: false, error: err.message || String(err) };
+      }
+    },
+  );
 }

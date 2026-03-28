@@ -10,11 +10,17 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
+import { ChangePasswordDialog } from './ChangePasswordDialog';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSuccess: (session: { host: string; port: number; email: string }) => void;
+  onSuccess: (session: {
+    host: string;
+    port: number;
+    email: string;
+    isAdmin: boolean;
+  }) => void;
 }
 
 export default function CommunityLoginDialog({
@@ -29,6 +35,14 @@ export default function CommunityLoginDialog({
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPasswordChangeDialog, setShowPasswordChangeDialog] =
+    useState(false);
+  const [loginSession, setLoginSession] = useState<{
+    host: string;
+    port: number;
+    email: string;
+    isAdmin: boolean;
+  } | null>(null);
 
   const handleClose = () => {
     if (loading) return;
@@ -76,7 +90,21 @@ export default function CommunityLoginDialog({
 
       if (result.success) {
         setPassword('');
-        onSuccess({ host: host.trim(), port: portNum, email: email.trim() });
+
+        const sessionData = {
+          host: host.trim(),
+          port: portNum,
+          email: email.trim(),
+          isAdmin: result.isAdmin ?? false,
+        };
+
+        // Check if password change is required
+        if (result.forcePasswordChange) {
+          setLoginSession(sessionData);
+          setShowPasswordChangeDialog(true);
+        } else {
+          onSuccess(sessionData);
+        }
       } else {
         setError(
           result.error ||
@@ -132,13 +160,12 @@ export default function CommunityLoginDialog({
               />
             </Box>
             <TextField
-              label={t('community.login.email') || 'Email'}
+              label={t('community.login.email') || 'Email / Login'}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
               required
               size="small"
-              type="email"
               autoComplete="username"
               sx={dialogStyles.textField}
             />
@@ -174,6 +201,20 @@ export default function CommunityLoginDialog({
           </Button>
         </DialogActions>
       </form>
+
+      <ChangePasswordDialog
+        open={showPasswordChangeDialog}
+        onClose={() => {
+          setShowPasswordChangeDialog(false);
+          setLoginSession(null);
+        }}
+        onSuccess={() => {
+          setShowPasswordChangeDialog(false);
+          if (loginSession) {
+            onSuccess(loginSession);
+          }
+        }}
+      />
     </Dialog>
   );
 }

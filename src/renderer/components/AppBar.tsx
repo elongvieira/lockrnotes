@@ -14,11 +14,14 @@ import UploadIcon from '@mui/icons-material/Upload';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloudIcon from '@mui/icons-material/Cloud';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
 import HotCopyBar from './HotCopyBar';
 import HotCopyManageDialog from './HotCopyManageDialog';
 import ImportDialog from './ImportDialog';
+import AdminDialog from './admin/AdminDialog';
+import ConfirmDialog from './ConfirmDialog';
 import { HotCopyItem } from '../types/hotcopy';
 import type { ImportFileInfo } from '../../main/preload/importApi';
 import { useAppContext } from '../contexts/AppContext';
@@ -35,6 +38,8 @@ export default function AppBar() {
   const [filesToImport, setFilesToImport] = useState<ImportFileInfo[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
+  const [adminOpen, setAdminOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   // Load persisted community session on mount
   useEffect(() => {
@@ -51,6 +56,7 @@ export default function AppBar() {
     try {
       await window.communityAuthAPI?.logout();
       setCommunitySession(null);
+      setLogoutConfirmOpen(false);
     } catch {
       // ignore
     }
@@ -288,7 +294,7 @@ export default function AppBar() {
             >
               <Chip
                 icon={<CloudIcon sx={{ fontSize: '20px !important' }} />}
-                onDelete={handleCommunityLogout}
+                onDelete={() => setLogoutConfirmOpen(true)}
                 deleteIcon={
                   <Tooltip title={t('community.logout') || 'Logout'}>
                     <LogoutIcon sx={{ fontSize: '16px !important' }} />
@@ -354,6 +360,20 @@ export default function AppBar() {
             </ListItemIcon>
             {t('settings.title') || 'Configurações'}
           </MenuItem>
+          {communitySession?.isAdmin && (
+            <MenuItem
+              onClick={() => {
+                setAdminOpen(true);
+                handleMenuClose();
+              }}
+              className="app-menu-item"
+            >
+              <ListItemIcon className="app-menu-icon">
+                <AdminPanelSettingsIcon fontSize="small" />
+              </ListItemIcon>
+              {t('admin.menuTitle')}
+            </MenuItem>
+          )}
           <MenuItem onClick={handleExport} className="app-menu-item">
             <ListItemIcon className="app-menu-icon">
               <DownloadIcon fontSize="small" />
@@ -394,6 +414,17 @@ export default function AppBar() {
           onClose={() => setImportDialogOpen(false)}
           files={filesToImport}
           onImportComplete={handleImportComplete}
+        />
+        <AdminDialog open={adminOpen} onClose={() => setAdminOpen(false)} />
+        <ConfirmDialog
+          open={logoutConfirmOpen}
+          title={t('community.logout.title') || 'Logout'}
+          message={
+            t('community.logout.message') ||
+            'Are you sure you want to disconnect?'
+          }
+          onConfirm={handleCommunityLogout}
+          onClose={() => setLogoutConfirmOpen(false)}
         />
       </Toolbar>
     </MuiAppBar>
