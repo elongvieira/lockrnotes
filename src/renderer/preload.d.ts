@@ -8,6 +8,7 @@ import type { SshAPI } from '../main/preload/sshApi';
 import type { RdpAPI } from '../main/preload/rdpApi';
 import type { CommunityAuthAPI } from '../main/preload/communityAuthApi';
 import type { CommunityAdminAPI } from '../main/preload/communityAdminApi';
+import type { CommunityFilesAPI } from '../main/preload/communityFilesApi';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -22,6 +23,7 @@ declare global {
     rdpAPI: RdpAPI;
     communityAuthAPI: CommunityAuthAPI;
     communityAdminAPI: CommunityAdminAPI;
+    communityFilesAPI: CommunityFilesAPI;
   }
 
   namespace NodeJS {

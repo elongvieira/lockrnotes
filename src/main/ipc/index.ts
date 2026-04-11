@@ -10,6 +10,7 @@ import { setupSshHandlers } from './sshHandlers';
 import { setupRdpHandlers } from './rdpHandlers';
 import { registerCommunityAuthHandlers } from './communityAuthHandlers';
 import { registerCommunityAdminHandlers } from './communityAdminHandlers';
+import { registerCommunityFilesHandlers } from './communityFilesHandlers';
 
 /**
  * Setup all IPC handlers
@@ -26,6 +27,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   setupRdpHandlers();
   registerCommunityAuthHandlers();
   registerCommunityAdminHandlers();
+  registerCommunityFilesHandlers();
 }
 
 export * from './filesystemHandlers';

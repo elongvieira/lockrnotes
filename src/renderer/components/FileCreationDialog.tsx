@@ -25,12 +25,14 @@ interface FileCreationDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (fileData: FileCreationData) => void;
+  isRemote?: boolean;
 }
 
 export default function FileCreationDialog({
   open,
   onClose,
   onConfirm,
+  isRemote,
 }: FileCreationDialogProps) {
   const { t } = useTranslation();
   const [filename, setFilename] = useState<string>('');
@@ -130,19 +132,21 @@ export default function FileCreationDialog({
       const finalFilename = `${cleanName}${extension}`;
 
       try {
-        const notesDir = await fileSystemService.getDefaultNotesDirectory();
-        const exists = await fileSystemService.itemExists(
-          notesDir,
-          finalFilename,
-        );
-        if (exists) {
-          setErrors((prev) => ({
-            ...prev,
-            filename:
-              t('dialog.file.errors.fileExists') ||
-              'A file with that name already exists',
-          }));
-          return;
+        if (!isRemote) {
+          const notesDir = await fileSystemService.getDefaultNotesDirectory();
+          const exists = await fileSystemService.itemExists(
+            notesDir,
+            finalFilename,
+          );
+          if (exists) {
+            setErrors((prev) => ({
+              ...prev,
+              filename:
+                t('dialog.file.errors.fileExists') ||
+                'A file with that name already exists',
+            }));
+            return;
+          }
         }
 
         const fileData: FileCreationData = {

@@ -5,6 +5,8 @@ import type {
   FileTemplate,
   FileCreationService,
 } from '../types/fileCreation';
+import { LocalFileCreator } from './LocalFileCreator';
+import { RemoteFileCreator } from './RemoteFileCreator';
 
 class FileCreationServiceImpl implements FileCreationService {
   private templates: Record<string, FileTemplate> = {
@@ -76,12 +78,10 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
     originalExtension?: string;
   }> {
     try {
-      // Validate input
       if (!targetPath || !fileData.filename.trim()) {
         throw new Error('Invalid target path or filename');
       }
 
-      // Get template for file type
       const template = this.templates[fileData.type];
       if (!template) {
         throw new Error(`Unsupported file type: ${fileData.type}`);
@@ -93,85 +93,22 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       let filename = `${cleanFilename}${originalExtension}`;
       let content = template.generateContent(cleanFilename);
 
-      // Handle managed encryption
-      if (fileData.encrypted && fileData.encryptionType === 'managed') {
-        try {
-          // Altera extensão baseada no tipo original ANTES de criptografar
-          const encryptedExtension =
-            this.getEncryptedExtension(originalExtension);
-          filename = `${cleanFilename}${encryptedExtension}`;
-
-          // Calcula o caminho final do arquivo
-          const filePath = await joinPath(targetPath, filename);
-
-          // Criptografa o conteúdo usando o caminho final
-          const encryptedData = await window.encryptionAPI.encryptContent(
-            content,
-            filePath,
-            originalExtension,
-          );
-
-          // No immediate verification in production
-
-          // Conteúdo vira JSON com dados criptografados
-          content = JSON.stringify(encryptedData, null, 2);
-        } catch (error) {
-          console.error('Encryption failed:', error);
-          throw new Error('Failed to encrypt file');
-        }
-      } else if (fileData.encrypted && fileData.encryptionType === 'manual') {
-        // Manual encryption with user password
-        if (!fileData.password) {
-          throw new Error('Password is required for manual encryption');
-        }
-
-        try {
-          // Keep the encrypted extension for manual encryption
-          const encryptedExtension =
-            this.getEncryptedExtension(originalExtension);
-          filename = `${cleanFilename}${encryptedExtension}`;
-
-          // Encrypt content with user password
-          const result = await window.manualEncryptionAPI.encryptContent(
-            content,
-            fileData.password,
-            originalExtension,
-          );
-
-          if (!result.success || !result.data) {
-            throw new Error(result.error || 'Encryption failed');
-          }
-
-          // Content becomes JSON with encrypted data
-          content = JSON.stringify(result.data, null, 2);
-        } catch (error) {
-          console.error('Manual encryption failed:', error);
-          throw new Error('Failed to encrypt file with password');
-        }
+      let strategy: import('../types/fileCreation').FileCreatorStrategy;
+      if (targetPath === 'remote') {
+        strategy = new RemoteFileCreator();
+      } else {
+        strategy = new LocalFileCreator();
       }
 
-      // Create file path
-      const filePath = await joinPath(targetPath, filename);
-
-      // Create the file
-      const success = await fileSystemService.createFile(filePath, content);
-
-      if (!success) {
-        throw new Error('Failed to create file');
-      }
-
-      return {
-        success: true,
+      return await strategy.createFile(
+        targetPath,
+        fileData,
         filename,
-        filePath,
-        password:
-          fileData.encrypted && fileData.encryptionType === 'manual'
-            ? fileData.password
-            : undefined,
+        content,
         originalExtension,
-      };
+        this.getEncryptedExtension.bind(this)
+      );
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('Error in FileCreationServiceImpl.createFile:', error);
       return { success: false };
     }

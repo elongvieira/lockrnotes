@@ -4,11 +4,29 @@ export interface FileCreationData {
   encrypted: boolean;
   encryptionType?: 'managed' | 'manual';
   password?: string;
+  parentId?: string;
 }
 
 export interface FileTemplate {
   extension: string;
   generateContent: (filename: string, data?: any) => string;
+}
+
+export interface FileCreatorStrategy {
+  createFile(
+    targetPath: string,
+    fileData: FileCreationData,
+    filename: string,
+    content: string,
+    originalExtension: string,
+    getEncryptedExtension: (ext: string) => string
+  ): Promise<{
+    success: boolean;
+    filename?: string;
+    filePath?: string;
+    password?: string;
+    originalExtension?: string;
+  }>;
 }
 
 export interface FileCreationService {
