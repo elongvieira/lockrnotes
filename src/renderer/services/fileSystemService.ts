@@ -5,19 +5,27 @@ import {
 } from '../types/filesystem';
 import { LocalFileSystemProvider } from './LocalFileSystemProvider';
 import { RemoteFileSystemProvider } from './RemoteFileSystemProvider';
+import { VaultFileSystemProvider } from './VaultFileSystemProvider';
 
 class FileSystemDispatcher implements FileSystemService {
   private localProvider = new LocalFileSystemProvider();
   private remoteProvider = new RemoteFileSystemProvider();
+  private vaultProvider = new VaultFileSystemProvider();
 
   private getProvider(path?: string): FileSystemService {
     if (path && path.startsWith('remote://')) {
       return this.remoteProvider;
     }
+    if (path && path.startsWith('vault://')) {
+      return this.vaultProvider;
+    }
     return this.localProvider;
   }
 
-  async readDirectory(path: string, options?: DirectoryReadOptions): Promise<FileSystemItem[]> {
+  async readDirectory(
+    path: string,
+    options?: DirectoryReadOptions,
+  ): Promise<FileSystemItem[]> {
     return this.getProvider(path).readDirectory(path, options);
   }
 
@@ -43,7 +51,12 @@ class FileSystemDispatcher implements FileSystemService {
     isEncrypted: boolean,
     originalExtension?: string,
   ): Promise<boolean> {
-    return this.getProvider(path).saveFileWithEncryption(path, content, isEncrypted, originalExtension);
+    return this.getProvider(path).saveFileWithEncryption(
+      path,
+      content,
+      isEncrypted,
+      originalExtension,
+    );
   }
 
   async readFile(path: string): Promise<string | null> {
@@ -70,7 +83,9 @@ class FileSystemDispatcher implements FileSystemService {
     return items.map((item) => ({
       itemId: item.id,
       label: item.name,
-      children: item.children ? this.convertToTreeItems(item.children) : undefined,
+      children: item.children
+        ? this.convertToTreeItems(item.children)
+        : undefined,
     }));
   }
 
@@ -82,7 +97,9 @@ class FileSystemDispatcher implements FileSystemService {
     return this.localProvider.updateConfig(updates);
   }
 
-  async decryptFile(filePath: string): Promise<{ success: boolean; fileName?: string; error?: string }> {
+  async decryptFile(
+    filePath: string,
+  ): Promise<{ success: boolean; fileName?: string; error?: string }> {
     try {
       const result = await window.electron.filesystem.decryptFile(filePath);
       return {
@@ -99,7 +116,10 @@ class FileSystemDispatcher implements FileSystemService {
     }
   }
 
-  async copyFolderContent(sourceDir: string, destDir: string): Promise<boolean> {
+  async copyFolderContent(
+    sourceDir: string,
+    destDir: string,
+  ): Promise<boolean> {
     return this.getProvider(sourceDir).copyFolderContent(sourceDir, destDir);
   }
 }

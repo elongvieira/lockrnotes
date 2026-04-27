@@ -22,7 +22,8 @@
       "aria": "Sidebar Tabs",
       "local": "Local",
       "files": "Files",
-      "remote": "Remote"
+      "remote": "Remote",
+      "vault": "Vault"
     },
     "local": {
       "content": "This is the local notes area. Select or create a note to start editing."
@@ -476,6 +477,81 @@
           "removeMemberFailed": "Failed to remove member"
         }
       }
+    }
+  },
+  "vault": {
+    "loginButton": "Connect",
+    "notConnected": "Connect to a Vault server to access secrets.",
+    "loginDialog": {
+      "title": "Connect to Vault",
+      "host": "Host / IP",
+      "port": "Port",
+      "token": "Token",
+      "connect": "Connect",
+      "cancel": "Cancel",
+      "connecting": "Connecting...",
+      "errors": {
+        "hostRequired": "Host is required",
+        "tokenRequired": "Token is required",
+        "invalidPort": "Port must be between 1 and 65535",
+        "connectionFailed": "Failed to connect to Vault"
+      }
+    },
+    "sidebar": {
+      "title": "Secrets"
+    },
+    "actions": {
+      "createSecret": "Create secret"
+    },
+    "dialog": {
+      "secretName": "Secret Name",
+      "types": {
+        "default": {
+          "name": "Vault Default",
+          "description": "Standard Vault secret using simple key-value pairs."
+        },
+        "json": {
+          "name": "JSON Pattern (Advanced)",
+          "description": "Allows advanced entries like SSH keys, RDP servers, and more structured options."
+        }
+      }
+    },
+    "chip": {
+      "tooltip": "Vault connected",
+      "disconnect": "Disconnect from Vault"
+    },
+    "logoutDialog": {
+      "title": "Disconnect from Vault",
+      "message": "Are you sure you want to disconnect from Vault?"
+    },
+    "errors": {
+      "loadFailed": "Failed to load secrets",
+      "readFailed": "Failed to read secret",
+      "saveFailed": "Failed to save secret"
+    },
+    "editor": {
+      "title": "Vault Editor",
+      "caption": "Sensitive fields stay hidden by default and can be copied individually.",
+      "defaultPath": "Vault Secret",
+      "search": "Search in this secret...",
+      "showPasswords": "Show passwords",
+      "hidePasswords": "Hide passwords",
+      "showField": "Show field",
+      "hideField": "Hide field",
+      "copyField": "Copy field",
+      "copyError": "Failed to copy field",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "actions": "Actions",
+      "emptyTitle": "No fields yet. Click \"Add Field\" to start.",
+      "emptyText": "Add key-value pairs to store credentials, tokens, or any Vault secret data.",
+      "noResultsTitle": "No results found",
+      "noResultsText": "Adjust your search to find a specific field.",
+      "addField": "Add Field",
+      "keyLabel": "Key",
+      "valueLabel": "Value",
+      "deleteField": "Delete field",
+      "deleteConfirm": "Delete field \"{key}\"?"
     }
   }
 }

@@ -22,7 +22,8 @@
       "aria": "Abas da barra lateral",
       "local": "Local",
       "files": "Arquivos",
-      "remote": "Remoto"
+      "remote": "Remoto",
+      "vault": "Vault"
     },
     "local": {
       "content": "Esta é a área de notas locais. Selecione ou crie uma nota para começar a editar."
@@ -474,6 +475,81 @@
           "removeMemberFailed": "Falha ao remover membro"
         }
       }
+    }
+  },
+  "vault": {
+    "loginButton": "Conectar",
+    "notConnected": "Conecte-se a um servidor Vault para acessar segredos.",
+    "loginDialog": {
+      "title": "Conectar ao Vault",
+      "host": "Host / IP",
+      "port": "Porta",
+      "token": "Token",
+      "connect": "Conectar",
+      "cancel": "Cancelar",
+      "connecting": "Conectando...",
+      "errors": {
+        "hostRequired": "Host é obrigatório",
+        "tokenRequired": "Token é obrigatório",
+        "invalidPort": "A porta deve estar entre 1 e 65535",
+        "connectionFailed": "Falha ao conectar ao Vault"
+      }
+    },
+    "sidebar": {
+      "title": "Segredos"
+    },
+    "actions": {
+      "createSecret": "Criar segredo"
+    },
+    "dialog": {
+      "secretName": "Nome do Segredo",
+      "types": {
+        "default": {
+          "name": "Padrão do Vault",
+          "description": "Segredo padrão do Vault usando pares de chave-valor simples."
+        },
+        "json": {
+          "name": "Padrão JSON (Avançado)",
+          "description": "Permite entradas avançadas como chaves SSH, servidores RDP e mais opções estruturadas."
+        }
+      }
+    },
+    "chip": {
+      "tooltip": "Vault conectado",
+      "disconnect": "Desconectar do Vault"
+    },
+    "logoutDialog": {
+      "title": "Desconectar do Vault",
+      "message": "Tem certeza que deseja desconectar do Vault?"
+    },
+    "errors": {
+      "loadFailed": "Falha ao carregar segredos",
+      "readFailed": "Falha ao ler segredo",
+      "saveFailed": "Falha ao salvar segredo"
+    },
+    "editor": {
+      "title": "Editor Vault",
+      "caption": "Campos sensiveis ficam ocultos por padrao e podem ser copiados individualmente.",
+      "defaultPath": "Segredo Vault",
+      "search": "Pesquisar neste segredo...",
+      "showPasswords": "Mostrar senhas",
+      "hidePasswords": "Ocultar senhas",
+      "showField": "Mostrar campo",
+      "hideField": "Ocultar campo",
+      "copyField": "Copiar campo",
+      "copyError": "Falha ao copiar campo",
+      "moveUp": "Mover para cima",
+      "moveDown": "Mover para baixo",
+      "actions": "Ações",
+      "emptyTitle": "Nenhum campo ainda. Clique em \"Adicionar campo\" para começar.",
+      "emptyText": "Adicione pares chave-valor para armazenar credenciais, tokens ou qualquer dado do Vault.",
+      "noResultsTitle": "Nenhum resultado encontrado",
+      "noResultsText": "Ajuste a pesquisa para encontrar um campo específico.",
+      "addField": "Adicionar campo",
+      "keyLabel": "Chave",
+      "valueLabel": "Valor",
+      "deleteField": "Excluir campo",
+      "deleteConfirm": "Excluir o campo \"{key}\"?"
     }
   }
 }

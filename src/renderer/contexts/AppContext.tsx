@@ -69,6 +69,16 @@ interface AppContextType {
     s: { host: string; port: number; email: string; isAdmin: boolean } | null,
   ) => void;
 
+  // Vault session
+  vaultSession: {
+    host: string;
+    port: number;
+    mountPath: string;
+  } | null;
+  setVaultSession: (
+    s: { host: string; port: number; mountPath: string } | null,
+  ) => void;
+
   // Notifications
   showNotification: (
     message: string,
@@ -140,6 +150,13 @@ export function AppProvider({ children }: AppProviderProps) {
     isAdmin: boolean;
   } | null>(null);
 
+  // Vault session state
+  const [vaultSession, setVaultSession] = useState<{
+    host: string;
+    port: number;
+    mountPath: string;
+  } | null>(null);
+
   // Save pulse state
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
 
@@ -169,6 +186,8 @@ export function AppProvider({ children }: AppProviderProps) {
       triggerSavePulse,
       communitySession,
       setCommunitySession,
+      vaultSession,
+      setVaultSession,
     }),
     [
       currentFile,
@@ -180,6 +199,7 @@ export function AppProvider({ children }: AppProviderProps) {
       isEncrypted,
       lastSavedAt,
       communitySession,
+      vaultSession,
     ],
   );
 

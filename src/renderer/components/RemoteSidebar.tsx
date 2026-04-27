@@ -30,6 +30,7 @@ import FileCreationDialog from './FileCreationDialog';
 import RenameDialog from './RenameDialog';
 import ConfirmDialog from './ConfirmDialog';
 import PasswordDialog from './PasswordDialog';
+import TreeItemLabel from './TreeItemLabel';
 import { dialogStyles } from '../styles/dialogStyles';
 
 interface RemoteFile {
@@ -58,12 +59,14 @@ export default function RemoteSidebar() {
     setTabs,
     setActiveTab,
   } = useAppContext();
-  
+
   const [loginOpen, setLoginOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<RemoteFile[]>([]);
   const [treeData, setTreeData] = useState<RemoteFileSystemItem[]>([]);
-  const [expandedItems, setExpandedItems] = useState<string[]>(['meus-arquivos']);
+  const [expandedItems, setExpandedItems] = useState<string[]>([
+    'meus-arquivos',
+  ]);
   const expandedItemsRef = useRef<string[]>(['meus-arquivos']);
 
   useEffect(() => {
@@ -73,7 +76,9 @@ export default function RemoteSidebar() {
   // Dialogs
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
-  const [targetFolderId, setTargetFolderId] = useState<string | undefined>(undefined);
+  const [targetFolderId, setTargetFolderId] = useState<string | undefined>(
+    undefined,
+  );
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [itemToRename, setItemToRename] = useState<FileSystemItem | null>(null);
@@ -97,56 +102,67 @@ export default function RemoteSidebar() {
     item: FileSystemItem | null;
   } | null>(null);
 
-  const handleLoginSuccess = (session: { host: string; port: number; email: string; isAdmin: boolean }) => {
+  const handleLoginSuccess = (session: {
+    host: string;
+    port: number;
+    email: string;
+    isAdmin: boolean;
+  }) => {
     setCommunitySession(session);
     setLoginOpen(false);
   };
 
-  const loadFiles = useCallback(async (preserveExpanded = false) => {
-    if (!communitySession) return;
-    setLoading(true);
-    try {
-      const result = await window.communityFilesAPI.getFiles();
-      if (result.success && result.data) {
-        let newFiles = result.data;
-        if (preserveExpanded) {
-          const promises = expandedItemsRef.current
-            .filter(id => id !== 'meus-arquivos' && !String(id).startsWith('loading'))
-            .map(id => window.communityFilesAPI.getFiles(id));
-          
-          const results = await Promise.all(promises);
-          for (const res of results) {
-            if (res.success && res.data) {
-              newFiles = [...newFiles, ...res.data];
+  const loadFiles = useCallback(
+    async (preserveExpanded = false) => {
+      if (!communitySession) return;
+      setLoading(true);
+      try {
+        const result = await window.communityFilesAPI.getFiles();
+        if (result.success && result.data) {
+          let newFiles = result.data;
+          if (preserveExpanded) {
+            const promises = expandedItemsRef.current
+              .filter(
+                (id) =>
+                  id !== 'meus-arquivos' && !String(id).startsWith('loading'),
+              )
+              .map((id) => window.communityFilesAPI.getFiles(id));
+
+            const results = await Promise.all(promises);
+            for (const res of results) {
+              if (res.success && res.data) {
+                newFiles = [...newFiles, ...res.data];
+              }
             }
+            setFiles(newFiles);
+          } else {
+            setFiles(result.data);
+            setExpandedItems(['meus-arquivos']);
           }
-          setFiles(newFiles);
         } else {
-          setFiles(result.data);
-          setExpandedItems(['meus-arquivos']);
+          showNotification('Failed to load remote files', 'error');
         }
-      } else {
-        showNotification('Failed to load remote files', 'error');
+      } catch (err) {
+        console.error(err);
+        showNotification('Error loading remote files', 'error');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-      showNotification('Error loading remote files', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [communitySession, showNotification]);
+    },
+    [communitySession, showNotification],
+  );
 
   // Build tree data whenever files change
   useEffect(() => {
     const buildTree = (allFiles: RemoteFile[]) => {
       const itemMap = new Map<string, RemoteFileSystemItem>();
-      
+
       // Init mapped objects
-      allFiles.forEach(f => {
+      allFiles.forEach((f) => {
         let extension = '';
         if (f.type === 'file') {
-           const dotIdx = f.name.lastIndexOf('.');
-           if (dotIdx >= 0) extension = f.name.substring(dotIdx);
+          const dotIdx = f.name.lastIndexOf('.');
+          if (dotIdx >= 0) extension = f.name.substring(dotIdx);
         }
         itemMap.set(f.id, {
           id: f.id,
@@ -155,13 +171,18 @@ export default function RemoteSidebar() {
           type: f.type === 'folder' ? 'directory' : 'file',
           extension,
           childrenCount: f.childrenCount,
-          children: f.type === 'folder' ? (f.childrenCount > 0 ? [] : undefined) : undefined
+          children:
+            f.type === 'folder'
+              ? f.childrenCount > 0
+                ? []
+                : undefined
+              : undefined,
         });
       });
 
       const rootChildren: RemoteFileSystemItem[] = [];
 
-      allFiles.forEach(f => {
+      allFiles.forEach((f) => {
         const item = itemMap.get(f.id)!;
         if (f.parentId && itemMap.has(f.parentId)) {
           const parentItem = itemMap.get(f.parentId)!;
@@ -177,7 +198,7 @@ export default function RemoteSidebar() {
         name: 'Meus Arquivos',
         path: 'remote://root',
         type: 'directory',
-        children: rootChildren
+        children: rootChildren,
       };
 
       setTreeData([meusArquivos]);
@@ -194,14 +215,16 @@ export default function RemoteSidebar() {
   }, [communitySession]);
 
   const fetchFolderContents = async (folderId: string) => {
-    if (files.some(f => f.parentId === folderId)) return; // already fetched
+    if (files.some((f) => f.parentId === folderId)) return; // already fetched
 
     try {
       // getFiles already accepts a parentId to fetch folder contents
       const result = await window.communityFilesAPI.getFiles(folderId);
       if (result.success && result.data) {
-        setFiles(prev => {
-          const newFiles = result.data.filter((newFile: RemoteFile) => !prev.some(f => f.id === newFile.id));
+        setFiles((prev) => {
+          const newFiles = result.data.filter(
+            (newFile: RemoteFile) => !prev.some((f) => f.id === newFile.id),
+          );
           return [...prev, ...newFiles];
         });
       }
@@ -210,14 +233,22 @@ export default function RemoteSidebar() {
     }
   };
 
-  const handleExpandedItemsChange = async (_event: React.SyntheticEvent | null, itemIds: string[]) => {
+  const handleExpandedItemsChange = async (
+    _event: React.SyntheticEvent | null,
+    itemIds: string[],
+  ) => {
     setExpandedItems(itemIds);
-    
+
     // Check if new folders were expanded
     for (const folderId of itemIds) {
-      if (folderId === 'meus-arquivos' || folderId === 'loading' || folderId === 'empty') continue;
-      
-      const item = files.find(f => f.id === folderId);
+      if (
+        folderId === 'meus-arquivos' ||
+        folderId === 'loading' ||
+        folderId === 'empty'
+      )
+        continue;
+
+      const item = files.find((f) => f.id === folderId);
       if (item && item.type === 'folder' && item.childrenCount > 0) {
         await fetchFolderContents(folderId);
       }
@@ -249,17 +280,23 @@ export default function RemoteSidebar() {
       const result = await window.communityFilesAPI.createFile({
         name: folderName,
         type: 'folder',
-        parentId: targetFolderId
+        parentId: targetFolderId,
       });
       if (result.success) {
         showNotification(t('notifications.folderCreated'), 'success');
         await loadFiles(true);
       } else {
-        showNotification(t('notifications.folderCreationError') || 'Error creating folder', 'error');
+        showNotification(
+          t('notifications.folderCreationError') || 'Error creating folder',
+          'error',
+        );
       }
     } catch (err) {
-       console.error(err);
-       showNotification(t('notifications.folderCreationError') || 'Error creating folder', 'error');
+      console.error(err);
+      showNotification(
+        t('notifications.folderCreationError') || 'Error creating folder',
+        'error',
+      );
     }
     setFolderDialogOpen(false);
   };
@@ -272,11 +309,14 @@ export default function RemoteSidebar() {
         showNotification(t('notifications.fileCreated'), 'success');
         await loadFiles(true);
       } else {
-        showNotification(t('notifications.fileCreationError') || 'Error creating file', 'error');
+        showNotification(
+          t('notifications.fileCreationError') || 'Error creating file',
+          'error',
+        );
       }
     } catch (error) {
-       console.error('Error creating file:', error);
-       showNotification(t('notifications.fileCreationError'), 'error');
+      console.error('Error creating file:', error);
+      showNotification(t('notifications.fileCreationError'), 'error');
     }
     setFileDialogOpen(false);
   };
@@ -321,7 +361,10 @@ export default function RemoteSidebar() {
 
   // ---------------- File Actions ----------------
   const handleFileClick = async (itemId: string) => {
-    const findItem = (items: FileSystemItem[], id: string): FileSystemItem | null => {
+    const findItem = (
+      items: FileSystemItem[],
+      id: string,
+    ): FileSystemItem | null => {
       for (const item of items) {
         if (item.id === id) return item;
         if (item.children) {
@@ -346,7 +389,7 @@ export default function RemoteSidebar() {
 
       let content = rawContent;
       let originalExtension = item.extension;
-      
+
       const isPlainTxt = item.name.toLowerCase().endsWith('.txt');
       const isPlainJson = item.name.toLowerCase().endsWith('.json');
       const isEncLtxt = item.name.toLowerCase().endsWith('.ltxt');
@@ -365,22 +408,29 @@ export default function RemoteSidebar() {
 
       if (isEncrypted) {
         try {
-          const looksEncrypted = await window.encryptionAPI.isContentEncrypted(rawContent);
+          const looksEncrypted =
+            await window.encryptionAPI.isContentEncrypted(rawContent);
 
           if (looksEncrypted) {
             const encryptedData = JSON.parse(rawContent);
-            const decrypted = await window.encryptionAPI.decryptContent(encryptedData, absolutePath);
+            const decrypted = await window.encryptionAPI.decryptContent(
+              encryptedData,
+              absolutePath,
+            );
             content = decrypted;
             isFileEncrypted = true;
             if (encryptedData && encryptedData.originalExtension) {
-               originalExtension = encryptedData.originalExtension;
+              originalExtension = encryptedData.originalExtension;
             }
           }
 
-          const isManuallyEncrypted = await window.manualEncryptionAPI.isManuallyEncrypted(rawContent);
+          const isManuallyEncrypted =
+            await window.manualEncryptionAPI.isManuallyEncrypted(rawContent);
 
           if (isManuallyEncrypted) {
-            const existingTab = tabs.find((tab) => tab.filePath === absolutePath);
+            const existingTab = tabs.find(
+              (tab) => tab.filePath === absolutePath,
+            );
             if (existingTab) {
               setActiveTab(existingTab.id);
               return;
@@ -394,11 +444,14 @@ export default function RemoteSidebar() {
             });
             setPasswordError('');
             setPasswordDialogOpen(true);
-            return; 
+            return;
           }
 
           if (!looksEncrypted && !isManuallyEncrypted) {
-            showNotification('File is encrypted but payload is invalid', 'error');
+            showNotification(
+              'File is encrypted but payload is invalid',
+              'error',
+            );
             return;
           }
         } catch (decryptError: any) {
@@ -426,18 +479,24 @@ export default function RemoteSidebar() {
 
     try {
       const encryptedData = JSON.parse(pendingFileData.rawContent);
-      const result = await window.manualEncryptionAPI.decryptContent(encryptedData, password);
+      const result = await window.manualEncryptionAPI.decryptContent(
+        encryptedData,
+        password,
+      );
 
       if (!result.success) {
         setPasswordError('Wrong password. Please try again.');
-        return; 
+        return;
       }
 
       setPasswordDialogOpen(false);
       setPendingFileData(null);
       setPasswordError('');
 
-      const originalExt = (await window.manualEncryptionAPI.getOriginalExtension(pendingFileData.rawContent)) || pendingFileData.originalExtension;
+      const originalExt =
+        (await window.manualEncryptionAPI.getOriginalExtension(
+          pendingFileData.rawContent,
+        )) || pendingFileData.originalExtension;
 
       openFileInEditor(
         pendingFileData.absolutePath,
@@ -457,29 +516,41 @@ export default function RemoteSidebar() {
     if (!itemToRename) return { success: false };
 
     try {
-      const result = await window.communityFilesAPI.updateFile(itemToRename.id, { name: newName });
+      const result = await window.communityFilesAPI.updateFile(
+        itemToRename.id,
+        { name: newName },
+      );
       if (result.success) {
         const openTab = tabs.find((tab) => tab.filePath === itemToRename.path);
         if (openTab) {
           // If file is open, update tab
-          const newTabList = tabs.map(t => {
-             if (t.id === openTab.id) {
-               return { ...t, name: newName };
-             }
-             return t;
+          const newTabList = tabs.map((t) => {
+            if (t.id === openTab.id) {
+              return { ...t, name: newName };
+            }
+            return t;
           });
           setTabs(newTabList);
         }
 
-        showNotification(t('notifications.fileRenamed') || 'Item renamed', 'success');
+        showNotification(
+          t('notifications.fileRenamed') || 'Item renamed',
+          'success',
+        );
         await loadFiles(true);
         return { success: true };
       }
-      showNotification(t('notifications.fileRenameError') || 'Failed to rename item', 'error');
+      showNotification(
+        t('notifications.fileRenameError') || 'Failed to rename item',
+        'error',
+      );
       return { success: false };
     } catch (error) {
       console.error(error);
-      showNotification(t('notifications.fileRenameError') || 'Failed to rename item', 'error');
+      showNotification(
+        t('notifications.fileRenameError') || 'Failed to rename item',
+        'error',
+      );
       return { success: false };
     } finally {
       setRenameDialogOpen(false);
@@ -495,24 +566,36 @@ export default function RemoteSidebar() {
         // If open in tab, close it
         const openTab = tabs.find((tab) => tab.filePath === itemToDelete.path);
         if (openTab) {
-           setTabs((prev) => prev.filter((tab) => tab.id !== openTab.id));
+          setTabs((prev) => prev.filter((tab) => tab.id !== openTab.id));
         }
 
-        showNotification(t('notifications.fileDeleted') || 'Item deleted', 'success');
+        showNotification(
+          t('notifications.fileDeleted') || 'Item deleted',
+          'success',
+        );
         await loadFiles(true);
       } else {
-        showNotification(t('notifications.fileDeleteError') || 'Failed to delete item', 'error');
+        showNotification(
+          t('notifications.fileDeleteError') || 'Failed to delete item',
+          'error',
+        );
       }
     } catch (error) {
-       console.error('Delete error', error);
-       showNotification(t('notifications.fileDeleteError') || 'Failed to delete item', 'error');
+      console.error('Delete error', error);
+      showNotification(
+        t('notifications.fileDeleteError') || 'Failed to delete item',
+        'error',
+      );
     } finally {
       setDeleteConfirmOpen(false);
       setItemToDelete(null);
     }
   };
 
-  const renderTreeItems = (items: RemoteFileSystemItem[], depth = 0): React.ReactNode => {
+  const renderTreeItems = (
+    items: RemoteFileSystemItem[],
+    depth = 0,
+  ): React.ReactNode => {
     return items.map((item) => {
       const isDirectory = item.type === 'directory';
       const isRoot = item.id === 'meus-arquivos';
@@ -521,7 +604,9 @@ export default function RemoteSidebar() {
       ) : isDirectory ? (
         <FolderIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
       ) : (
-        <InsertDriveFileIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
+        <InsertDriveFileIcon
+          sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }}
+        />
       );
 
       return (
@@ -529,70 +614,68 @@ export default function RemoteSidebar() {
           key={item.id}
           itemId={item.id}
           label={
-            <Box
-              onContextMenu={isRoot ? undefined : (e) => handleContextMenu(e, item)}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                paddingLeft: `${depth * 10}px`,
-                width: '100%',
-                '&:hover .folder-actions': {
-                  opacity: 1,
-                },
-              }}
-            >
-              {icon}
-              <Box sx={{ flexGrow: 1, fontWeight: isRoot ? 'bold' : 'normal' }}>{item.name}</Box>
-              {isDirectory && (
-                <Box
-                  className="folder-actions"
-                  sx={{
-                    opacity: 0,
-                    transition: 'opacity 0.2s',
-                    display: 'flex',
-                    gap: 0.5,
-                    mr: 1,
-                  }}
-                >
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCreateFolderInPath(item.id);
-                    }}
+            <TreeItemLabel
+              icon={icon}
+              name={item.name}
+              depth={depth}
+              isBold={isRoot}
+              onContextMenu={
+                isRoot ? undefined : (e) => handleContextMenu(e, item)
+              }
+              actions={
+                isDirectory ? (
+                  <Box
+                    className="folder-actions"
                     sx={{
-                      padding: '2px',
-                      color: '#4da6ff',
-                      '&:hover': {
-                        backgroundColor: 'rgba(77, 166, 255, 0.1)',
-                        color: '#3399ff',
-                      },
+                      opacity: 0,
+                      transition: 'opacity 0.2s',
+                      display: 'flex',
+                      gap: 0.5,
+                      mr: 1,
                     }}
-                    title={t('sidebar.actions.createFolder') || 'Create folder'}
                   >
-                    <CreateNewFolderIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCreateFileInPath(item.id);
-                    }}
-                    sx={{
-                      padding: '2px',
-                      color: '#4da6ff',
-                      '&:hover': {
-                        backgroundColor: 'rgba(77, 166, 255, 0.1)',
-                        color: '#3399ff',
-                      },
-                    }}
-                    title={t('sidebar.actions.createFile') || 'Create file'}
-                  >
-                    <NoteAddIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Box>
-              )}
-            </Box>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateFolderInPath(item.id);
+                      }}
+                      sx={{
+                        padding: '2px',
+                        color: '#4da6ff',
+                        '&:hover': {
+                          backgroundColor: 'rgba(77, 166, 255, 0.1)',
+                          color: '#3399ff',
+                        },
+                      }}
+                      title={
+                        t('sidebar.actions.createFolder') || 'Create folder'
+                      }
+                    >
+                      <CreateNewFolderIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateFileInPath(item.id);
+                      }}
+                      sx={{
+                        padding: '2px',
+                        color: '#4da6ff',
+                        '&:hover': {
+                          backgroundColor: 'rgba(77, 166, 255, 0.1)',
+                          color: '#3399ff',
+                        },
+                      }}
+                      title={t('sidebar.actions.createFile') || 'Create file'}
+                    >
+                      <NoteAddIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Box>
+                ) : undefined
+              }
+            />
           }
           sx={{
             '& .MuiTreeItem-content': {
@@ -600,11 +683,14 @@ export default function RemoteSidebar() {
             },
           }}
         >
-          {item.children && item.children.length > 0
-            ? renderTreeItems(item.children, depth + 1)
-            : item.childrenCount && item.childrenCount > 0
-              ? <TreeItem itemId={`loading-${item.id}`} label={t('sidebar.tree.loading') || 'Loading...'} />
-              : null}
+          {item.children && item.children.length > 0 ? (
+            renderTreeItems(item.children, depth + 1)
+          ) : item.childrenCount && item.childrenCount > 0 ? (
+            <TreeItem
+              itemId={`loading-${item.id}`}
+              label={t('sidebar.tree.loading') || 'Loading...'}
+            />
+          ) : null}
         </TreeItem>
       );
     });
@@ -614,16 +700,38 @@ export default function RemoteSidebar() {
   if (!communitySession) {
     return (
       <>
-        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 2 }}>
+        <Box
+          sx={{
+            p: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            mt: 2,
+          }}
+        >
           <CloudIcon sx={{ fontSize: 56, color: 'var(--primary-blue)' }} />
-          <Typography variant="body2" sx={{ color: 'var(--text-secondary)', textAlign: 'center' }}>
-            {t('community.notConnected') || 'Connect to a community server to access shared notes.'}
+          <Typography
+            variant="body2"
+            sx={{ color: 'var(--text-secondary)', textAlign: 'center' }}
+          >
+            {t('community.notConnected') ||
+              'Connect to a community server to access shared notes.'}
           </Typography>
-          <Button variant="contained" size="small" onClick={() => setLoginOpen(true)} sx={{ textTransform: 'none' }}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setLoginOpen(true)}
+            sx={{ textTransform: 'none' }}
+          >
             {t('community.loginButton') || 'Connect'}
           </Button>
         </Box>
-        <CommunityLoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} onSuccess={handleLoginSuccess} />
+        <CommunityLoginDialog
+          open={loginOpen}
+          onClose={() => setLoginOpen(false)}
+          onSuccess={handleLoginSuccess}
+        />
       </>
     );
   }
@@ -633,15 +741,28 @@ export default function RemoteSidebar() {
       <div className="files-card-header">
         <h4>{t('sidebar.tabs.files')}</h4>
         <div className="header-actions">
-           <IconButton size="small" title={t('sidebar.actions.createFolder') || 'Create folder'} onClick={handleCreateFolder}>
-              <CreateNewFolderIcon fontSize="small" />
-           </IconButton>
-           <IconButton size="small" title={t('sidebar.actions.createFile') || 'Create file'} onClick={handleCreateFile}>
-              <NoteAddIcon fontSize="small" />
-           </IconButton>
-           <IconButton size="small" title={t('sidebar.actions.refresh') || 'Refresh'} disabled={loading} onClick={() => loadFiles(false)}>
-              <RefreshIcon fontSize="small" />
-           </IconButton>
+          <IconButton
+            size="small"
+            title={t('sidebar.actions.createFolder') || 'Create folder'}
+            onClick={handleCreateFolder}
+          >
+            <CreateNewFolderIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            title={t('sidebar.actions.createFile') || 'Create file'}
+            onClick={handleCreateFile}
+          >
+            <NoteAddIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            title={t('sidebar.actions.refresh') || 'Refresh'}
+            disabled={loading}
+            onClick={() => loadFiles(false)}
+          >
+            <RefreshIcon fontSize="small" />
+          </IconButton>
         </div>
       </div>
       <div className="tree-container">
@@ -655,7 +776,10 @@ export default function RemoteSidebar() {
           sx={{ flex: 1, overflow: 'auto', ...dialogStyles.scrollbar }}
         >
           {loading && treeData.length === 0 ? (
-            <TreeItem itemId="loading" label={t('sidebar.tree.loading') || 'Loading...'} />
+            <TreeItem
+              itemId="loading"
+              label={t('sidebar.tree.loading') || 'Loading...'}
+            />
           ) : (
             renderTreeItems(treeData)
           )}
@@ -667,7 +791,7 @@ export default function RemoteSidebar() {
         onClose={() => setFolderDialogOpen(false)}
         onConfirm={handleFolderDialogConfirm}
       />
-      
+
       <FileCreationDialog
         open={fileDialogOpen}
         onClose={() => setFileDialogOpen(false)}
@@ -687,19 +811,19 @@ export default function RemoteSidebar() {
         slotProps={{ paper: { className: 'app-menu-paper' } }}
       >
         <MenuItem onClick={handleContextMenuOpen} className="app-menu-item">
-          <ListItemIcon className="app-menu-icon" sx={{minWidth: '32px'}}>
+          <ListItemIcon className="app-menu-icon" sx={{ minWidth: '32px' }}>
             <OpenInNewIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('contextMenu.open')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleContextMenuRename} className="app-menu-item">
-          <ListItemIcon className="app-menu-icon" sx={{minWidth: '32px'}}>
+          <ListItemIcon className="app-menu-icon" sx={{ minWidth: '32px' }}>
             <EditIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('contextMenu.rename')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleContextMenuDelete} className="app-menu-item">
-          <ListItemIcon className="app-menu-icon" sx={{minWidth: '32px'}}>
+          <ListItemIcon className="app-menu-icon" sx={{ minWidth: '32px' }}>
             <DeleteIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('contextMenu.delete')}</ListItemText>
@@ -708,11 +832,18 @@ export default function RemoteSidebar() {
 
       <RenameDialog
         open={renameDialogOpen}
-        onClose={() => { setRenameDialogOpen(false); setItemToRename(null); }}
+        onClose={() => {
+          setRenameDialogOpen(false);
+          setItemToRename(null);
+        }}
         onConfirm={handleRenameDialogConfirm}
         currentName={itemToRename?.name || ''}
         itemType={itemToRename?.type === 'directory' ? 'folder' : 'file'}
-        isFileOpen={itemToRename ? tabs.some((tab) => tab.filePath === itemToRename.path) : false}
+        isFileOpen={
+          itemToRename
+            ? tabs.some((tab) => tab.filePath === itemToRename.path)
+            : false
+        }
       />
 
       <ConfirmDialog
@@ -722,12 +853,19 @@ export default function RemoteSidebar() {
         confirmLabel={t('dialog.actions.delete')}
         cancelLabel={t('dialog.actions.cancel')}
         onConfirm={handleDeleteConfirmProceed}
-        onClose={() => { setDeleteConfirmOpen(false); setItemToDelete(null); }}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setItemToDelete(null);
+        }}
       />
 
       <PasswordDialog
         open={passwordDialogOpen}
-        onClose={() => { setPasswordDialogOpen(false); setPendingFileData(null); setPasswordError(''); }}
+        onClose={() => {
+          setPasswordDialogOpen(false);
+          setPendingFileData(null);
+          setPasswordError('');
+        }}
         onConfirm={handlePasswordConfirm}
         filename={pendingFileData?.item.name}
         error={passwordError}

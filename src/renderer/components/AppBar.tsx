@@ -15,6 +15,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloudIcon from '@mui/icons-material/Cloud';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
 import HotCopyBar from './HotCopyBar';
@@ -29,8 +30,13 @@ import './AppBar.css';
 
 export default function AppBar() {
   const { t, i18n } = useTranslation();
-  const { refreshSidebar, communitySession, setCommunitySession } =
-    useAppContext();
+  const {
+    refreshSidebar,
+    communitySession,
+    setCommunitySession,
+    vaultSession,
+    setVaultSession,
+  } = useAppContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hotCopyManageOpen, setHotCopyManageOpen] = useState(false);
   const [hotCopyItems, setHotCopyItems] = useState<HotCopyItem[]>([]);
@@ -40,6 +46,7 @@ export default function AppBar() {
   const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
   const [adminOpen, setAdminOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [vaultLogoutConfirmOpen, setVaultLogoutConfirmOpen] = useState(false);
 
   // Load persisted community session on mount
   useEffect(() => {
@@ -52,11 +59,32 @@ export default function AppBar() {
       .catch(() => {});
   }, [setCommunitySession]);
 
+  // Load persisted vault session on mount
+  useEffect(() => {
+    window.vaultAPI
+      ?.getSession()
+      .then((res) => {
+        if (res.success && res.session) setVaultSession(res.session);
+        return res;
+      })
+      .catch(() => {});
+  }, [setVaultSession]);
+
   const handleCommunityLogout = async () => {
     try {
       await window.communityAuthAPI?.logout();
       setCommunitySession(null);
       setLogoutConfirmOpen(false);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleVaultLogout = async () => {
+    try {
+      await window.vaultAPI?.logout();
+      setVaultSession(null);
+      setVaultLogoutConfirmOpen(false);
     } catch {
       // ignore
     }
@@ -317,6 +345,36 @@ export default function AppBar() {
             </Tooltip>
           )}
 
+          {/* Vault connection indicator */}
+          {vaultSession && (
+            <Tooltip
+              title={`Vault @ ${vaultSession.host}:${vaultSession.port}`}
+            >
+              <Chip
+                icon={<VpnKeyIcon sx={{ fontSize: '20px !important' }} />}
+                onDelete={() => setVaultLogoutConfirmOpen(true)}
+                deleteIcon={
+                  <Tooltip title={t('vault.logout') || 'Disconnect'}>
+                    <LogoutIcon sx={{ fontSize: '16px !important' }} />
+                  </Tooltip>
+                }
+                sx={{
+                  height: 32,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: 'var(--primary-blue)',
+                  backgroundColor: 'var(--primary-blue-light)',
+                  '-webkit-app-region': 'no-drag',
+                  '& .MuiChip-icon': { color: 'var(--primary-blue)' },
+                  '& .MuiChip-deleteIcon': {
+                    color: 'var(--text-secondary)',
+                    '&:hover': { color: 'var(--text-primary)' },
+                  },
+                }}
+              />
+            </Tooltip>
+          )}
+
           <button type="button" className="window-btn" onClick={handleMinimize}>
             —
           </button>
@@ -425,6 +483,16 @@ export default function AppBar() {
           }
           onConfirm={handleCommunityLogout}
           onClose={() => setLogoutConfirmOpen(false)}
+        />
+        <ConfirmDialog
+          open={vaultLogoutConfirmOpen}
+          title={t('vault.logoutDialog.title') || 'Disconnect from Vault'}
+          message={
+            t('vault.logoutDialog.message') ||
+            'Are you sure you want to disconnect from the Vault server?'
+          }
+          onConfirm={handleVaultLogout}
+          onClose={() => setVaultLogoutConfirmOpen(false)}
         />
       </Toolbar>
     </MuiAppBar>

@@ -14,6 +14,7 @@ import { rdpApi } from './preload/rdpApi';
 import { communityAuthApi } from './preload/communityAuthApi';
 import { communityAdminApi } from './preload/communityAdminApi';
 import { communityFilesApi } from './preload/communityFilesApi';
+import { vaultApi } from './preload/vaultApi';
 import './preload/encryptionApi';
 import './preload/manualEncryptionApi';
 
@@ -35,5 +36,6 @@ contextBridge.exposeInMainWorld('rdpAPI', rdpApi);
 contextBridge.exposeInMainWorld('communityAuthAPI', communityAuthApi);
 contextBridge.exposeInMainWorld('communityAdminAPI', communityAdminApi);
 contextBridge.exposeInMainWorld('communityFilesAPI', communityFilesApi);
+contextBridge.exposeInMainWorld('vaultAPI', vaultApi);
 
 export type ElectronHandler = typeof electronHandler;

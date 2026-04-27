@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import FileCreationDialog from './FileCreationDialog';
 import PasswordDialog from './PasswordDialog';
 import JsonEditor from './JsonEditor';
+import VaultSecretEditor from './VaultSecretEditor';
 import { fileCreationService } from '../services/fileCreationService';
 import type { FileCreationData } from '../types/fileCreation';
 import { fileSystemService } from '../services/fileSystemService';
@@ -547,6 +548,11 @@ export default function Editor() {
 
   // Obter aba ativa
   const currentTab = tabs.find((tab) => tab.id === activeTab);
+  const isVaultTab = currentTab?.filePath.startsWith('vault://') || false;
+  const isJsonTab =
+    currentTab?.filePath.endsWith('.json') ||
+    (!!currentTab?.isEncrypted && currentTab?.originalExtension === '.json') ||
+    false;
 
   // Atualizar status no context quando aba mudar
   useEffect(() => {
@@ -718,9 +724,15 @@ export default function Editor() {
         <Card className="editor-card" elevation={2}>
           {/* Container do editor */}
           <Box className="editor-content">
-            {currentTab.filePath.endsWith('.json') ||
-            (currentTab.isEncrypted &&
-              currentTab.originalExtension === '.json') ? (
+            {isVaultTab ? (
+              <VaultSecretEditor
+                content={currentTab.content}
+                onContentChange={(newContent) =>
+                  updateTabContent(currentTab.id, newContent)
+                }
+                filePath={currentTab.filePath}
+              />
+            ) : isJsonTab ? (
               <JsonEditor
                 content={currentTab.content}
                 onContentChange={(newContent) =>

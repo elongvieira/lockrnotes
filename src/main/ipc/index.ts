@@ -11,6 +11,7 @@ import { setupRdpHandlers } from './rdpHandlers';
 import { registerCommunityAuthHandlers } from './communityAuthHandlers';
 import { registerCommunityAdminHandlers } from './communityAdminHandlers';
 import { registerCommunityFilesHandlers } from './communityFilesHandlers';
+import { registerVaultHandlers } from './vaultHandlers';
 
 /**
  * Setup all IPC handlers
@@ -28,6 +29,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   registerCommunityAuthHandlers();
   registerCommunityAdminHandlers();
   registerCommunityFilesHandlers();
+  registerVaultHandlers();
 }
 
 export * from './filesystemHandlers';

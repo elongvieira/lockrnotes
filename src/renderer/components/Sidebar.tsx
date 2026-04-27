@@ -24,6 +24,7 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
 import RemoteSidebar from './RemoteSidebar';
+import VaultSidebar from './VaultSidebar';
 import { fileSystemService } from '../services/fileSystemService';
 import { fileCreationService } from '../services/fileCreationService';
 import type { FileCreationData } from '../types/fileCreation';
@@ -35,6 +36,7 @@ import RenameDialog from './RenameDialog';
 import MoveDialog from './MoveDialog';
 import ConfirmDialog from './ConfirmDialog';
 import PasswordDialog from './PasswordDialog';
+import TreeItemLabel from './TreeItemLabel';
 import { useAppContext } from '../contexts/AppContext';
 import { dialogStyles } from '../styles/dialogStyles';
 
@@ -814,70 +816,65 @@ export default function Sidebar() {
           key={item.id}
           itemId={item.id}
           label={
-            <Box
+            <TreeItemLabel
+              icon={icon}
+              name={item.name}
+              depth={depth}
               onContextMenu={(e) => handleContextMenu(e, item)}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                paddingLeft: `${depth * 10}px`,
-                width: '100%',
-                '&:hover .folder-actions': {
-                  opacity: 1,
-                },
-              }}
-            >
-              {icon}
-              <Box sx={{ flexGrow: 1 }}>{item.name}</Box>
-              {isDirectory && (
-                <Box
-                  className="folder-actions"
-                  sx={{
-                    opacity: 0.6,
-                    transition: 'opacity 0.2s',
-                    display: 'flex',
-                    gap: 0.5,
-                    mr: 1,
-                  }}
-                >
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCreateFolderInPath(item.path);
-                    }}
+              actions={
+                isDirectory ? (
+                  <Box
+                    className="folder-actions"
                     sx={{
-                      padding: '2px',
-                      color: '#4da6ff',
-                      '&:hover': {
-                        backgroundColor: 'rgba(77, 166, 255, 0.1)',
-                        color: '#3399ff',
-                      },
+                      opacity: 0.6,
+                      transition: 'opacity 0.2s',
+                      display: 'flex',
+                      gap: 0.5,
+                      mr: 1,
                     }}
-                    title={t('sidebar.actions.createFolder') || 'Create folder'}
                   >
-                    <CreateNewFolderIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCreateFileInPath(item.path);
-                    }}
-                    sx={{
-                      padding: '2px',
-                      color: '#4da6ff',
-                      '&:hover': {
-                        backgroundColor: 'rgba(77, 166, 255, 0.1)',
-                        color: '#3399ff',
-                      },
-                    }}
-                    title={t('sidebar.actions.createFile') || 'Create file'}
-                  >
-                    <NoteAddIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Box>
-              )}
-            </Box>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateFolderInPath(item.path);
+                      }}
+                      sx={{
+                        padding: '2px',
+                        color: '#4da6ff',
+                        '&:hover': {
+                          backgroundColor: 'rgba(77, 166, 255, 0.1)',
+                          color: '#3399ff',
+                        },
+                      }}
+                      title={
+                        t('sidebar.actions.createFolder') || 'Create folder'
+                      }
+                    >
+                      <CreateNewFolderIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateFileInPath(item.path);
+                      }}
+                      sx={{
+                        padding: '2px',
+                        color: '#4da6ff',
+                        '&:hover': {
+                          backgroundColor: 'rgba(77, 166, 255, 0.1)',
+                          color: '#3399ff',
+                        },
+                      }}
+                      title={t('sidebar.actions.createFile') || 'Create file'}
+                    >
+                      <NoteAddIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Box>
+                ) : undefined
+              }
+            />
           }
           sx={{
             '& .MuiTreeItem-content': {
@@ -959,6 +956,11 @@ export default function Sidebar() {
               id="tab-remote"
               aria-controls="tabpanel-remote"
             />
+            <Tab
+              label={t('sidebar.tabs.vault')}
+              id="tab-vault"
+              aria-controls="tabpanel-vault"
+            />
           </Tabs>
         </Box>
       </div>
@@ -1034,6 +1036,20 @@ export default function Sidebar() {
         }}
       >
         <RemoteSidebar />
+      </div>
+
+      <div
+        role="tabpanel"
+        hidden={value !== 2}
+        id="tabpanel-vault"
+        aria-labelledby="tab-vault"
+        style={{
+          flex: 1,
+          display: value === 2 ? 'flex' : 'none',
+          flexDirection: 'column',
+        }}
+      >
+        <VaultSidebar />
       </div>
 
       <FolderDialog
