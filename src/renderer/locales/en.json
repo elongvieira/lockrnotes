@@ -102,7 +102,12 @@
       "add": "Add",
       "save": "Save",
       "move": "Move",
-      "unlock": "Unlock"
+      "unlock": "Unlock",
+      "overwrite": "Overwrite"
+    },
+    "conflict": {
+      "title": "File Conflict",
+      "message": "This file has been modified externally by another program or session. Do you want to overwrite the external changes with your current version?"
     },
     "confirm": {
       "title": "Confirmation",

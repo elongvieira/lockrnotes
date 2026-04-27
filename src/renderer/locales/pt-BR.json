@@ -102,7 +102,12 @@
       "add": "Adicionar",
       "save": "Salvar",
       "move": "Mover",
-      "unlock": "Desbloquear"
+      "unlock": "Desbloquear",
+      "overwrite": "Sobrescrever"
+    },
+    "conflict": {
+      "title": "Conflito de Arquivo",
+      "message": "Este arquivo foi modificado externamente por outro programa ou sessão. Deseja sobrescrever as alterações externas com a sua versão atual?"
     },
     "confirm": {
       "title": "Confirmação",
