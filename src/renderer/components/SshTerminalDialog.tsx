@@ -41,6 +41,7 @@ export default function SshTerminalDialog({
     'connecting' | 'connected' | 'error' | 'closed'
   >('connecting');
   const [_errorMsg, setErrorMsg] = useState<string>('');
+  const [reconnectCounter, setReconnectCounter] = useState(0);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -67,6 +68,15 @@ export default function SshTerminalDialog({
       if (terminalRef.current) {
         term.open(terminalRef.current);
         fit.fit();
+
+        // Auto-copy selected text to clipboard
+        term.onSelectionChange(() => {
+          const sel = term.getSelection();
+          if (sel) {
+            navigator.clipboard.writeText(sel).catch(() => {});
+          }
+        });
+
         term.writeln(`Connecting to ${host}...`);
       }
     }, 100);
@@ -167,10 +177,16 @@ export default function SshTerminalDialog({
       setStatus('connecting');
       setErrorMsg('');
     };
-  }, [open, host, user, password]);
+  }, [open, host, user, password, reconnectCounter]);
 
   const handleClose = () => {
     onClose();
+  };
+
+  const handleReconnect = () => {
+    setStatus('connecting');
+    setErrorMsg('');
+    setReconnectCounter((prev) => prev + 1);
   };
 
   return (
@@ -231,6 +247,14 @@ export default function SshTerminalDialog({
         />
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
+        {(status === 'error' || status === 'closed') && (
+          <Button
+            onClick={handleReconnect}
+            sx={{ ...dialogStyles.cancelButton, color: 'var(--primary-blue)' }}
+          >
+            {t('ssh.reconnect') || 'Reconnect'}
+          </Button>
+        )}
         <Button onClick={handleClose} sx={dialogStyles.cancelButton}>
           {t('ssh.disconnect') || 'Disconnect'}
         </Button>
