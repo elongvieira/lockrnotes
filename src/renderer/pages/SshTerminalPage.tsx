@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, CircularProgress, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import TerminalIcon from '@mui/icons-material/Terminal';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
@@ -260,6 +261,13 @@ export default function SshTerminalPage() {
     sshAPI?.closeWindow();
   };
 
+  const handleReconnect = () => {
+    if (config) {
+      setConfig({ ...config });
+      setStatus('loading');
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -348,6 +356,27 @@ export default function SshTerminalPage() {
             {statusLabel[status] || status}
           </Typography>
         </Box>
+
+        {/* Reconnect button */}
+        {(status === 'error' || status === 'closed') && (
+          <IconButton
+            size="small"
+            onClick={handleReconnect}
+            sx={{
+              WebkitAppRegion: 'no-drag',
+              color: 'var(--text-secondary)',
+              borderRadius: '4px',
+              mr: 1,
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: '#e6edf3',
+              },
+            }}
+            title="Reconnect"
+          >
+            <ReplayIcon fontSize="small" />
+          </IconButton>
+        )}
 
         {/* Close button */}
         <IconButton
