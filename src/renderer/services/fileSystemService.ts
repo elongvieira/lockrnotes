@@ -9,7 +9,9 @@ import { VaultFileSystemProvider } from './VaultFileSystemProvider';
 
 class FileSystemDispatcher implements FileSystemService {
   private localProvider = new LocalFileSystemProvider();
+
   private remoteProvider = new RemoteFileSystemProvider();
+
   private vaultProvider = new VaultFileSystemProvider();
 
   private getProvider(path?: string): FileSystemService {

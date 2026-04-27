@@ -1,6 +1,9 @@
 import { joinPath } from '../utils/pathUtil';
 import { fileSystemService } from './fileSystemService';
-import type { FileCreatorStrategy, FileCreationData } from '../types/fileCreation';
+import type {
+  FileCreatorStrategy,
+  FileCreationData,
+} from '../types/fileCreation';
 
 export class LocalFileCreator implements FileCreatorStrategy {
   async createFile(
@@ -9,7 +12,7 @@ export class LocalFileCreator implements FileCreatorStrategy {
     initialFilename: string,
     initialContent: string,
     originalExtension: string,
-    getEncryptedExtension: (ext: string) => string
+    getEncryptedExtension: (ext: string) => string,
   ): Promise<{
     success: boolean;
     filename?: string;

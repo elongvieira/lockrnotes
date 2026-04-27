@@ -9,7 +9,9 @@ export class RemoteFileSystemProvider implements FileSystemService {
     _path: string,
     _options?: DirectoryReadOptions,
   ): Promise<FileSystemItem[]> {
-    throw new Error('readDirectory not implemented directly for Remote. Use communityFilesAPI.');
+    throw new Error(
+      'readDirectory not implemented directly for Remote. Use communityFilesAPI.',
+    );
   }
 
   async getItem(_path: string): Promise<FileSystemItem | null> {
@@ -27,7 +29,9 @@ export class RemoteFileSystemProvider implements FileSystemService {
   async saveFile(path: string, content: string): Promise<boolean> {
     try {
       const fileId = path.substring(9);
-      const result = await window.communityFilesAPI.updateFile(fileId, { content });
+      const result = await window.communityFilesAPI.updateFile(fileId, {
+        content,
+      });
       return result.success;
     } catch (error) {
       console.error('Failed to save remote file:', error);
@@ -60,7 +64,9 @@ export class RemoteFileSystemProvider implements FileSystemService {
       }
 
       const fileId = path.substring(9);
-      const result = await window.communityFilesAPI.updateFile(fileId, { content: contentToSave });
+      const result = await window.communityFilesAPI.updateFile(fileId, {
+        content: contentToSave,
+      });
       return result.success;
     } catch (error) {
       console.error('Failed to save remote file with encryption:', error);

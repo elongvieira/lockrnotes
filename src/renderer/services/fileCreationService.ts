@@ -1,5 +1,3 @@
-import { fileSystemService } from './fileSystemService';
-import { joinPath } from '../utils/pathUtil';
 import type {
   FileCreationData,
   FileTemplate,
@@ -90,8 +88,8 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       // Prepare filename and content
       const cleanFilename = this.sanitizeFilename(fileData.filename);
       const originalExtension = template.extension;
-      let filename = `${cleanFilename}${originalExtension}`;
-      let content = template.generateContent(cleanFilename);
+      const filename = `${cleanFilename}${originalExtension}`;
+      const content = template.generateContent(cleanFilename);
 
       let strategy: import('../types/fileCreation').FileCreatorStrategy;
       if (targetPath === 'remote') {
@@ -106,7 +104,7 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
         filename,
         content,
         originalExtension,
-        this.getEncryptedExtension.bind(this)
+        this.getEncryptedExtension.bind(this),
       );
     } catch (error) {
       console.error('Error in FileCreationServiceImpl.createFile:', error);

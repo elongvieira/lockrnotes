@@ -1,3 +1,4 @@
+/* global RequestInit */
 import { ipcMain } from 'electron';
 import {
   saveVaultSession,

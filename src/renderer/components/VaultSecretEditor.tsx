@@ -116,31 +116,26 @@ export default function VaultSecretEditor({
   const isJsonPattern = useMemo(() => {
     try {
       const parsed = JSON.parse(content);
+      // eslint-disable-next-line no-underscore-dangle
       return parsed && parsed._editor_pattern === 'json';
     } catch {
       return false;
     }
   }, [content]);
 
-  const handleJsonEditorChange = useCallback((newContent: string) => {
-    try {
-      const parsed = JSON.parse(newContent);
-      parsed._editor_pattern = 'json';
-      onContentChange(JSON.stringify(parsed, null, 2));
-    } catch {
-      onContentChange(newContent);
-    }
-  }, [onContentChange]);
-
-  if (isJsonPattern) {
-    return (
-      <JsonEditor
-        content={content}
-        onContentChange={handleJsonEditorChange}
-        filePath={filePath}
-      />
-    );
-  }
+  const handleJsonEditorChange = useCallback(
+    (newContent: string) => {
+      try {
+        const parsed = JSON.parse(newContent);
+        // eslint-disable-next-line no-underscore-dangle
+        parsed._editor_pattern = 'json';
+        onContentChange(JSON.stringify(parsed, null, 2));
+      } catch {
+        onContentChange(newContent);
+      }
+    },
+    [onContentChange],
+  );
 
   // ─── Default Vault Pattern State ────────────────────────────────
 
@@ -291,6 +286,16 @@ export default function VaultSecretEditor({
     : t('vault.editor.defaultPath') || 'Vault Secret';
 
   // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  if (isJsonPattern) {
+    return (
+      <JsonEditor
+        content={content}
+        onContentChange={handleJsonEditorChange}
+        filePath={filePath}
+      />
+    );
+  }
 
   return (
     <Box className="vault-secret-editor-root">

@@ -8,11 +8,15 @@ describe('hashUtil', () => {
         value: {
           subtle: {
             digest: async (algorithm: any, data: any) => {
-              return require('crypto').createHash('sha256').update(data).digest();
-            }
-          }
+              // eslint-disable-next-line global-require
+              return require('crypto')
+                .createHash('sha256')
+                .update(data)
+                .digest();
+            },
+          },
         },
-        writable: true
+        writable: true,
       });
     }
   });
@@ -20,8 +24,9 @@ describe('hashUtil', () => {
   it('should generate a correct SHA-256 hash for a given string', async () => {
     const input = 'hello world';
     // sha256('hello world') = b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
-    const expectedHash = 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9';
-    
+    const expectedHash =
+      'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9';
+
     const hash = await generateHash(input);
     expect(hash).toBe(expectedHash);
   });
@@ -29,7 +34,7 @@ describe('hashUtil', () => {
   it('should generate different hashes for different inputs', async () => {
     const hash1 = await generateHash('input 1');
     const hash2 = await generateHash('input 2');
-    
+
     expect(hash1).not.toBe(hash2);
   });
 
@@ -37,15 +42,16 @@ describe('hashUtil', () => {
     const input = 'consistent input';
     const hash1 = await generateHash(input);
     const hash2 = await generateHash(input);
-    
+
     expect(hash1).toBe(hash2);
   });
 
   it('should handle empty strings', async () => {
     const input = '';
     // sha256('') = e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-    const expectedHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
-    
+    const expectedHash =
+      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+
     const hash = await generateHash(input);
     expect(hash).toBe(expectedHash);
   });

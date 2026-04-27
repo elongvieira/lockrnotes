@@ -179,7 +179,10 @@ export default function VaultSidebar() {
       const preferredResult = await window.vaultAPI.listSecrets(preferredRoot);
 
       if (preferredResult.success && preferredResult.data) {
-        const preferredItems = keysToTreeItems(preferredResult.data, preferredRoot);
+        const preferredItems = keysToTreeItems(
+          preferredResult.data,
+          preferredRoot,
+        );
         if (preferredItems.length > 0) {
           setVaultRootPath(preferredRoot);
           setTargetPath(preferredRoot);
@@ -191,7 +194,10 @@ export default function VaultSidebar() {
       const fallbackRoot = '';
       const fallbackResult = await window.vaultAPI.listSecrets(fallbackRoot);
       if (fallbackResult.success && fallbackResult.data) {
-        const fallbackItems = keysToTreeItems(fallbackResult.data, fallbackRoot);
+        const fallbackItems = keysToTreeItems(
+          fallbackResult.data,
+          fallbackRoot,
+        );
         if (fallbackItems.length > 0) {
           setVaultRootPath(fallbackRoot);
           setTargetPath(fallbackRoot);
@@ -349,10 +355,13 @@ export default function VaultSidebar() {
     setFolderDialogOpen(false);
   };
 
-  const handleSecretDialogConfirm = async (secretName: string, type: 'default' | 'json') => {
+  const handleSecretDialogConfirm = async (
+    secretName: string,
+    type: 'default' | 'json',
+  ) => {
     try {
       const fullPath = `${targetPath}${secretName}`;
-      
+
       let initialData: Record<string, any>;
       if (type === 'json') {
         initialData = { _editor_pattern: 'json', entries: [] };

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary, no-use-before-define, @typescript-eslint/no-shadow */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';

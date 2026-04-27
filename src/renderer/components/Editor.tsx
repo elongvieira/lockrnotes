@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -383,7 +384,12 @@ export default function Editor() {
           if (content && existing.content !== content) {
             const updated = prev.map((tabItem) =>
               tabItem.filePath === filePath
-                ? { ...tabItem, content, encryptedPassword, originalHash: contentHash }
+                ? {
+                    ...tabItem,
+                    content,
+                    encryptedPassword,
+                    originalHash: contentHash,
+                  }
                 : tabItem,
             );
             // focus existing
@@ -459,28 +465,46 @@ export default function Editor() {
         // --- OCC (Optimistic Concurrency Control) Check ---
         if (!forceOverwrite && targetTab.originalHash) {
           try {
-            const fileContent = await fileSystemService.readFile(targetTab.filePath);
+            const fileContent = await fileSystemService.readFile(
+              targetTab.filePath,
+            );
             let diskContent: string | null = null;
-            
+
             if (fileContent !== null) {
               if (targetTab.filePath.startsWith('vault://')) {
                 diskContent = fileContent;
               } else if (targetTab.isEncrypted) {
                 if (targetTab.encryptedPassword) {
-                  const isManuallyEncrypted = await window.manualEncryptionAPI.isManuallyEncrypted(fileContent);
+                  const isManuallyEncrypted =
+                    await window.manualEncryptionAPI.isManuallyEncrypted(
+                      fileContent,
+                    );
                   if (isManuallyEncrypted) {
-                    const password = await sessionKeyService.decryptPassword(targetTab.encryptedPassword);
+                    const password = await sessionKeyService.decryptPassword(
+                      targetTab.encryptedPassword,
+                    );
                     const encryptedData = JSON.parse(fileContent);
-                    const decResult = await window.manualEncryptionAPI.decryptContent(encryptedData, password);
-                    diskContent = (decResult.success && decResult.data) ? decResult.data : fileContent;
+                    const decResult =
+                      await window.manualEncryptionAPI.decryptContent(
+                        encryptedData,
+                        password,
+                      );
+                    diskContent =
+                      decResult.success && decResult.data
+                        ? decResult.data
+                        : fileContent;
                   } else {
                     diskContent = fileContent;
                   }
                 } else {
-                  const isContentEncrypted = await window.encryptionAPI.isContentEncrypted(fileContent);
+                  const isContentEncrypted =
+                    await window.encryptionAPI.isContentEncrypted(fileContent);
                   if (isContentEncrypted) {
                     const encryptedData = JSON.parse(fileContent);
-                    diskContent = await window.encryptionAPI.decryptContent(encryptedData, targetTab.filePath);
+                    diskContent = await window.encryptionAPI.decryptContent(
+                      encryptedData,
+                      targetTab.filePath,
+                    );
                   } else {
                     diskContent = fileContent;
                   }
@@ -589,7 +613,9 @@ export default function Editor() {
           // Marcar aba como não modificada e atualizar o hash
           setTabs((prev) =>
             prev.map((tabItem) =>
-              tabItem.id === tabId ? { ...tabItem, isDirty: false, originalHash: newHash } : tabItem,
+              tabItem.id === tabId
+                ? { ...tabItem, isDirty: false, originalHash: newHash }
+                : tabItem,
             ),
           );
           // Trigger status bar save pulse instead of a global notification
@@ -854,7 +880,10 @@ export default function Editor() {
       <ConfirmDialog
         open={conflictDialogOpen}
         title={t('dialog.conflict.title') || 'Conflito de Arquivo'}
-        message={t('dialog.conflict.message') || 'Este arquivo foi modificado externamente por outro programa ou sessão. Deseja sobrescrever as alterações externas com a sua versão atual?'}
+        message={
+          t('dialog.conflict.message') ||
+          'Este arquivo foi modificado externamente por outro programa ou sessão. Deseja sobrescrever as alterações externas com a sua versão atual?'
+        }
         confirmLabel={t('dialog.actions.overwrite') || 'Sobrescrever'}
         cancelLabel={t('dialog.actions.cancel') || 'Cancelar'}
         onConfirm={() => {

@@ -19,7 +19,7 @@ export interface FileCreatorStrategy {
     filename: string,
     content: string,
     originalExtension: string,
-    getEncryptedExtension: (ext: string) => string
+    getEncryptedExtension: (ext: string) => string,
   ): Promise<{
     success: boolean;
     filename?: string;

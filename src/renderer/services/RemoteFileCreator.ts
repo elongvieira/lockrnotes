@@ -1,4 +1,7 @@
-import type { FileCreatorStrategy, FileCreationData } from '../types/fileCreation';
+import type {
+  FileCreatorStrategy,
+  FileCreationData,
+} from '../types/fileCreation';
 
 export class RemoteFileCreator implements FileCreatorStrategy {
   async createFile(
@@ -7,7 +10,7 @@ export class RemoteFileCreator implements FileCreatorStrategy {
     initialFilename: string,
     initialContent: string,
     originalExtension: string,
-    getEncryptedExtension: (ext: string) => string
+    getEncryptedExtension: (ext: string) => string,
   ): Promise<{
     success: boolean;
     filename?: string;
@@ -16,7 +19,7 @@ export class RemoteFileCreator implements FileCreatorStrategy {
     originalExtension?: string;
   }> {
     let filename = initialFilename;
-    let content = initialContent;
+    const content = initialContent;
 
     // Determine final filename extension for encrypted file
     if (fileData.encrypted) {
@@ -29,11 +32,15 @@ export class RemoteFileCreator implements FileCreatorStrategy {
       name: filename,
       type: 'file',
       content: '',
-      parentId: fileData.parentId
+      parentId: fileData.parentId,
     });
 
     if (!createResult.success || !createResult.data || !createResult.data.id) {
-      throw new Error('Failed to create file remotely: ' + (createResult.error || 'Unknown network error'));
+      throw new Error(
+        `Failed to create file remotely: ${
+          createResult.error || 'Unknown network error'
+        }`,
+      );
     }
 
     const newId = createResult.data.id;
@@ -45,22 +52,26 @@ export class RemoteFileCreator implements FileCreatorStrategy {
       const encryptedData = await window.encryptionAPI.encryptContent(
         content,
         filePath,
-        originalExtension
+        originalExtension,
       );
       finalContent = JSON.stringify(encryptedData, null, 2);
     } else if (fileData.encrypted && fileData.encryptionType === 'manual') {
-      if (!fileData.password) throw new Error('Password required for manual encryption');
+      if (!fileData.password)
+        throw new Error('Password required for manual encryption');
       const result = await window.manualEncryptionAPI.encryptContent(
         content,
         fileData.password,
-        originalExtension
+        originalExtension,
       );
-      if (!result.success || !result.data) throw new Error(result.error || 'Encryption failed');
+      if (!result.success || !result.data)
+        throw new Error(result.error || 'Encryption failed');
       finalContent = JSON.stringify(result.data, null, 2);
     }
 
     // Step 3: Update file content remotely
-    const updateResult = await window.communityFilesAPI.updateFile(newId, { content: finalContent });
+    const updateResult = await window.communityFilesAPI.updateFile(newId, {
+      content: finalContent,
+    });
     if (!updateResult.success) {
       throw new Error('Failed to update remote file content');
     }
@@ -69,8 +80,11 @@ export class RemoteFileCreator implements FileCreatorStrategy {
       success: true,
       filename,
       filePath,
-      password: fileData.encrypted && fileData.encryptionType === 'manual' ? fileData.password : undefined,
-      originalExtension
+      password:
+        fileData.encrypted && fileData.encryptionType === 'manual'
+          ? fileData.password
+          : undefined,
+      originalExtension,
     };
   }
 }
