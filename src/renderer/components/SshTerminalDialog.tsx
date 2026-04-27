@@ -186,7 +186,7 @@ export default function SshTerminalDialog({
   const handleReconnect = () => {
     setStatus('connecting');
     setErrorMsg('');
-    setReconnectCounter(prev => prev + 1);
+    setReconnectCounter((prev) => prev + 1);
   };
 
   return (
@@ -248,7 +248,10 @@ export default function SshTerminalDialog({
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
         {(status === 'error' || status === 'closed') && (
-          <Button onClick={handleReconnect} sx={{ ...dialogStyles.cancelButton, color: 'var(--primary-blue)' }}>
+          <Button
+            onClick={handleReconnect}
+            sx={{ ...dialogStyles.cancelButton, color: 'var(--primary-blue)' }}
+          >
             {t('ssh.reconnect') || 'Reconnect'}
           </Button>
         )}
