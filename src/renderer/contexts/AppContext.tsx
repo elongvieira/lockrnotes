@@ -15,6 +15,7 @@ interface FileTab {
   originalExtension?: string;
   filePath: string;
   encryptedPassword?: string; // Senha criptografada com chave de sessão
+  originalHash?: string;
 }
 
 interface AppContextType {

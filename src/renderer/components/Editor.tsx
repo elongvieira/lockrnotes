@@ -471,7 +471,8 @@ export default function Editor() {
                   if (isManuallyEncrypted) {
                     const password = await sessionKeyService.decryptPassword(targetTab.encryptedPassword);
                     const encryptedData = JSON.parse(fileContent);
-                    diskContent = await window.manualEncryptionAPI.decryptContent(encryptedData, password);
+                    const decResult = await window.manualEncryptionAPI.decryptContent(encryptedData, password);
+                    diskContent = (decResult.success && decResult.data) ? decResult.data : fileContent;
                   } else {
                     diskContent = fileContent;
                   }
