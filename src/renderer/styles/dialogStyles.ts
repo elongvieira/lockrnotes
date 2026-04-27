@@ -170,6 +170,40 @@ export const dialogStyles = {
     },
   } as SxProps<Theme>,
 
+  // Status chip - active
+  statusChipActive: {
+    cursor: 'pointer',
+    fontSize: 11,
+    height: 20,
+    backgroundColor: 'var(--status-success-bg)',
+    color: 'var(--status-success)',
+    border: 'none',
+    '&:hover': { opacity: 0.85 },
+  } as SxProps<Theme>,
+
+  // Status chip - inactive
+  statusChipInactive: {
+    cursor: 'pointer',
+    fontSize: 11,
+    height: 20,
+    backgroundColor: 'var(--bg-tree-container)',
+    color: 'var(--text-secondary)',
+    border: 'none',
+    '&:hover': { opacity: 0.85 },
+  } as SxProps<Theme>,
+
+  // Danger icon button (delete/remove)
+  dangerIconButton: {
+    color: 'var(--text-secondary)',
+    '&:hover': { color: 'var(--status-danger)' },
+  } as SxProps<Theme>,
+
+  // Warning icon button (force-password etc.)
+  warningIconButton: {
+    color: 'var(--text-secondary)',
+    '&:hover': { color: 'var(--status-warning)' },
+  } as SxProps<Theme>,
+
   // Select dropdown padrão
   select: {
     backgroundColor: 'var(--bg-tree-container)',

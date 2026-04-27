@@ -8,6 +8,10 @@ import { registerImportHandlers } from './importHandlers';
 import { registerHotCopyHandlers } from './hotcopyHandlers';
 import { setupSshHandlers } from './sshHandlers';
 import { setupRdpHandlers } from './rdpHandlers';
+import { registerCommunityAuthHandlers } from './communityAuthHandlers';
+import { registerCommunityAdminHandlers } from './communityAdminHandlers';
+import { registerCommunityFilesHandlers } from './communityFilesHandlers';
+import { registerVaultHandlers } from './vaultHandlers';
 
 /**
  * Setup all IPC handlers
@@ -22,6 +26,10 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   registerHotCopyHandlers();
   setupSshHandlers(mainWindow);
   setupRdpHandlers();
+  registerCommunityAuthHandlers();
+  registerCommunityAdminHandlers();
+  registerCommunityFilesHandlers();
+  registerVaultHandlers();
 }
 
 export * from './filesystemHandlers';

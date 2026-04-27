@@ -22,7 +22,8 @@
       "aria": "Sidebar Tabs",
       "local": "Local",
       "files": "Files",
-      "remote": "Remote"
+      "remote": "Remote",
+      "vault": "Vault"
     },
     "local": {
       "content": "This is the local notes area. Select or create a note to start editing."
@@ -101,7 +102,12 @@
       "add": "Add",
       "save": "Save",
       "move": "Move",
-      "unlock": "Unlock"
+      "unlock": "Unlock",
+      "overwrite": "Overwrite"
+    },
+    "conflict": {
+      "title": "File Conflict",
+      "message": "This file has been modified externally by another program or session. Do you want to overwrite the external changes with your current version?"
     },
     "confirm": {
       "title": "Confirmation",
@@ -334,5 +340,223 @@
     "manage": "Manage slots",
     "noItems": "No items configured",
     "entry": "Entry"
+  },
+  "community": {
+    "notConnected": "Connect to a community server to access shared notes.",
+    "loginButton": "Connect",
+    "logout": "Logout",
+    "login": {
+      "title": "Connect to Community Server",
+      "host": "Host / IP",
+      "port": "Port",
+      "email": "Email / Login",
+      "password": "Password",
+      "submit": "Login",
+      "errors": {
+        "hostRequired": "Host is required",
+        "portInvalid": "Port must be between 1 and 65535",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required",
+        "loginFailed": "Login failed. Check your credentials."
+      }
+    },
+    "logout": {
+      "title": "Logout",
+      "message": "Are you sure you want to disconnect from the community server?"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "message": "You must change your password before proceeding.",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Change Password",
+      "errors": {
+        "currentRequired": "Current password is required",
+        "newRequired": "New password is required",
+        "confirmRequired": "Password confirmation is required",
+        "mismatch": "Passwords do not match",
+        "changeFailed": "Failed to change password",
+        "currentIncorrect": "Current password is incorrect"
+      }
+    }
+  },
+  "admin": {
+    "menuTitle": "Administration",
+    "dialog": {
+      "title": "Administration",
+      "users": {
+        "title": "Users",
+        "newUser": "New User",
+        "empty": "No users found.",
+        "table": {
+          "name": "Name",
+          "email": "Email",
+          "role": "Role",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "roles": {
+          "admin": "Admin",
+          "user": "User"
+        },
+        "loginTypes": {
+          "password": "Password",
+          "magicLink": "Magic Link"
+        },
+        "form": {
+          "titleCreate": "New User",
+          "titleEdit": "Edit User",
+          "name": "Name",
+          "email": "Email",
+          "password": "Password",
+          "loginType": "Login Type",
+          "role": "Profile",
+          "forcePasswordChange": "Require password change on first login",
+          "isActive": "Active account",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "forcePassword": {
+          "buttonTooltip": "Force Password Change",
+          "title": "Force Password Change",
+          "message": "User \"{{name}}\" will be required to change their password on next login."
+        },
+        "delete": {
+          "title": "Delete User",
+          "message": "User \"{{email}}\" will be permanently deleted. Are you sure?"
+        },
+        "errors": {
+          "loadFailed": "Failed to load users",
+          "createFailed": "Failed to create user",
+          "updateFailed": "Failed to update user",
+          "deleteFailed": "Failed to delete user",
+          "activateFailed": "Failed to activate user",
+          "deactivateFailed": "Failed to deactivate user",
+          "forcePasswordFailed": "Failed to set force password change",
+          "nameRequired": "Name is required",
+          "emailRequired": "Email is required",
+          "passwordRequired": "Password is required for new users"
+        }
+      },
+      "groups": {
+        "title": "Groups",
+        "newGroup": "New Group",
+        "empty": "No groups found.",
+        "table": {
+          "name": "Name",
+          "actions": "Actions"
+        },
+        "form": {
+          "titleCreate": "New Group",
+          "titleEdit": "Edit Group",
+          "name": "Group Name",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "members": {
+          "title": "Members of \"{{name}}\"",
+          "empty": "No members in this group.",
+          "add": "Add",
+          "manage": "Manage Members",
+          "selectUser": "User",
+            "noUsersAvailable": "All users are already members",
+            "remove": "Remove"
+        },
+        "delete": {
+          "title": "Delete Group",
+          "message": "Group \"{{name}}\" will be permanently deleted. Are you sure?"
+        },
+        "errors": {
+          "loadFailed": "Failed to load groups",
+          "createFailed": "Failed to create group",
+          "updateFailed": "Failed to update group",
+          "deleteFailed": "Failed to delete group",
+          "nameRequired": "Group name is required",
+          "loadMembersFailed": "Failed to load group members",
+          "addMemberFailed": "Failed to add member",
+          "removeMemberFailed": "Failed to remove member"
+        }
+      }
+    }
+  },
+  "vault": {
+    "loginButton": "Connect",
+    "notConnected": "Connect to a Vault server to access secrets.",
+    "loginDialog": {
+      "title": "Connect to Vault",
+      "host": "Host / IP",
+      "port": "Port",
+      "token": "Token",
+      "connect": "Connect",
+      "cancel": "Cancel",
+      "connecting": "Connecting...",
+      "errors": {
+        "hostRequired": "Host is required",
+        "tokenRequired": "Token is required",
+        "invalidPort": "Port must be between 1 and 65535",
+        "connectionFailed": "Failed to connect to Vault"
+      }
+    },
+    "sidebar": {
+      "title": "Secrets"
+    },
+    "actions": {
+      "createSecret": "Create secret"
+    },
+    "dialog": {
+      "secretName": "Secret Name",
+      "types": {
+        "default": {
+          "name": "Vault Default",
+          "description": "Standard Vault secret using simple key-value pairs."
+        },
+        "json": {
+          "name": "JSON Pattern (Advanced)",
+          "description": "Allows advanced entries like SSH keys, RDP servers, and more structured options."
+        }
+      }
+    },
+    "chip": {
+      "tooltip": "Vault connected",
+      "disconnect": "Disconnect from Vault"
+    },
+    "logoutDialog": {
+      "title": "Disconnect from Vault",
+      "message": "Are you sure you want to disconnect from Vault?"
+    },
+    "errors": {
+      "loadFailed": "Failed to load secrets",
+      "readFailed": "Failed to read secret",
+      "saveFailed": "Failed to save secret"
+    },
+    "editor": {
+      "title": "Vault Editor",
+      "caption": "Sensitive fields stay hidden by default and can be copied individually.",
+      "defaultPath": "Vault Secret",
+      "search": "Search in this secret...",
+      "showPasswords": "Show passwords",
+      "hidePasswords": "Hide passwords",
+      "showField": "Show field",
+      "hideField": "Hide field",
+      "copyField": "Copy field",
+      "copyError": "Failed to copy field",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "actions": "Actions",
+      "emptyTitle": "No fields yet. Click \"Add Field\" to start.",
+      "emptyText": "Add key-value pairs to store credentials, tokens, or any Vault secret data.",
+      "noResultsTitle": "No results found",
+      "noResultsText": "Adjust your search to find a specific field.",
+      "addField": "Add Field",
+      "keyLabel": "Key",
+      "valueLabel": "Value",
+      "deleteField": "Delete field",
+      "deleteConfirm": "Delete field \"{key}\"?"
+    }
   }
 }

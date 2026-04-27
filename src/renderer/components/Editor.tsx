@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -12,11 +13,14 @@ import { useTranslation } from 'react-i18next';
 import FileCreationDialog from './FileCreationDialog';
 import PasswordDialog from './PasswordDialog';
 import JsonEditor from './JsonEditor';
+import VaultSecretEditor from './VaultSecretEditor';
 import { fileCreationService } from '../services/fileCreationService';
 import type { FileCreationData } from '../types/fileCreation';
 import { fileSystemService } from '../services/fileSystemService';
 import { sessionKeyService } from '../services/sessionKeyService';
 import { useAppContext } from '../contexts/AppContext';
+import ConfirmDialog from './ConfirmDialog';
+import { generateHash } from '../utils/hashUtil';
 import './Editor.css';
 
 interface FileTab {
@@ -28,6 +32,7 @@ interface FileTab {
   originalExtension?: string;
   filePath: string;
   encryptedPassword?: string; // Senha criptografada com chave de sessão
+  originalHash?: string;
 }
 
 interface PendingEncryptedFile {
@@ -62,6 +67,8 @@ export default function Editor() {
   const [passwordDialogOpen, setPasswordDialogOpen] = useState<boolean>(false);
   const [passwordError, setPasswordError] = useState<string>('');
   const [restoredTabs, setRestoredTabs] = useState<FileTab[]>([]);
+  const [conflictDialogOpen, setConflictDialogOpen] = useState<boolean>(false);
+  const [conflictingTabId, setConflictingTabId] = useState<string | null>(null);
 
   // Initialize session key on mount
   useEffect(() => {
@@ -149,6 +156,7 @@ export default function Editor() {
                       isEncrypted,
                       originalExtension: savedTab.originalExtension,
                       filePath: savedTab.filePath,
+                      originalHash: await generateHash(content),
                     },
                   };
                 }
@@ -251,6 +259,7 @@ export default function Editor() {
           originalExtension: currentPendingFile.savedTab.originalExtension,
           filePath: currentPendingFile.savedTab.filePath,
           encryptedPassword, // Store encrypted password in memory
+          originalHash: await generateHash(result.data),
         };
 
         // Add tab to existing tabs
@@ -365,6 +374,8 @@ export default function Editor() {
         encryptedPassword = await sessionKeyService.encryptPassword(password);
       }
 
+      const contentHash = await generateHash(content);
+
       setTabs((prev) => {
         // If file is already open, focus existing tab and optionally update content
         const existing = prev.find((tabItem) => tabItem.filePath === filePath);
@@ -373,7 +384,12 @@ export default function Editor() {
           if (content && existing.content !== content) {
             const updated = prev.map((tabItem) =>
               tabItem.filePath === filePath
-                ? { ...tabItem, content, encryptedPassword }
+                ? {
+                    ...tabItem,
+                    content,
+                    encryptedPassword,
+                    originalHash: contentHash,
+                  }
                 : tabItem,
             );
             // focus existing
@@ -395,6 +411,7 @@ export default function Editor() {
           originalExtension,
           filePath,
           encryptedPassword,
+          originalHash: contentHash,
         };
 
         // focus new tab
@@ -438,12 +455,79 @@ export default function Editor() {
 
   // Função para salvar arquivo
   const saveFile = useCallback(
-    async (tabId: string) => {
+    async (tabId: string, forceOverwrite = false) => {
       const targetTab = tabs.find((tab) => tab.id === tabId);
       if (!targetTab) return;
 
       try {
         let success = false;
+
+        // --- OCC (Optimistic Concurrency Control) Check ---
+        if (!forceOverwrite && targetTab.originalHash) {
+          try {
+            const fileContent = await fileSystemService.readFile(
+              targetTab.filePath,
+            );
+            let diskContent: string | null = null;
+
+            if (fileContent !== null) {
+              if (targetTab.filePath.startsWith('vault://')) {
+                diskContent = fileContent;
+              } else if (targetTab.isEncrypted) {
+                if (targetTab.encryptedPassword) {
+                  const isManuallyEncrypted =
+                    await window.manualEncryptionAPI.isManuallyEncrypted(
+                      fileContent,
+                    );
+                  if (isManuallyEncrypted) {
+                    const password = await sessionKeyService.decryptPassword(
+                      targetTab.encryptedPassword,
+                    );
+                    const encryptedData = JSON.parse(fileContent);
+                    const decResult =
+                      await window.manualEncryptionAPI.decryptContent(
+                        encryptedData,
+                        password,
+                      );
+                    diskContent =
+                      decResult.success && decResult.data
+                        ? decResult.data
+                        : fileContent;
+                  } else {
+                    diskContent = fileContent;
+                  }
+                } else {
+                  const isContentEncrypted =
+                    await window.encryptionAPI.isContentEncrypted(fileContent);
+                  if (isContentEncrypted) {
+                    const encryptedData = JSON.parse(fileContent);
+                    diskContent = await window.encryptionAPI.decryptContent(
+                      encryptedData,
+                      targetTab.filePath,
+                    );
+                  } else {
+                    diskContent = fileContent;
+                  }
+                }
+              } else {
+                diskContent = fileContent;
+              }
+            }
+
+            if (diskContent !== null) {
+              const currentDiskHash = await generateHash(diskContent);
+              if (currentDiskHash !== targetTab.originalHash) {
+                // Conflict detected!
+                setConflictingTabId(tabId);
+                setConflictDialogOpen(true);
+                return; // Stop saving
+              }
+            }
+          } catch (e) {
+            console.warn('Could not read file for OCC check', e);
+          }
+        }
+        // ------------------------------------------------
 
         // Check if file has a password (manual encryption)
         if (targetTab.encryptedPassword) {
@@ -525,10 +609,13 @@ export default function Editor() {
         }
 
         if (success) {
-          // Marcar aba como não modificada
+          const newHash = await generateHash(targetTab.content);
+          // Marcar aba como não modificada e atualizar o hash
           setTabs((prev) =>
             prev.map((tabItem) =>
-              tabItem.id === tabId ? { ...tabItem, isDirty: false } : tabItem,
+              tabItem.id === tabId
+                ? { ...tabItem, isDirty: false, originalHash: newHash }
+                : tabItem,
             ),
           );
           // Trigger status bar save pulse instead of a global notification
@@ -547,6 +634,11 @@ export default function Editor() {
 
   // Obter aba ativa
   const currentTab = tabs.find((tab) => tab.id === activeTab);
+  const isVaultTab = currentTab?.filePath.startsWith('vault://') || false;
+  const isJsonTab =
+    currentTab?.filePath.endsWith('.json') ||
+    (!!currentTab?.isEncrypted && currentTab?.originalExtension === '.json') ||
+    false;
 
   // Atualizar status no context quando aba mudar
   useEffect(() => {
@@ -718,9 +810,15 @@ export default function Editor() {
         <Card className="editor-card" elevation={2}>
           {/* Container do editor */}
           <Box className="editor-content">
-            {currentTab.filePath.endsWith('.json') ||
-            (currentTab.isEncrypted &&
-              currentTab.originalExtension === '.json') ? (
+            {isVaultTab ? (
+              <VaultSecretEditor
+                content={currentTab.content}
+                onContentChange={(newContent) =>
+                  updateTabContent(currentTab.id, newContent)
+                }
+                filePath={currentTab.filePath}
+              />
+            ) : isJsonTab ? (
               <JsonEditor
                 content={currentTab.content}
                 onContentChange={(newContent) =>
@@ -777,6 +875,28 @@ export default function Editor() {
         onConfirm={handlePasswordConfirm}
         onClose={handlePasswordCancel}
         error={passwordError}
+      />
+
+      <ConfirmDialog
+        open={conflictDialogOpen}
+        title={t('dialog.conflict.title') || 'Conflito de Arquivo'}
+        message={
+          t('dialog.conflict.message') ||
+          'Este arquivo foi modificado externamente por outro programa ou sessão. Deseja sobrescrever as alterações externas com a sua versão atual?'
+        }
+        confirmLabel={t('dialog.actions.overwrite') || 'Sobrescrever'}
+        cancelLabel={t('dialog.actions.cancel') || 'Cancelar'}
+        onConfirm={() => {
+          setConflictDialogOpen(false);
+          if (conflictingTabId) {
+            saveFile(conflictingTabId, true);
+            setConflictingTabId(null);
+          }
+        }}
+        onClose={() => {
+          setConflictDialogOpen(false);
+          setConflictingTabId(null);
+        }}
       />
     </Box>
   );

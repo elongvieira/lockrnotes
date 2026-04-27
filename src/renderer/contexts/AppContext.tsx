@@ -15,6 +15,7 @@ interface FileTab {
   originalExtension?: string;
   filePath: string;
   encryptedPassword?: string; // Senha criptografada com chave de sessão
+  originalHash?: string;
 }
 
 interface AppContextType {
@@ -57,6 +58,27 @@ interface AppContextType {
   setWordCount: (count: number) => void;
   isEncrypted: boolean;
   setIsEncrypted: (encrypted: boolean) => void;
+
+  // Community server session
+  communitySession: {
+    host: string;
+    port: number;
+    email: string;
+    isAdmin: boolean;
+  } | null;
+  setCommunitySession: (
+    s: { host: string; port: number; email: string; isAdmin: boolean } | null,
+  ) => void;
+
+  // Vault session
+  vaultSession: {
+    host: string;
+    port: number;
+    mountPath: string;
+  } | null;
+  setVaultSession: (
+    s: { host: string; port: number; mountPath: string } | null,
+  ) => void;
 
   // Notifications
   showNotification: (
@@ -121,6 +143,21 @@ export function AppProvider({ children }: AppProviderProps) {
     window.dispatchEvent(new CustomEvent('hide-notification'));
   };
 
+  // Community session state
+  const [communitySession, setCommunitySession] = useState<{
+    host: string;
+    port: number;
+    email: string;
+    isAdmin: boolean;
+  } | null>(null);
+
+  // Vault session state
+  const [vaultSession, setVaultSession] = useState<{
+    host: string;
+    port: number;
+    mountPath: string;
+  } | null>(null);
+
   // Save pulse state
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
 
@@ -148,6 +185,10 @@ export function AppProvider({ children }: AppProviderProps) {
       hideNotification,
       lastSavedAt,
       triggerSavePulse,
+      communitySession,
+      setCommunitySession,
+      vaultSession,
+      setVaultSession,
     }),
     [
       currentFile,
@@ -158,6 +199,8 @@ export function AppProvider({ children }: AppProviderProps) {
       wordCount,
       isEncrypted,
       lastSavedAt,
+      communitySession,
+      vaultSession,
     ],
   );
 
