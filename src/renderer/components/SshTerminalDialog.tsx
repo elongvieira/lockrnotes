@@ -67,6 +67,15 @@ export default function SshTerminalDialog({
       if (terminalRef.current) {
         term.open(terminalRef.current);
         fit.fit();
+
+        // Auto-copy selected text to clipboard
+        term.onSelectionChange(() => {
+          const sel = term.getSelection();
+          if (sel) {
+            navigator.clipboard.writeText(sel).catch(() => {});
+          }
+        });
+
         term.writeln(`Connecting to ${host}...`);
       }
     }, 100);

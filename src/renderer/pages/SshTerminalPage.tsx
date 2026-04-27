@@ -97,6 +97,14 @@ export default function SshTerminalPage() {
     term.open(terminalRef.current);
     fit.fit();
 
+    // Auto-copy selected text to clipboard
+    term.onSelectionChange(() => {
+      const sel = term.getSelection();
+      if (sel) {
+        navigator.clipboard.writeText(sel).catch(() => {});
+      }
+    });
+
     const container = terminalRef.current;
 
     // Ctrl+C — copy selection when text is selected; otherwise SIGINT passes through
