@@ -14,6 +14,7 @@ A IA deve priorizar seguir padrões existentes ao invés de criar novos.
 ## 🎨 STYLE
 
 - Procurar usar os layouts default do sistema e estilos já criados
+- Para Selects/Dropdowns, usar sempre `<TextField select>` ao invés de `FormControl` e `Select` soltos, aplicando os estilos existentes (ex: `sx={dialogStyles.textField}`) para garantir consistência visual.
 - Evitar usar estilos diretamente em componentes, a menos que sejam casos específicos
 - Caso não exista um estilo adequado, criar um novo seguindo o padrão existente
 - Manter consistência visual em toda a aplicação
