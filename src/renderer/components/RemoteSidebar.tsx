@@ -211,6 +211,11 @@ export default function RemoteSidebar() {
   useEffect(() => {
     if (communitySession) {
       loadFiles(false);
+    } else {
+      // Clear cached files when session ends
+      setFiles([]);
+      setTreeData([]);
+      setExpandedItems(['meus-arquivos']);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [communitySession]);

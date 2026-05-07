@@ -236,6 +236,12 @@ export default function VaultSidebar() {
   useEffect(() => {
     if (vaultSession) {
       loadRootSecrets();
+    } else {
+      // Clear cached secrets when session ends
+      setTreeData([]);
+      setExpandedItems([]);
+      setVaultRootPath('notes/');
+      setTargetPath('notes/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vaultSession]);
