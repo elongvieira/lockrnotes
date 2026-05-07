@@ -85,10 +85,12 @@ export default function VaultSidebar() {
 
   /** Convert Vault keys list into tree items. Keys ending in / are folders. */
   const keysToTreeItems = (
-    keys: string[],
+    keys: string[] | null | undefined,
     parentPath: string,
   ): VaultTreeItem[] => {
-    const items = keys
+    // Ensure keys is always an array
+    const keysArray = Array.isArray(keys) ? keys : [];
+    const items = keysArray
       .filter((k) => k !== '.folder') // hide folder markers
       .map((key) => {
         const isDir = key.endsWith('/');

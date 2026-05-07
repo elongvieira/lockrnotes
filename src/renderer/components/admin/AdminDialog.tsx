@@ -1073,11 +1073,12 @@ function ManageGroupMembersDialog({
     }
   }, [open, group, loadMembers]);
 
-  const memberUserIds = new Set(members.map((m) => m.userId));
+  const memberUserIds = new Set((members || []).map((m) => m.userId));
 
-  const nonMembers = allUsers.filter((u) => !memberUserIds.has(u.id));
+  const nonMembers = (allUsers || []).filter((u) => !memberUserIds.has(u.id));
 
-  const getUserById = (userId: string) => allUsers.find((u) => u.id === userId);
+  const getUserById = (userId: string) =>
+    (allUsers || []).find((u) => u.id === userId);
 
   const handleAdd = async () => {
     if (!group || !selectedUser) return;

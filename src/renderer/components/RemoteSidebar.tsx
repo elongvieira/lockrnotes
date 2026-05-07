@@ -156,10 +156,12 @@ export default function RemoteSidebar() {
   // Build tree data whenever files change
   useEffect(() => {
     const buildTree = (allFiles: RemoteFile[]) => {
+      // Ensure allFiles is always an array
+      const filesArray = Array.isArray(allFiles) ? allFiles : [];
       const itemMap = new Map<string, RemoteFileSystemItem>();
 
       // Init mapped objects
-      allFiles.forEach((f) => {
+      filesArray.forEach((f) => {
         let extension = '';
         if (f.type === 'file') {
           const dotIdx = f.name.lastIndexOf('.');
@@ -183,7 +185,7 @@ export default function RemoteSidebar() {
 
       const rootChildren: RemoteFileSystemItem[] = [];
 
-      allFiles.forEach((f) => {
+      filesArray.forEach((f) => {
         const item = itemMap.get(f.id)!;
         if (f.parentId && itemMap.has(f.parentId)) {
           const parentItem = itemMap.get(f.parentId)!;
