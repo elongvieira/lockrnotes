@@ -4,8 +4,11 @@ export const vaultApi = {
   login(params: {
     host: string;
     port: number;
-    token: string;
     mountPath?: string;
+    authMethod?: 'token' | 'ldap';
+    token?: string;
+    username?: string;
+    password?: string;
   }): Promise<{ success: boolean; error?: string }> {
     return ipcRenderer.invoke('vault:login', params);
   },

@@ -492,12 +492,19 @@
       "host": "Host / IP",
       "port": "Port",
       "token": "Token",
+      "username": "Username",
+      "password": "Password",
+      "methodToken": "Token",
+      "methodLdap": "LDAP",
+      "authMethod": "Authentication Method",
       "connect": "Connect",
       "cancel": "Cancel",
       "connecting": "Connecting...",
       "errors": {
         "hostRequired": "Host is required",
         "tokenRequired": "Token is required",
+        "usernameRequired": "Username is required",
+        "passwordRequired": "Password is required",
         "invalidPort": "Port must be between 1 and 65535",
         "connectionFailed": "Failed to connect to Vault"
       }

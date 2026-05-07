@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import MenuItem from '@mui/material/MenuItem';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
 
@@ -25,7 +26,10 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
   const { t } = useTranslation();
   const [host, setHost] = useState('');
   const [port, setPort] = useState('8200');
+  const [authMethod, setAuthMethod] = useState<'token' | 'ldap'>('token');
   const [token, setToken] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -41,19 +45,40 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
 
     const portNum = parseInt(port, 10);
     if (!host.trim()) {
-      setError(t('vault.login.errors.hostRequired') || 'Host is required');
+      setError(
+        t('vault.loginDialog.errors.hostRequired') || 'Host is required',
+      );
       return;
     }
     if (Number.isNaN(portNum) || portNum < 1 || portNum > 65535) {
       setError(
-        t('vault.login.errors.portInvalid') ||
+        t('vault.loginDialog.errors.portInvalid') ||
           'Port must be between 1 and 65535',
       );
       return;
     }
-    if (!token.trim()) {
-      setError(t('vault.login.errors.tokenRequired') || 'Token is required');
+    if (authMethod === 'token' && !token.trim()) {
+      setError(
+        t('vault.loginDialog.errors.tokenRequired') || 'Token is required',
+      );
       return;
+    }
+
+    if (authMethod === 'ldap') {
+      if (!username.trim()) {
+        setError(
+          t('vault.loginDialog.errors.usernameRequired') ||
+            'Username is required',
+        );
+        return;
+      }
+      if (!password.trim()) {
+        setError(
+          t('vault.loginDialog.errors.passwordRequired') ||
+            'Password is required',
+        );
+        return;
+      }
     }
 
     setLoading(true);
@@ -61,7 +86,10 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
       const result = await window.vaultAPI.login({
         host: host.trim(),
         port: portNum,
+        authMethod,
         token: token.trim(),
+        username: username.trim(),
+        password: password.trim(),
       });
 
       if (result.success) {
@@ -74,7 +102,7 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
       } else {
         setError(
           result.error ||
-            t('vault.login.errors.loginFailed') ||
+            t('vault.loginDialog.errors.loginFailed') ||
             'Failed to connect to Vault',
         );
       }
@@ -95,7 +123,7 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle sx={dialogStyles.dialogTitle}>
-          {t('vault.login.title') || 'Connect to Vault'}
+          {t('vault.loginDialog.title') || 'Connect to Vault'}
         </DialogTitle>
         <DialogContent sx={dialogStyles.dialogContent}>
           <Box
@@ -104,7 +132,7 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
             {error && <Alert severity="error">{error}</Alert>}
             <Box sx={{ display: 'flex', gap: 1 }}>
               <TextField
-                label={t('vault.login.host') || 'Host / IP'}
+                label={t('vault.loginDialog.host') || 'Host / IP'}
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
                 disabled={loading}
@@ -114,7 +142,7 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
                 sx={{ ...dialogStyles.textField, flex: 2 }}
               />
               <TextField
-                label={t('vault.login.port') || 'Port'}
+                label={t('vault.loginDialog.port') || 'Port'}
                 value={port}
                 onChange={(e) => setPort(e.target.value)}
                 disabled={loading}
@@ -126,16 +154,68 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
               />
             </Box>
             <TextField
-              label={t('vault.login.token') || 'Token'}
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              disabled={loading}
-              required
+              select
+              label={
+                t('vault.loginDialog.authMethod') || 'Authentication Method'
+              }
+              value={authMethod}
+              onChange={(e) =>
+                setAuthMethod(e.target.value as 'token' | 'ldap')
+              }
               size="small"
-              type="password"
-              autoComplete="off"
-              sx={dialogStyles.textField}
-            />
+              fullWidth
+              sx={{ ...dialogStyles.textField, mb: 1 }}
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: dialogStyles.selectPaper,
+                  },
+                },
+              }}
+            >
+              <MenuItem value="token">
+                {t('vault.loginDialog.methodToken') || 'Token'}
+              </MenuItem>
+              <MenuItem value="ldap">
+                {t('vault.loginDialog.methodLdap') || 'LDAP'}
+              </MenuItem>
+            </TextField>
+            {authMethod === 'token' ? (
+              <TextField
+                label={t('vault.loginDialog.token') || 'Token'}
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                disabled={loading}
+                required
+                size="small"
+                type="password"
+                autoComplete="off"
+                sx={dialogStyles.textField}
+              />
+            ) : (
+              <>
+                <TextField
+                  label={t('vault.loginDialog.username') || 'Username'}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={loading}
+                  required
+                  size="small"
+                  sx={dialogStyles.textField}
+                />
+                <TextField
+                  label={t('vault.loginDialog.password') || 'Password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  required
+                  size="small"
+                  type="password"
+                  autoComplete="off"
+                  sx={dialogStyles.textField}
+                />
+              </>
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={dialogStyles.dialogActions}>
@@ -153,7 +233,7 @@ export default function VaultLoginDialog({ open, onClose, onSuccess }: Props) {
             startIcon={loading ? <CircularProgress size={16} /> : undefined}
             sx={dialogStyles.confirmButton}
           >
-            {t('vault.login.submit') || 'Connect'}
+            {t('vault.loginDialog.connect') || 'Connect'}
           </Button>
         </DialogActions>
       </form>

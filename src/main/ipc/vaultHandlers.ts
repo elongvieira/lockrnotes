@@ -14,16 +14,21 @@ function vaultUrl(host: string, port: number): string {
 /** Helper: perform an authenticated Vault HTTP request. */
 async function vaultRequest<T>(
   url: string,
-  token: string,
+  token?: string,
   options: RequestInit = {},
 ): Promise<{ ok: boolean; status: number; data?: T; error?: string }> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers['X-Vault-Token'] = token;
+  }
+
   const response = await fetch(url, {
     ...options,
-    headers: {
-      'X-Vault-Token': token,
-      'Content-Type': 'application/json',
-      ...(options.headers as Record<string, string>),
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -55,15 +60,60 @@ export function registerVaultHandlers(): void {
     'vault:login',
     async (
       _event,
-      params: { host: string; port: number; token: string; mountPath?: string },
+      params: {
+        host: string;
+        port: number;
+        mountPath?: string;
+        authMethod?: 'token' | 'ldap';
+        token?: string;
+        username?: string;
+        password?: string;
+      },
     ) => {
       try {
-        const { host, port, token, mountPath = 'secret' } = params;
-        const url = `${vaultUrl(host, port)}/v1/auth/token/lookup-self`;
+        const {
+          host,
+          port,
+          mountPath = 'secret',
+          authMethod = 'token',
+          username,
+          password,
+        } = params;
+        let { token } = params;
 
-        const result = await vaultRequest<any>(url, token);
-        if (!result.ok) {
-          return { success: false, error: result.error };
+        if (authMethod === 'ldap') {
+          if (!username || !password) {
+            return {
+              success: false,
+              error: 'Username and password required for LDAP login',
+            };
+          }
+          const url = `${vaultUrl(host, port)}/v1/auth/ldap/login/${username}`;
+          const result = await vaultRequest<any>(url, undefined, {
+            method: 'POST',
+            body: JSON.stringify({ password }),
+          });
+
+          if (!result.ok) {
+            return { success: false, error: result.error };
+          }
+
+          token = result.data?.auth?.client_token;
+          if (!token) {
+            return {
+              success: false,
+              error: 'Failed to retrieve token from LDAP login',
+            };
+          }
+        } else {
+          if (!token) {
+            return { success: false, error: 'Token is required' };
+          }
+          const url = `${vaultUrl(host, port)}/v1/auth/token/lookup-self`;
+          const result = await vaultRequest<any>(url, token);
+          if (!result.ok) {
+            return { success: false, error: result.error };
+          }
         }
 
         await saveVaultSession({ host, port, token, mountPath });
