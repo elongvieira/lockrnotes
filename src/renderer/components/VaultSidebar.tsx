@@ -184,10 +184,12 @@ export default function VaultSidebar() {
         const items = keysToTreeItems(result.data, rootPath);
         setVaultRootPath(rootPath);
         setTargetPath(rootPath);
+        setExpandedItems([]);
         setTreeData(items);
       } else {
         setVaultRootPath(rootPath);
         setTargetPath(rootPath);
+        setExpandedItems([]);
         setTreeData([]);
         // Only show error if it's not a 'no data' situation
         if (result.error && !result.error.includes('404')) {
