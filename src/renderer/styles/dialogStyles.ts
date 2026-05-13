@@ -34,6 +34,9 @@ export const dialogStyles = {
 
   // Campo de texto padrão
   textField: {
+    '& .MuiInputBase-input': {
+      fontSize: 'var(--font-size-body)',
+    },
     '& .MuiOutlinedInput-root': {
       backgroundColor: 'var(--bg-tree-container)',
       color: 'var(--text-primary)',

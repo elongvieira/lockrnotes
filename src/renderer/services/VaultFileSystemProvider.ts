@@ -70,7 +70,7 @@ export class VaultFileSystemProvider implements FileSystemService {
 
   async saveFile(path: string, content: string): Promise<boolean> {
     try {
-      // path format: vault://notes/path/to/secret
+      // path format: vault://path/to/secret
       const secretPath = path.substring(8); // strip "vault://"
       const result = await window.vaultAPI.saveSecret(
         secretPath,
@@ -132,7 +132,7 @@ export class VaultFileSystemProvider implements FileSystemService {
   }
 
   async getDefaultNotesDirectory(): Promise<string> {
-    return 'vault://notes/';
+    return 'vault://';
   }
 
   async itemExists(_dirPath: string, _filename: string): Promise<boolean> {

@@ -58,8 +58,8 @@ export default function VaultSidebar() {
   // Dialogs
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
   const [secretDialogOpen, setSecretDialogOpen] = useState(false);
-  const [vaultRootPath, setVaultRootPath] = useState('notes/');
-  const [targetPath, setTargetPath] = useState('notes/');
+  const [vaultRootPath, setVaultRootPath] = useState('');
+  const [targetPath, setTargetPath] = useState('');
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [itemToRename, setItemToRename] = useState<VaultTreeItem | null>(null);
@@ -85,10 +85,12 @@ export default function VaultSidebar() {
 
   /** Convert Vault keys list into tree items. Keys ending in / are folders. */
   const keysToTreeItems = (
-    keys: string[],
+    keys: string[] | null | undefined,
     parentPath: string,
   ): VaultTreeItem[] => {
-    const items = keys
+    // Ensure keys is always an array
+    const keysArray = Array.isArray(keys) ? keys : [];
+    const items = keysArray
       .filter((k) => k !== '.folder') // hide folder markers
       .map((key) => {
         const isDir = key.endsWith('/');
@@ -175,52 +177,29 @@ export default function VaultSidebar() {
     if (!vaultSession) return;
     setLoading(true);
     try {
-      const preferredRoot = 'notes/';
-      const preferredResult = await window.vaultAPI.listSecrets(preferredRoot);
+      const rootPath = '';
+      const result = await window.vaultAPI.listSecrets(rootPath);
 
-      if (preferredResult.success && preferredResult.data) {
-        const preferredItems = keysToTreeItems(
-          preferredResult.data,
-          preferredRoot,
-        );
-        if (preferredItems.length > 0) {
-          setVaultRootPath(preferredRoot);
-          setTargetPath(preferredRoot);
-          setTreeData(preferredItems);
-          return;
-        }
-      }
-
-      const fallbackRoot = '';
-      const fallbackResult = await window.vaultAPI.listSecrets(fallbackRoot);
-      if (fallbackResult.success && fallbackResult.data) {
-        const fallbackItems = keysToTreeItems(
-          fallbackResult.data,
-          fallbackRoot,
-        );
-        if (fallbackItems.length > 0) {
-          setVaultRootPath(fallbackRoot);
-          setTargetPath(fallbackRoot);
-          setTreeData(fallbackItems);
-          return;
-        }
-      }
-
-      if (preferredResult.success) {
-        setVaultRootPath(preferredRoot);
-        setTargetPath(preferredRoot);
-        setTreeData([]);
-      } else if (fallbackResult.success) {
-        setVaultRootPath(fallbackRoot);
-        setTargetPath(fallbackRoot);
-        setTreeData([]);
+      if (result.success && result.data) {
+        const items = keysToTreeItems(result.data, rootPath);
+        setVaultRootPath(rootPath);
+        setTargetPath(rootPath);
+        setExpandedItems([]);
+        setTreeData(items);
       } else {
-        showNotification(
-          preferredResult.error ||
-            t('vault.errors.loadFailed') ||
-            'Failed to load secrets',
-          'error',
-        );
+        setVaultRootPath(rootPath);
+        setTargetPath(rootPath);
+        setExpandedItems([]);
+        setTreeData([]);
+        // Only show error if it's not a 'no data' situation
+        if (result.error && !result.error.includes('404')) {
+          showNotification(
+            result.error ||
+              t('vault.errors.loadFailed') ||
+              'Failed to load secrets',
+            'error',
+          );
+        }
       }
     } catch (err) {
       console.error(err);
@@ -236,6 +215,12 @@ export default function VaultSidebar() {
   useEffect(() => {
     if (vaultSession) {
       loadRootSecrets();
+    } else {
+      // Clear cached secrets when session ends
+      setTreeData([]);
+      setExpandedItems([]);
+      setVaultRootPath('');
+      setTargetPath('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vaultSession]);

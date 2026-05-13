@@ -35,7 +35,7 @@ import { dialogStyles } from '../styles/dialogStyles';
 import './VaultSecretEditor.css';
 import JsonEditor from './JsonEditor';
 
-// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---
 
 interface VaultField {
   id: string;
@@ -49,7 +49,7 @@ interface VaultSecretEditorProps {
   filePath?: string;
 }
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---
 
 /**
  * Keys matching this pattern have their values hidden by default so
@@ -101,7 +101,7 @@ function newFieldId(): string {
   return `field_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
-// â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---
 
 export default function VaultSecretEditor({
   content,
@@ -111,7 +111,7 @@ export default function VaultSecretEditor({
   const { t } = useTranslation();
   const { showNotification } = useAppContext();
 
-  // ─── Json Pattern Logic ─────────────────────────────────────────
+  // ---
 
   const isJsonPattern = useMemo(() => {
     try {
@@ -137,7 +137,7 @@ export default function VaultSecretEditor({
     [onContentChange],
   );
 
-  // ─── Default Vault Pattern State ────────────────────────────────
+  // ---
 
   const [fields, setFields] = useState<VaultField[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,7 +154,7 @@ export default function VaultSecretEditor({
     setFields(parseFields(content));
   }, [content]);
 
-  // â”€â”€ Derived state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ---
 
   const filteredFields = useMemo(() => {
     if (!searchQuery.trim()) return fields;
@@ -174,7 +174,7 @@ export default function VaultSecretEditor({
     sensitiveFieldIds.length > 0 &&
     sensitiveFieldIds.every((id) => visibleValues.has(id));
 
-  // â”€â”€ Field management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ---
 
   const persist = useCallback(
     (next: VaultField[]) => {
@@ -218,7 +218,7 @@ export default function VaultSecretEditor({
     persist(next);
   };
 
-  // â”€â”€ Visibility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ---
 
   const toggleVisibility = (id: string) => {
     setVisibleValues((prev) => {
@@ -241,7 +241,7 @@ export default function VaultSecretEditor({
     }
   };
 
-  // â”€â”€ Copy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ---
 
   const handleCopy = async (fieldId: string, value: string) => {
     try {
@@ -259,7 +259,7 @@ export default function VaultSecretEditor({
     }
   };
 
-  // â”€â”€ Raw JSON toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ---
 
   const toggleEditMode = () => {
     if (editMode === 'structured') {
@@ -279,13 +279,13 @@ export default function VaultSecretEditor({
     }
   };
 
-  // â”€â”€ Labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ---
 
   const secretLabel = filePath
     ? filePath.replace(/^vault:\/\/notes\//, '')
     : t('vault.editor.defaultPath') || 'Vault Secret';
 
-  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ---
 
   if (isJsonPattern) {
     return (
@@ -299,7 +299,7 @@ export default function VaultSecretEditor({
 
   return (
     <Box className="vault-secret-editor-root">
-      {/* â”€â”€ Header â”€â”€ */}
+      {/* */}
       <Box className="vault-secret-editor-header">
         <Typography variant="h6" className="vault-secret-editor-title" noWrap>
           {secretLabel}
@@ -372,7 +372,7 @@ export default function VaultSecretEditor({
         </Box>
       </Box>
 
-      {/* â”€â”€ Structured view â”€â”€ */}
+      {/* */}
       {editMode === 'structured' && (
         <>
           {fields.length === 0 && (
@@ -588,7 +588,7 @@ export default function VaultSecretEditor({
         </>
       )}
 
-      {/* â”€â”€ Raw JSON editor â”€â”€ */}
+      {/* */}
       {editMode === 'raw' && (
         <Box sx={{ flex: 1, p: 2, display: 'flex', flexDirection: 'column' }}>
           <TextField
@@ -603,14 +603,13 @@ export default function VaultSecretEditor({
               ...dialogStyles.textField,
               '& .MuiInputBase-root': {
                 fontFamily: 'monospace',
-                fontSize: '0.875rem',
               },
             }}
           />
         </Box>
       )}
 
-      {/* â”€â”€ Delete confirmation â”€â”€ */}
+      {/* */}
       <ConfirmDialog
         open={deleteConfirmOpen}
         title={t('vault.editor.deleteField') || 'Delete field'}
