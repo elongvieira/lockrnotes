@@ -176,7 +176,7 @@ export const dialogStyles = {
   // Status chip - active
   statusChipActive: {
     cursor: 'pointer',
-    fontSize: 11,
+    fontSize: 'var(--font-size-xs)',
     height: 20,
     backgroundColor: 'var(--status-success-bg)',
     color: 'var(--status-success)',
@@ -187,7 +187,7 @@ export const dialogStyles = {
   // Status chip - inactive
   statusChipInactive: {
     cursor: 'pointer',
-    fontSize: 11,
+    fontSize: 'var(--font-size-xs)',
     height: 20,
     backgroundColor: 'var(--bg-tree-container)',
     color: 'var(--text-secondary)',
@@ -260,7 +260,7 @@ export const dialogStyles = {
   // Texto de erro
   errorText: {
     color: 'var(--status-danger)',
-    fontSize: '0.875rem',
+    fontSize: 'var(--font-size-body)',
     mt: 1,
   } as SxProps<Theme>,
 
@@ -296,7 +296,7 @@ export const dialogStyles = {
 
   // Alert de erro
   alertError: {
-    fontSize: '0.875rem',
+    fontSize: 'var(--font-size-body)',
   } as SxProps<Theme>,
 
   // FormControl base
