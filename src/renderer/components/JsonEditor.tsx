@@ -441,7 +441,7 @@ export default function JsonEditor({
         const kvEntry = entry as KeyValueEntry;
         const kvVisible = visibleValues.has(`${entry.id}-0`);
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={dialogStyles.flexCenterGap}>
             <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
               {maskValue(kvEntry.value, kvVisible)}
             </Typography>

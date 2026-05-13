@@ -325,4 +325,29 @@ export const dialogStyles = {
   iconLarge: {
     fontSize: 56,
   } as SxProps<Theme>,
+
+  // Flex container com alinhamento vertical
+  flexVertical: {
+    display: 'flex',
+    flexDirection: 'column',
+  } as SxProps<Theme>,
+
+  // Flex container horizontal com gap
+  flexHorizontal: {
+    display: 'flex',
+    gap: 1,
+  } as SxProps<Theme>,
+
+  // Flex container com alinhamento de centro
+  flexCenter: {
+    display: 'flex',
+    alignItems: 'center',
+  } as SxProps<Theme>,
+
+  // Flex container horizontal + center + gap
+  flexCenterGap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1,
+  } as SxProps<Theme>,
 };
