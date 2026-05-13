@@ -82,7 +82,7 @@ export default function PasswordDialog({
         {filename && (
           <Typography
             variant="body2"
-            sx={{ mb: 2, color: 'var(--primary-blue)', fontWeight: 'bold' }}
+            sx={{ mb: 2, color: 'var(--primary-blue)', fontWeight: 600 }}
           >
             {filename}
           </Typography>
@@ -113,7 +113,7 @@ export default function PasswordDialog({
           }}
         />
         {error && (
-          <Box sx={{ color: '#ff6b6b', fontSize: '0.875rem', mt: 1 }}>
+          <Box sx={dialogStyles.errorText}>
             {error}
           </Box>
         )}

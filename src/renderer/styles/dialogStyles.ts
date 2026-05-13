@@ -256,4 +256,98 @@ export const dialogStyles = {
       },
     },
   } as SxProps<Theme>,
+
+  // Texto de erro
+  errorText: {
+    color: 'var(--status-danger)',
+    fontSize: '0.875rem',
+    mt: 1,
+  } as SxProps<Theme>,
+
+  // Status SSH - Conectado
+  sshStatusConnected: {
+    color: 'var(--text-success)',
+  } as SxProps<Theme>,
+
+  // Status SSH - Erro
+  sshStatusError: {
+    color: 'var(--status-danger)',
+  } as SxProps<Theme>,
+
+  // Status SSH - Desconectado
+  sshStatusDisconnected: {
+    color: 'var(--text-warning)',
+  } as SxProps<Theme>,
+
+  // Tipografia - Bold
+  fontWeightBold: {
+    fontWeight: 600,
+  } as SxProps<Theme>,
+
+  // Tipografia - Medium
+  fontWeightMedium: {
+    fontWeight: 500,
+  } as SxProps<Theme>,
+
+  // Tipografia - Normal
+  fontWeightNormal: {
+    fontWeight: 400,
+  } as SxProps<Theme>,
+
+  // Alert de erro
+  alertError: {
+    fontSize: '0.875rem',
+  } as SxProps<Theme>,
+
+  // FormControl base
+  formControlBase: {
+    mt: 1,
+    mb: 1,
+    width: '100%',
+  } as SxProps<Theme>,
+
+  // FormLabel base
+  formLabelBase: {
+    mb: 0.5,
+  } as SxProps<Theme>,
+
+  // Ícone pequeno
+  iconSmall: {
+    fontSize: 16,
+  } as SxProps<Theme>,
+
+  // Ícone médio
+  iconMedium: {
+    fontSize: 20,
+  } as SxProps<Theme>,
+
+  // Ícone grande
+  iconLarge: {
+    fontSize: 56,
+  } as SxProps<Theme>,
+
+  // Flex container com alinhamento vertical
+  flexVertical: {
+    display: 'flex',
+    flexDirection: 'column',
+  } as SxProps<Theme>,
+
+  // Flex container horizontal com gap
+  flexHorizontal: {
+    display: 'flex',
+    gap: 1,
+  } as SxProps<Theme>,
+
+  // Flex container com alinhamento de centro
+  flexCenter: {
+    display: 'flex',
+    alignItems: 'center',
+  } as SxProps<Theme>,
+
+  // Flex container horizontal + center + gap
+  flexCenterGap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1,
+  } as SxProps<Theme>,
 };

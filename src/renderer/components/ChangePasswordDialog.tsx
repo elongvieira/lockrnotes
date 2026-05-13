@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
+import { SPACING, GAPS } from '../styles/spacingConstants';
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -101,7 +102,7 @@ export function ChangePasswordDialog({
         {t('community.changePassword.title')}
       </DialogTitle>
       <DialogContent sx={dialogStyles.dialogContent}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2.5 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: GAPS.SECTION, mt: SPACING.XL }}>
           <Alert severity="info">{t('community.changePassword.message')}</Alert>
 
           {error && <Alert severity="error">{error}</Alert>}

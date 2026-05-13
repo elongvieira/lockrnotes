@@ -210,17 +210,17 @@ export default function SshTerminalDialog({
             <CircularProgress size={18} sx={{ color: 'var(--primary-blue)' }} />
           )}
           {status === 'connected' && (
-            <Typography variant="caption" sx={{ color: '#a6e3a1', ml: 1 }}>
+            <Typography variant="caption" sx={{ ...dialogStyles.sshStatusConnected, ml: 1 }}>
               {t('ssh.connected') || 'Connected'}
             </Typography>
           )}
           {status === 'error' && (
-            <Typography variant="caption" sx={{ color: '#f38ba8', ml: 1 }}>
+            <Typography variant="caption" sx={{ ...dialogStyles.sshStatusError, ml: 1 }}>
               {t('ssh.error') || 'Error'}
             </Typography>
           )}
           {status === 'closed' && (
-            <Typography variant="caption" sx={{ color: '#fab387', ml: 1 }}>
+            <Typography variant="caption" sx={{ ...dialogStyles.sshStatusDisconnected, ml: 1 }}>
               {t('ssh.disconnected') || 'Disconnected'}
             </Typography>
           )}
