@@ -26,6 +26,7 @@ import ConfirmDialog from './ConfirmDialog';
 import { HotCopyItem } from '../types/hotcopy';
 import type { ImportFileInfo } from '../../main/preload/importApi';
 import { useAppContext } from '../contexts/AppContext';
+import { dialogStyles } from '../styles/dialogStyles';
 import './AppBar.css';
 
 export default function AppBar() {
@@ -321,11 +322,11 @@ export default function AppBar() {
               title={`${communitySession.email} @ ${communitySession.host}:${communitySession.port}`}
             >
               <Chip
-                icon={<CloudIcon sx={{ fontSize: '20px !important' }} />}
+                icon={<CloudIcon sx={dialogStyles.iconMedium} />}
                 onDelete={() => setLogoutConfirmOpen(true)}
                 deleteIcon={
                   <Tooltip title={t('community.logout') || 'Logout'}>
-                    <LogoutIcon sx={{ fontSize: '16px !important' }} />
+                    <LogoutIcon sx={dialogStyles.iconSmall} />
                   </Tooltip>
                 }
                 sx={{
@@ -351,11 +352,11 @@ export default function AppBar() {
               title={`Vault @ ${vaultSession.host}:${vaultSession.port}`}
             >
               <Chip
-                icon={<VpnKeyIcon sx={{ fontSize: '20px !important' }} />}
+                icon={<VpnKeyIcon sx={dialogStyles.iconMedium} />}
                 onDelete={() => setVaultLogoutConfirmOpen(true)}
                 deleteIcon={
                   <Tooltip title={t('vault.logout') || 'Disconnect'}>
-                    <LogoutIcon sx={{ fontSize: '16px !important' }} />
+                    <LogoutIcon sx={dialogStyles.iconSmall} />
                   </Tooltip>
                 }
                 sx={{

@@ -113,7 +113,7 @@ export default function PasswordDialog({
           }}
         />
         {error && (
-          <Box sx={{ color: '#ff6b6b', fontSize: '0.875rem', mt: 1 }}>
+          <Box sx={dialogStyles.errorText}>
             {error}
           </Box>
         )}

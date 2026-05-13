@@ -315,7 +315,7 @@ function CreateUserDialog({
               />
             }
             label={
-              <Typography sx={{ ...dialogStyles.secondaryText, fontSize: 13 }}>
+              <Typography sx={dialogStyles.secondaryText}>
                 {t('admin.dialog.users.form.forcePasswordChange')}
               </Typography>
             }
@@ -434,7 +434,7 @@ function EditUserDialog({
       <DialogContent sx={dialogStyles.dialogContent}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           {error && (
-            <Alert severity="error" sx={{ fontSize: 13 }}>
+            <Alert severity="error" sx={dialogStyles.alertError}>
               {error}
             </Alert>
           )}
@@ -1137,7 +1137,7 @@ function ManageGroupMembersDialog({
       <DialogContent sx={dialogStyles.dialogContent}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           {error && (
-            <Alert severity="error" sx={{ fontSize: 13 }}>
+            <Alert severity="error" sx={dialogStyles.alertError}>
               {error}
             </Alert>
           )}
