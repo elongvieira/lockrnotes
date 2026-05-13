@@ -10,6 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
+import { SPACING, GAPS } from '../styles/spacingConstants';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
 
 interface Props {
@@ -133,10 +134,10 @@ export default function CommunityLoginDialog({
         </DialogTitle>
         <DialogContent sx={dialogStyles.dialogContent}>
           <Box
-            sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2.5 }}
+            sx={{ display: 'flex', flexDirection: 'column', gap: GAPS.SECTION, mt: SPACING.XL }}
           >
             {error && <Alert severity="error">{error}</Alert>}
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: 'flex', gap: GAPS.ITEM }}>
               <TextField
                 label={t('community.login.host') || 'Host / IP'}
                 value={host}

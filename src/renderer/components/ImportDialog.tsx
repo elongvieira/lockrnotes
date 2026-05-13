@@ -24,6 +24,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
+import { SPACING, GAPS } from '../styles/spacingConstants';
 import { fileCreationService } from '../services/fileCreationService';
 import type { ImportFileInfo } from '../../main/preload/importApi';
 
@@ -323,7 +324,7 @@ export default function ImportDialog({
         <Typography variant="h6" sx={{ ...dialogStyles.headingText, mb: 1 }}>
           {t('dialog.import.destination') || 'Pasta de destino'}
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: GAPS.ITEM, mb: SPACING.XXL }}>
           <TextField
             fullWidth
             placeholder={

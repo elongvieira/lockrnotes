@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { fileSystemService } from '../services/fileSystemService';
 import { fileCreationService } from '../services/fileCreationService';
 import { dialogStyles } from '../styles/dialogStyles';
+import { SPACING, GAPS, MARGINS } from '../styles/spacingConstants';
 import type { FileCreationData } from '../types/fileCreation';
 
 interface FileCreationDialogProps {
@@ -210,14 +211,14 @@ export default function FileCreationDialog({
           error={!!errors.filename}
           helperText={errors.filename}
           sx={{
-            mb: 3,
-            mt: 2,
+            mb: SPACING.XXL,
+            mt: SPACING.LG,
             ...dialogStyles.textField,
           }}
         />
 
         {/* File Type Selection */}
-        <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: SPACING.XXL, mb: SPACING.XXL }}>
           {/* Left side - Type options */}
           <Box sx={{ flex: 1 }}>
             <Typography
@@ -238,7 +239,7 @@ export default function FileCreationDialog({
                     control={<Radio sx={dialogStyles.checkboxRadio} />}
                     label={
                       <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        sx={{ display: 'flex', alignItems: 'center', gap: GAPS.ITEM }}
                       >
                         <Box>
                           <Typography
@@ -269,7 +270,7 @@ export default function FileCreationDialog({
           <Box sx={{ flex: 1, pl: 2 }}>
             <Typography
               variant="h6"
-              sx={{ ...dialogStyles.headingText, mb: 2 }}
+              sx={{ ...dialogStyles.headingText, mb: SPACING.LG }}
             >
               {t('dialog.file.previewTitle') || 'Exemplo'}
             </Typography>
@@ -292,7 +293,7 @@ export default function FileCreationDialog({
         <Divider sx={{ my: 3, ...dialogStyles.divider }} />
 
         {/* Encryption Options */}
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: SPACING.LG }}>
           <FormControlLabel
             control={
               <Checkbox
@@ -310,11 +311,11 @@ export default function FileCreationDialog({
         </Box>
 
         {encrypted && (
-          <Box sx={{ ml: 4, mb: 2 }}>
+          <Box sx={{ ml: MARGINS.INDENT_1, mb: SPACING.LG }}>
             <RadioGroup
               value={encryptionType}
               onChange={(e) => setEncryptionType(e.target.value)}
-              sx={{ mb: 2 }}
+              sx={{ mb: SPACING.LG }}
             >
               <FormControlLabel
                 value="managed"
@@ -339,7 +340,7 @@ export default function FileCreationDialog({
 
             {encryptionType === 'manual' && (
               <>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: GAPS.SECTION, mb: SPACING.LG }}>
                   <TextField
                     type="password"
                     label={t('dialog.file.password') || 'Senha'}
