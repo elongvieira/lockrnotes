@@ -603,7 +603,6 @@ export default function VaultSecretEditor({
               ...dialogStyles.textField,
               '& .MuiInputBase-root': {
                 fontFamily: 'monospace',
-                fontSize: '0.875rem',
               },
             }}
           />

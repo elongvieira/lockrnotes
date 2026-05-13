@@ -58,6 +58,10 @@
   --spacing-md: 12px;
   --spacing-lg: 16px;
   --spacing-xl: 20px;
+
+  /* Typography */
+  --font-size-body: 0.875rem;
+  --font-size-sm: 0.75rem;
 }
 
 /* App menus (context menu, app menu, language menu) */
