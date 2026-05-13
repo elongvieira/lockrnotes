@@ -144,7 +144,7 @@ export default function HotCopyManageDialog({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontWeight: 'bold',
+                        fontWeight: 600,
                         fontSize: '14px',
                       }}
                     >

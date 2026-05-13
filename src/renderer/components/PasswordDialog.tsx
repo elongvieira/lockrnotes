@@ -82,7 +82,7 @@ export default function PasswordDialog({
         {filename && (
           <Typography
             variant="body2"
-            sx={{ mb: 2, color: 'var(--primary-blue)', fontWeight: 'bold' }}
+            sx={{ mb: 2, color: 'var(--primary-blue)', fontWeight: 600 }}
           >
             {filename}
           </Typography>

@@ -216,7 +216,7 @@ function CreateUserDialog({
       <DialogContent sx={dialogStyles.dialogContent}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           {error && (
-            <Alert severity="error" sx={{ fontSize: 13 }}>
+            <Alert severity="error" sx={dialogStyles.alertError}>
               {error}
             </Alert>
           )}
@@ -584,16 +584,16 @@ function UsersSection({
         <Button
           size="small"
           variant="contained"
-          startIcon={<PersonAddIcon sx={{ fontSize: '16px !important' }} />}
+          startIcon={<PersonAddIcon sx={dialogStyles.iconSmall} />}
           onClick={onNew}
-          sx={{ ...dialogStyles.confirmButton, px: 1.5, fontSize: 13 }}
+          sx={dialogStyles.confirmButton}
         >
           {t('admin.dialog.users.newUser')}
         </Button>
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2, fontSize: 13 }}>
+        <Alert severity="error" sx={{ ...dialogStyles.alertError, mb: 2 }}>
           {error}
         </Alert>
       )}
@@ -796,16 +796,16 @@ function GroupsSection({
         <Button
           size="small"
           variant="contained"
-          startIcon={<GroupAddIcon sx={{ fontSize: '16px !important' }} />}
+          startIcon={<GroupAddIcon sx={dialogStyles.iconSmall} />}
           onClick={onNew}
-          sx={{ ...dialogStyles.confirmButton, px: 1.5, fontSize: 13 }}
+          sx={dialogStyles.confirmButton}
         >
           {t('admin.dialog.groups.newGroup')}
         </Button>
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2, fontSize: 13 }}>
+        <Alert severity="error" sx={{ ...dialogStyles.alertError, mb: 2 }}>
           {error}
         </Alert>
       )}
@@ -979,7 +979,7 @@ function GroupFormDialog({
       <DialogContent sx={dialogStyles.dialogContent}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           {error && (
-            <Alert severity="error" sx={{ fontSize: 13 }}>
+            <Alert severity="error" sx={dialogStyles.alertError}>
               {error}
             </Alert>
           )}
