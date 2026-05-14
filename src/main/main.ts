@@ -12,7 +12,11 @@ import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import { ensureConfigFile, updateConfigFile } from './config';
+import {
+  ensureConfigFile,
+  migrateConfigIfNeeded,
+  updateConfigFile,
+} from './config';
 import { resolveHtmlPath } from './util';
 import { setupIpcHandlers } from './ipc';
 
@@ -159,8 +163,9 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    // Ensure config file exists in the working directory before creating UI
-    ensureConfigFile()
+    // Migrate legacy plaintext config.json → encrypted config.enc, then ensure config exists
+    migrateConfigIfNeeded()
+      .then(() => ensureConfigFile())
       .then(() => createWindow())
       .catch(console.log);
     app.on('activate', () => {
