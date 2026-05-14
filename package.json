@@ -233,7 +233,8 @@
     }
   },
   "overrides": {
-    "minimatch": "^9.0.7"
+    "minimatch": "^9.0.7",
+    "npm": "^11.14.1"
   },
   "collective": {
     "url": "https://lockrnotes.com"
