@@ -47,6 +47,10 @@ export const filesystemApi = {
     return ipcRenderer.invoke('fs-read-config');
   },
 
+  readConfigDebug(): Promise<string | null> {
+    return ipcRenderer.invoke('fs-read-config-debug');
+  },
+
   updateConfig(updates: any): Promise<boolean> {
     return ipcRenderer.invoke('fs-update-config', updates);
   },

@@ -30,7 +30,7 @@ interface SettingsDialogProps {
   onClose: () => void;
 }
 
-type SettingsSection = 'editor' | 'storage' | 'security' | 'language';
+type SettingsSection = 'editor' | 'storage' | 'security' | 'language' | 'debug';
 
 export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   const { t } = useTranslation();
@@ -44,6 +44,8 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   const [language, setLanguage] = useState<string>('pt-BR');
   const [showCopyDialog, setShowCopyDialog] = useState<boolean>(false);
   const [selectedNewPath, setSelectedNewPath] = useState<string>('');
+  const [debugConfigJson, setDebugConfigJson] = useState<string | null>(null);
+  const isDev = process.env.NODE_ENV === 'development';
 
   // Carregar configurações ao abrir o diálogo
   useEffect(() => {
@@ -163,6 +165,69 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
       console.error('Failed to save settings:', error);
       setLoading(false);
     }
+  };
+
+  const renderDebugSettings = () => {
+    const loadDebugConfig = async () => {
+      try {
+        const raw = await window.electron?.filesystem?.readConfigDebug();
+        setDebugConfigJson(raw ?? null);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load debug config:', error);
+      }
+    };
+
+    if (debugConfigJson === null) {
+      loadDebugConfig();
+    }
+
+    return (
+      <Box>
+        <Typography
+          variant="h6"
+          sx={{
+            ...dialogStyles.headingText,
+            mb: 2,
+          }}
+        >
+          Debug — config.enc
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{ ...dialogStyles.secondaryText, display: 'block', mb: 2 }}
+        >
+          Conteúdo atual do arquivo de configuração encriptado (apenas visível
+          em modo desenvolvimento).
+        </Typography>
+        <Button
+          size="small"
+          variant="outlined"
+          sx={{ mb: 2, ...dialogStyles.cancelButton }}
+          onClick={() => {
+            setDebugConfigJson(null);
+          }}
+        >
+          Recarregar
+        </Button>
+        <Box
+          component="pre"
+          sx={{
+            ...dialogStyles.primaryText,
+            fontSize: '0.75rem',
+            backgroundColor: 'var(--bg-secondary, rgba(0,0,0,0.2))',
+            border: '1px solid var(--border-primary)',
+            borderRadius: 1,
+            p: 2,
+            overflowX: 'auto',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-all',
+          }}
+        >
+          {debugConfigJson ?? 'Carregando...'}
+        </Box>
+      </Box>
+    );
   };
 
   const renderEditorSettings = () => (
@@ -524,6 +589,21 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
                 />
               </ListItemButton>
             </ListItem>
+            {isDev && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  selected={selectedSection === 'debug'}
+                  onClick={() => setSelectedSection('debug')}
+                >
+                  <ListItemText
+                    primary="Debug"
+                    primaryTypographyProps={{
+                      sx: { ...dialogStyles.primaryText },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )}
           </List>
         </Box>
 
@@ -540,6 +620,7 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
           {selectedSection === 'storage' && renderStorageSettings()}
           {selectedSection === 'security' && renderSecuritySettings()}
           {selectedSection === 'language' && renderLanguageSettings()}
+          {selectedSection === 'debug' && isDev && renderDebugSettings()}
         </Box>
       </DialogContent>
 

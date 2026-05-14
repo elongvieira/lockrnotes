@@ -12,7 +12,11 @@ import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import { ensureConfigFile, updateConfigFile } from './config';
+import {
+  ensureConfigFile,
+  migrateConfigIfNeeded,
+  updateConfigFile,
+} from './config';
 import { resolveHtmlPath } from './util';
 import { setupIpcHandlers } from './ipc';
 
@@ -158,11 +162,16 @@ app.on('window-all-closed', () => {
 
 app
   .whenReady()
-  .then(() => {
-    // Ensure config file exists in the working directory before creating UI
-    ensureConfigFile()
-      .then(() => createWindow())
-      .catch(console.log);
+  .then(async () => {
+    try {
+      // Migrate legacy plaintext config.json → encrypted config.enc, then ensure config exists
+      await migrateConfigIfNeeded();
+      await ensureConfigFile();
+      await createWindow();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    }
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

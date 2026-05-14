@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { readConfigFile, updateConfigFile } from '../config';
+import { readConfigFile, readConfigRaw, updateConfigFile } from '../config';
 import { managedEncryptionService } from '../services/managedEncryptionService';
 
 /**
@@ -188,6 +188,20 @@ export function setupFilesystemHandlers() {
       }
     },
   );
+
+  // Debug-only: expose raw decrypted config JSON (only registered in dev/debug builds)
+  const isDebug =
+    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+  if (isDebug) {
+    ipcMain.handle('fs-read-config-debug', async () => {
+      try {
+        return await readConfigRaw();
+      } catch (error) {
+        console.error('Error reading raw config:', error);
+        return null;
+      }
+    });
+  }
 
   // Read config file
   ipcMain.handle('fs-read-config', async () => {
