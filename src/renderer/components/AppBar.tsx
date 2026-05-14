@@ -335,7 +335,7 @@ export default function AppBar() {
                   fontWeight: 500,
                   color: 'var(--primary-blue)',
                   backgroundColor: 'var(--primary-blue-light)',
-                  '-webkit-app-region': 'no-drag',
+                  webkitAppRegion: 'no-drag',
                   '& .MuiChip-icon': { color: 'var(--primary-blue)' },
                   '& .MuiChip-deleteIcon': {
                     color: 'var(--text-secondary)',
@@ -365,7 +365,7 @@ export default function AppBar() {
                   fontWeight: 500,
                   color: 'var(--primary-blue)',
                   backgroundColor: 'var(--primary-blue-light)',
-                  '-webkit-app-region': 'no-drag',
+                  webkitAppRegion: 'no-drag',
                   '& .MuiChip-icon': { color: 'var(--primary-blue)' },
                   '& .MuiChip-deleteIcon': {
                     color: 'var(--text-secondary)',
