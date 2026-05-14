@@ -102,7 +102,14 @@ export function ChangePasswordDialog({
         {t('community.changePassword.title')}
       </DialogTitle>
       <DialogContent sx={dialogStyles.dialogContent}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: GAPS.SECTION, mt: SPACING.XL }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: GAPS.SECTION,
+            mt: SPACING.XL,
+          }}
+        >
           <Alert severity="info">{t('community.changePassword.message')}</Alert>
 
           {error && <Alert severity="error">{error}</Alert>}

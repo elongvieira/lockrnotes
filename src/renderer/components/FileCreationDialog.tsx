@@ -239,7 +239,11 @@ export default function FileCreationDialog({
                     control={<Radio sx={dialogStyles.checkboxRadio} />}
                     label={
                       <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: GAPS.ITEM }}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: GAPS.ITEM,
+                        }}
                       >
                         <Box>
                           <Typography
@@ -340,7 +344,9 @@ export default function FileCreationDialog({
 
             {encryptionType === 'manual' && (
               <>
-                <Box sx={{ display: 'flex', gap: GAPS.SECTION, mb: SPACING.LG }}>
+                <Box
+                  sx={{ display: 'flex', gap: GAPS.SECTION, mb: SPACING.LG }}
+                >
                   <TextField
                     type="password"
                     label={t('dialog.file.password') || 'Senha'}
