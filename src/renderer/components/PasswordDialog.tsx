@@ -112,11 +112,7 @@ export default function PasswordDialog({
             ),
           }}
         />
-        {error && (
-          <Box sx={dialogStyles.errorText}>
-            {error}
-          </Box>
-        )}
+        {error && <Box sx={dialogStyles.errorText}>{error}</Box>}
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
         <Button onClick={onClose} sx={dialogStyles.cancelButton}>

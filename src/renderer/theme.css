@@ -60,8 +60,10 @@
   --spacing-xl: 20px;
 
   /* Typography */
-  --font-size-body: 0.875rem;
-  --font-size-sm: 0.75rem;
+  --font-size-body: 0.875rem; /* 14px — texto padrão */
+  --font-size-sm: 0.75rem; /* 12px — texto pequeno */
+  --font-size-xs: 0.6875rem; /* 11px — chips, badges */
+  --font-size-compact: 0.8125rem; /* 13px — elementos compactos */
 }
 
 /* App menus (context menu, app menu, language menu) */

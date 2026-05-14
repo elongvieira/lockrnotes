@@ -134,7 +134,12 @@ export default function CommunityLoginDialog({
         </DialogTitle>
         <DialogContent sx={dialogStyles.dialogContent}>
           <Box
-            sx={{ display: 'flex', flexDirection: 'column', gap: GAPS.SECTION, mt: SPACING.XL }}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: GAPS.SECTION,
+              mt: SPACING.XL,
+            }}
           >
             {error && <Alert severity="error">{error}</Alert>}
             <Box sx={{ display: 'flex', gap: GAPS.ITEM }}>
