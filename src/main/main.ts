@@ -162,12 +162,16 @@ app.on('window-all-closed', () => {
 
 app
   .whenReady()
-  .then(() => {
-    // Migrate legacy plaintext config.json → encrypted config.enc, then ensure config exists
-    migrateConfigIfNeeded()
-      .then(() => ensureConfigFile())
-      .then(() => createWindow())
-      .catch(console.log);
+  .then(async () => {
+    try {
+      // Migrate legacy plaintext config.json → encrypted config.enc, then ensure config exists
+      await migrateConfigIfNeeded();
+      await ensureConfigFile();
+      await createWindow();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    }
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

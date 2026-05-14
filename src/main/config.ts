@@ -11,6 +11,28 @@ function getConfigPath(): string {
   return path.join(app.getPath('userData'), CONFIG_FILE_NAME);
 }
 
+/** Internal helper: encrypt and atomically write the config object to disk. */
+async function writeEncryptedConfig(config: any): Promise<void> {
+  const configPath = getConfigPath();
+  await fs.promises.mkdir(path.dirname(configPath), { recursive: true });
+
+  const encrypted = safeStorage.encryptString(JSON.stringify(config));
+  const wrapper = {
+    type: CONFIG_WRAPPER_TYPE,
+    version: CONFIG_WRAPPER_VERSION,
+    encrypted: encrypted.toString('base64'),
+    created: new Date().toISOString(),
+  };
+
+  const tmpPath = `${configPath}.tmp`;
+  await fs.promises.writeFile(
+    tmpPath,
+    JSON.stringify(wrapper, null, 2),
+    'utf8',
+  );
+  await fs.promises.rename(tmpPath, configPath);
+}
+
 /**
  * One-time migration: if a legacy plaintext config.json exists in process.cwd(),
  * read it, encrypt it into the new location, then delete the old file.
@@ -44,28 +66,6 @@ export async function migrateConfigIfNeeded(): Promise<void> {
     // eslint-disable-next-line no-console
     console.error('Failed to migrate legacy config:', error);
   }
-}
-
-/** Internal helper: encrypt and atomically write the config object to disk. */
-async function writeEncryptedConfig(config: any): Promise<void> {
-  const configPath = getConfigPath();
-  await fs.promises.mkdir(path.dirname(configPath), { recursive: true });
-
-  const encrypted = safeStorage.encryptString(JSON.stringify(config));
-  const wrapper = {
-    type: CONFIG_WRAPPER_TYPE,
-    version: CONFIG_WRAPPER_VERSION,
-    encrypted: encrypted.toString('base64'),
-    created: new Date().toISOString(),
-  };
-
-  const tmpPath = `${configPath}.tmp`;
-  await fs.promises.writeFile(
-    tmpPath,
-    JSON.stringify(wrapper, null, 2),
-    'utf8',
-  );
-  await fs.promises.rename(tmpPath, configPath);
 }
 
 /**
