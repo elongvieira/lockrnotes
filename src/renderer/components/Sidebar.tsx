@@ -20,6 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,7 @@ import MoveDialog from './MoveDialog';
 import ConfirmDialog from './ConfirmDialog';
 import PasswordDialog from './PasswordDialog';
 import TreeItemLabel from './TreeItemLabel';
+import CopyToVaultDialog from './CopyToVaultDialog';
 import { useAppContext } from '../contexts/AppContext';
 import { dialogStyles } from '../styles/dialogStyles';
 
@@ -49,6 +51,7 @@ export default function Sidebar() {
     setTabs,
     activeTab,
     setActiveTab,
+    vaultSession,
   } = useAppContext();
   const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
@@ -79,6 +82,12 @@ export default function Sidebar() {
   // Copy dialog state
   const [_copyDialogOpen, setCopyDialogOpen] = useState<boolean>(false);
   const [itemToCopy, setItemToCopy] = useState<FileSystemItem | null>(null);
+
+  // Copy to Vault dialog state
+  const [copyToVaultDialogOpen, setCopyToVaultDialogOpen] =
+    useState<boolean>(false);
+  const [itemToCopyToVault, setItemToCopyToVault] =
+    useState<FileSystemItem | null>(null);
 
   // Password dialog state for manual encryption
   const [passwordDialogOpen, setPasswordDialogOpen] = useState<boolean>(false);
@@ -464,6 +473,14 @@ export default function Sidebar() {
     if (contextMenu?.item) {
       setItemToCopy(contextMenu.item);
       setCopyDialogOpen(true);
+    }
+    handleContextMenuClose();
+  };
+
+  const handleContextMenuCopyToVault = () => {
+    if (contextMenu?.item) {
+      setItemToCopyToVault(contextMenu.item);
+      setCopyToVaultDialogOpen(true);
     }
     handleContextMenuClose();
   };
@@ -1120,6 +1137,17 @@ export default function Sidebar() {
             <ListItemText>{t('contextMenu.decrypt') || 'Decrypt'}</ListItemText>
           </MenuItem>
         )}
+        {contextMenu?.item?.type === 'file' && vaultSession?.host && (
+          <MenuItem
+            onClick={handleContextMenuCopyToVault}
+            className="app-menu-item"
+          >
+            <ListItemIcon className="app-menu-icon">
+              <VpnKeyIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('contextMenu.copyToVault')}</ListItemText>
+          </MenuItem>
+        )}
         <MenuItem onClick={handleContextMenuDelete} className="app-menu-item">
           <ListItemIcon className="app-menu-icon">
             <DeleteIcon fontSize="small" />
@@ -1176,6 +1204,15 @@ export default function Sidebar() {
         onConfirm={handlePasswordConfirm}
         filename={pendingFileData?.item.name}
         error={passwordError}
+      />
+
+      <CopyToVaultDialog
+        open={copyToVaultDialogOpen}
+        onClose={() => setCopyToVaultDialogOpen(false)}
+        file={itemToCopyToVault}
+        onCopyComplete={() =>
+          showNotification(t('notifications.fileCopiedToVault'), 'success')
+        }
       />
     </aside>
   );

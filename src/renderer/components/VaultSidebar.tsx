@@ -225,6 +225,19 @@ export default function VaultSidebar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vaultSession]);
 
+  useEffect(() => {
+    const handleSecretCopied = () => {
+      if (vaultSession) {
+        loadRootSecrets();
+      }
+    };
+
+    window.addEventListener('vault:secret-copied', handleSecretCopied);
+    return () => {
+      window.removeEventListener('vault:secret-copied', handleSecretCopied);
+    };
+  }, [vaultSession, loadRootSecrets]);
+
   const fetchFolderContents = async (item: VaultTreeItem) => {
     if (item.loaded) return;
     try {

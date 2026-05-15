@@ -39,6 +39,8 @@ export const vaultApi = {
     success: boolean;
     data?: Record<string, string>;
     metadata?: any;
+    notFound?: boolean;
+    status?: number;
     error?: string;
   }> {
     return ipcRenderer.invoke('vault:get-secret', path);

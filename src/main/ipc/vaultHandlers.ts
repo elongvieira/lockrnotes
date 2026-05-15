@@ -192,13 +192,19 @@ export function registerVaultHandlers(): void {
       }>(url, session.token);
 
       if (!result.ok) {
-        return { success: false, error: result.error };
+        return {
+          success: false,
+          error: result.error,
+          status: result.status,
+          notFound: result.status === 404,
+        };
       }
 
       return {
         success: true,
         data: result.data?.data?.data ?? {},
         metadata: result.data?.data?.metadata ?? {},
+        status: result.status,
       };
     } catch (err: any) {
       return { success: false, error: err.message || String(err) };
