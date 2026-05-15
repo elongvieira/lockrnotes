@@ -233,7 +233,8 @@
     "move": "Move",
     "copy": "Copy",
     "delete": "Delete",
-    "decrypt": "Decrypt"
+    "decrypt": "Decrypt",
+    "copyToVault": "Copy to Vault"
   },
   "notifications": {
     "fileCreated": "File created successfully",
@@ -259,7 +260,31 @@
     "exportInProgress": "Exporting files...",
     "importSuccess": "{{count}} file(s) imported successfully",
     "importError": "Error selecting files to import: {{error}}",
-    "importPartialError": "Errors during import: {{errors}}"
+    "importPartialError": "Errors during import: {{errors}}",
+    "fileCopiedToVault": "File copied to Vault successfully",
+    "fileCopyToVaultError": "Error copying file to Vault"
+  },
+  "copyToVaultDialog": {
+    "title": "Copy to Vault",
+    "fileLabel": "File",
+    "vaultPathLabel": "Vault secret name",
+    "vaultPathHelper": "To save inside a folder, use folder/subfolder/secret-name.",
+    "vaultPathPlaceholder": "e.g. finance/mastercard",
+    "detectingEncryption": "Detecting encryption...",
+    "managedEncryptionInfo": "This file is encrypted and will be decrypted automatically before being sent to Vault.",
+    "passwordLabel": "Decryption password",
+    "confirm": "Copy to Vault",
+    "copying": "Copying...",
+    "errors": {
+      "emptyPath": "Vault secret name cannot be empty",
+      "secretAlreadyExists": "A secret with this name already exists in this folder",
+      "checkExistsFailed": "Failed to check whether the secret already exists in Vault",
+      "passwordRequired": "Password is required to decrypt this file",
+      "readFailed": "Failed to read the file",
+      "invalidEncryptedFile": "File appears to be encrypted but could not be parsed",
+      "decryptionFailed": "Decryption failed. Check your password.",
+      "saveFailed": "Failed to save secret to Vault"
+    }
   },
   "status": {
     "saved": "Saved",
@@ -514,6 +539,24 @@
     },
     "actions": {
       "createSecret": "Create secret"
+    },
+    "transferDialog": {
+      "copyTitle": "Copy Secret",
+      "moveTitle": "Move Secret",
+      "destinationLabel": "Destination in Vault",
+      "destinationPlaceholder": "e.g. folder/subfolder/new-name",
+      "destinationHelper": "Provide the full destination secret path in Vault.",
+      "errors": {
+        "emptyPath": "Please provide a destination path",
+        "sameLocation": "Destination is the same as current location",
+        "invalidPath": "Destination path cannot end with /",
+        "fileExists": "A secret with this name already exists in destination",
+        "checkExistsFailed": "Failed to validate destination in Vault",
+        "readSourceFailed": "Failed to read source secret",
+        "saveFailed": "Failed to save destination secret",
+        "deleteFailed": "Failed to remove source secret",
+        "failed": "Failed to transfer secret"
+      }
     },
     "dialog": {
       "secretName": "Secret Name",

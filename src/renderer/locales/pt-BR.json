@@ -233,7 +233,8 @@
     "move": "Mover",
     "copy": "Copiar",
     "delete": "Excluir",
-    "decrypt": "Descriptografar"
+    "decrypt": "Descriptografar",
+    "copyToVault": "Copiar para o Vault"
   },
   "notifications": {
     "fileCreated": "Arquivo criado com sucesso",
@@ -259,7 +260,31 @@
     "exportInProgress": "Exportando arquivos...",
     "importSuccess": "{{count}} arquivo(s) importado(s) com sucesso",
     "importError": "Erro ao selecionar arquivos para importar: {{error}}",
-    "importPartialError": "Erros durante a importação: {{errors}}"
+    "importPartialError": "Erros durante a importação: {{errors}}",
+    "fileCopiedToVault": "Arquivo copiado para o Vault com sucesso",
+    "fileCopyToVaultError": "Erro ao copiar arquivo para o Vault"
+  },
+  "copyToVaultDialog": {
+    "title": "Copiar para o Vault",
+    "fileLabel": "Arquivo",
+    "vaultPathLabel": "Nome do segredo no Vault",
+    "vaultPathHelper": "Para salvar dentro de uma pasta, use o formato pasta/subpasta/nome-do-segredo.",
+    "vaultPathPlaceholder": "ex: financeiro/cartao-master",
+    "detectingEncryption": "Detectando criptografia...",
+    "managedEncryptionInfo": "Este arquivo está criptografado e será descriptografado automaticamente antes de ser enviado ao Vault.",
+    "passwordLabel": "Senha de descriptografia",
+    "confirm": "Copiar para o Vault",
+    "copying": "Copiando...",
+    "errors": {
+      "emptyPath": "O nome do segredo no Vault não pode ser vazio",
+      "secretAlreadyExists": "Já existe um segredo com esse nome nesta pasta",
+      "checkExistsFailed": "Falha ao verificar se o segredo já existe no Vault",
+      "passwordRequired": "É necessário informar a senha para descriptografar este arquivo",
+      "readFailed": "Falha ao ler o arquivo",
+      "invalidEncryptedFile": "O arquivo parece estar criptografado mas não pôde ser processado",
+      "decryptionFailed": "Falha na descriptografia. Verifique sua senha.",
+      "saveFailed": "Falha ao salvar o segredo no Vault"
+    }
   },
   "status": {
     "saved": "Salvo",
@@ -512,6 +537,24 @@
     },
     "actions": {
       "createSecret": "Criar segredo"
+    },
+    "transferDialog": {
+      "copyTitle": "Copiar Segredo",
+      "moveTitle": "Mover Segredo",
+      "destinationLabel": "Destino no Vault",
+      "destinationPlaceholder": "ex: pasta/subpasta/novo-nome",
+      "destinationHelper": "Informe o caminho completo do segredo de destino no Vault.",
+      "errors": {
+        "emptyPath": "Informe o caminho de destino",
+        "sameLocation": "O destino é o mesmo da localização atual",
+        "invalidPath": "O caminho de destino não pode terminar com /",
+        "fileExists": "Já existe um segredo com esse nome no destino",
+        "checkExistsFailed": "Falha ao validar o destino no Vault",
+        "readSourceFailed": "Falha ao ler o segredo de origem",
+        "saveFailed": "Falha ao salvar o segredo no destino",
+        "deleteFailed": "Falha ao remover o segredo de origem",
+        "failed": "Falha ao transferir segredo"
+      }
     },
     "dialog": {
       "secretName": "Nome do Segredo",
