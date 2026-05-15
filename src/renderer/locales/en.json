@@ -540,6 +540,24 @@
     "actions": {
       "createSecret": "Create secret"
     },
+    "transferDialog": {
+      "copyTitle": "Copy Secret",
+      "moveTitle": "Move Secret",
+      "destinationLabel": "Destination in Vault",
+      "destinationPlaceholder": "e.g. folder/subfolder/new-name",
+      "destinationHelper": "Provide the full destination secret path in Vault.",
+      "errors": {
+        "emptyPath": "Please provide a destination path",
+        "sameLocation": "Destination is the same as current location",
+        "invalidPath": "Destination path cannot end with /",
+        "fileExists": "A secret with this name already exists in destination",
+        "checkExistsFailed": "Failed to validate destination in Vault",
+        "readSourceFailed": "Failed to read source secret",
+        "saveFailed": "Failed to save destination secret",
+        "deleteFailed": "Failed to remove source secret",
+        "failed": "Failed to transfer secret"
+      }
+    },
     "dialog": {
       "secretName": "Secret Name",
       "types": {

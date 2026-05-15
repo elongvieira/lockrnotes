@@ -538,6 +538,24 @@
     "actions": {
       "createSecret": "Criar segredo"
     },
+    "transferDialog": {
+      "copyTitle": "Copiar Segredo",
+      "moveTitle": "Mover Segredo",
+      "destinationLabel": "Destino no Vault",
+      "destinationPlaceholder": "ex: pasta/subpasta/novo-nome",
+      "destinationHelper": "Informe o caminho completo do segredo de destino no Vault.",
+      "errors": {
+        "emptyPath": "Informe o caminho de destino",
+        "sameLocation": "O destino é o mesmo da localização atual",
+        "invalidPath": "O caminho de destino não pode terminar com /",
+        "fileExists": "Já existe um segredo com esse nome no destino",
+        "checkExistsFailed": "Falha ao validar o destino no Vault",
+        "readSourceFailed": "Falha ao ler o segredo de origem",
+        "saveFailed": "Falha ao salvar o segredo no destino",
+        "deleteFailed": "Falha ao remover o segredo de origem",
+        "failed": "Falha ao transferir segredo"
+      }
+    },
     "dialog": {
       "secretName": "Nome do Segredo",
       "types": {

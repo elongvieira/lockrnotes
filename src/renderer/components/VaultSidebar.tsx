@@ -15,6 +15,8 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import StorageIcon from '@mui/icons-material/Storage';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
@@ -23,6 +25,7 @@ import { useAppContext } from '../contexts/AppContext';
 import VaultLoginDialog from './VaultLoginDialog';
 import FolderDialog from './FolderDialog';
 import VaultSecretDialog from './VaultSecretDialog';
+import VaultTransferDialog from './VaultTransferDialog';
 import RenameDialog from './RenameDialog';
 import ConfirmDialog from './ConfirmDialog';
 import TreeItemLabel from './TreeItemLabel';
@@ -36,6 +39,11 @@ interface VaultTreeItem {
   type: 'file' | 'directory';
   children?: VaultTreeItem[];
   loaded?: boolean;
+}
+
+interface VaultTransferResult {
+  success: boolean;
+  message?: string;
 }
 
 export default function VaultSidebar() {
@@ -63,6 +71,12 @@ export default function VaultSidebar() {
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [itemToRename, setItemToRename] = useState<VaultTreeItem | null>(null);
+
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+  const [transferMode, setTransferMode] = useState<'copy' | 'move'>('copy');
+  const [itemToTransfer, setItemToTransfer] = useState<VaultTreeItem | null>(
+    null,
+  );
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<VaultTreeItem | null>(null);
@@ -429,6 +443,162 @@ export default function VaultSidebar() {
     handleContextMenuClose();
   };
 
+  const handleContextMenuCopy = () => {
+    if (contextMenu?.item && contextMenu.item.type === 'file') {
+      setTransferMode('copy');
+      setItemToTransfer(contextMenu.item);
+      setTransferDialogOpen(true);
+    }
+    handleContextMenuClose();
+  };
+
+  const handleContextMenuMove = () => {
+    if (contextMenu?.item && contextMenu.item.type === 'file') {
+      setTransferMode('move');
+      setItemToTransfer(contextMenu.item);
+      setTransferDialogOpen(true);
+    }
+    handleContextMenuClose();
+  };
+
+  const handleTransferDialogClose = () => {
+    setTransferDialogOpen(false);
+    setItemToTransfer(null);
+  };
+
+  const handleTransferDialogConfirm = async (
+    destinationPath: string,
+  ): Promise<VaultTransferResult> => {
+    if (!itemToTransfer) {
+      return {
+        success: false,
+        message:
+          t('vault.transferDialog.errors.failed') ||
+          'Failed to transfer secret',
+      };
+    }
+
+    const sourcePath = itemToTransfer.path;
+    const destinationSecretPath = destinationPath.trim().replace(/^\/+/, '');
+
+    if (!destinationSecretPath) {
+      return {
+        success: false,
+        message:
+          t('vault.transferDialog.errors.emptyPath') ||
+          'Please provide a destination path',
+      };
+    }
+
+    if (transferMode === 'move' && destinationSecretPath === sourcePath) {
+      return {
+        success: false,
+        message:
+          t('vault.transferDialog.errors.sameLocation') ||
+          'Destination is the same as current location',
+      };
+    }
+
+    try {
+      const destinationExists = await window.vaultAPI.getSecret(
+        destinationSecretPath,
+      );
+      if (destinationExists.success) {
+        return {
+          success: false,
+          message:
+            t('vault.transferDialog.errors.fileExists') ||
+            'A secret with this name already exists in the destination',
+        };
+      }
+
+      if (!destinationExists.notFound) {
+        return {
+          success: false,
+          message:
+            destinationExists.error ||
+            t('vault.transferDialog.errors.checkExistsFailed') ||
+            'Failed to validate destination in Vault',
+        };
+      }
+
+      const sourceSecret = await window.vaultAPI.getSecret(sourcePath);
+      if (!sourceSecret.success) {
+        return {
+          success: false,
+          message:
+            sourceSecret.error ||
+            t('vault.transferDialog.errors.readSourceFailed') ||
+            'Failed to read source secret',
+        };
+      }
+
+      const saveResult = await window.vaultAPI.saveSecret(
+        destinationSecretPath,
+        sourceSecret.data || {},
+      );
+
+      if (!saveResult.success) {
+        return {
+          success: false,
+          message:
+            saveResult.error ||
+            t('vault.transferDialog.errors.saveFailed') ||
+            'Failed to save destination secret',
+        };
+      }
+
+      if (transferMode === 'move') {
+        const deleteResult = await window.vaultAPI.deleteSecret(sourcePath);
+        if (!deleteResult.success) {
+          return {
+            success: false,
+            message:
+              deleteResult.error ||
+              t('vault.transferDialog.errors.deleteFailed') ||
+              'Failed to delete source secret after move',
+          };
+        }
+
+        const sourceVaultPath = `vault://${sourcePath}`;
+        const targetVaultPath = `vault://${destinationSecretPath}`;
+        const targetName =
+          destinationSecretPath.split('/').pop() || itemToTransfer.name;
+
+        setTabs((prev) =>
+          prev.map((tab) =>
+            tab.filePath === sourceVaultPath
+              ? {
+                  ...tab,
+                  filename: targetName,
+                  filePath: targetVaultPath,
+                }
+              : tab,
+          ),
+        );
+      }
+
+      showNotification(
+        transferMode === 'copy'
+          ? t('notifications.fileCopied') || 'Item copied successfully'
+          : t('notifications.fileMoved') || 'Item moved successfully',
+        'success',
+      );
+
+      await loadRootSecrets();
+
+      return { success: true };
+    } catch (error) {
+      console.error('Vault transfer error', error);
+      return {
+        success: false,
+        message:
+          t('vault.transferDialog.errors.failed') ||
+          'Failed to transfer secret',
+      };
+    }
+  };
+
   const handleRenameDialogConfirm = async (newName: string) => {
     if (!itemToRename) return { success: false };
 
@@ -759,6 +929,22 @@ export default function VaultSidebar() {
             <ListItemText>{t('contextMenu.open')}</ListItemText>
           </MenuItem>
         )}
+        {contextMenu?.item?.type === 'file' && (
+          <MenuItem onClick={handleContextMenuCopy} className="app-menu-item">
+            <ListItemIcon className="app-menu-icon" sx={{ minWidth: '32px' }}>
+              <FileCopyIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('contextMenu.copy')}</ListItemText>
+          </MenuItem>
+        )}
+        {contextMenu?.item?.type === 'file' && (
+          <MenuItem onClick={handleContextMenuMove} className="app-menu-item">
+            <ListItemIcon className="app-menu-icon" sx={{ minWidth: '32px' }}>
+              <DriveFileMoveIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('contextMenu.move')}</ListItemText>
+          </MenuItem>
+        )}
         <MenuItem onClick={handleContextMenuRename} className="app-menu-item">
           <ListItemIcon className="app-menu-icon" sx={{ minWidth: '32px' }}>
             <EditIcon fontSize="small" />
@@ -802,6 +988,15 @@ export default function VaultSidebar() {
           setDeleteConfirmOpen(false);
           setItemToDelete(null);
         }}
+      />
+
+      <VaultTransferDialog
+        open={transferDialogOpen}
+        mode={transferMode}
+        itemName={itemToTransfer?.name || ''}
+        currentPath={itemToTransfer?.path || ''}
+        onClose={handleTransferDialogClose}
+        onConfirm={handleTransferDialogConfirm}
       />
     </div>
   );
