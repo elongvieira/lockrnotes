@@ -9,6 +9,8 @@ export interface VaultSession {
   port: number;
   token: string;
   mountPath: string;
+  /** KV secrets engine version detected at login time. Defaults to 2 if unknown. */
+  kvVersion?: 1 | 2;
 }
 
 export function getVaultSessionFilePath(): string {

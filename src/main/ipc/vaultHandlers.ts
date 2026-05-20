@@ -54,6 +54,33 @@ async function vaultRequest<T>(
   return { ok: true, status: response.status, data };
 }
 
+/**
+ * Detect whether the given mount path is a KV v1 or KV v2 secrets engine.
+ * Queries /v1/sys/mounts and inspects the `options.version` field.
+ * Falls back to v2 if the call fails or the field is absent.
+ */
+async function detectKvVersion(
+  host: string,
+  port: number,
+  mountPath: string,
+  token: string,
+): Promise<1 | 2> {
+  try {
+    const url = `${vaultUrl(host, port)}/v1/sys/mounts`;
+    const result = await vaultRequest<any>(url, token);
+    if (result.ok && result.data) {
+      const mountKey = `${mountPath}/`;
+      // The response may be wrapped in a `data` envelope or not.
+      const mountInfo = result.data.data?.[mountKey] ?? result.data[mountKey];
+      const version = mountInfo?.options?.version;
+      if (version === '1' || version === 1) return 1;
+    }
+  } catch {
+    // fall through to default
+  }
+  return 2;
+}
+
 export function registerVaultHandlers(): void {
   // ─── Login (validate token) ─────────────────────────────────
   ipcMain.handle(
@@ -116,7 +143,8 @@ export function registerVaultHandlers(): void {
           }
         }
 
-        await saveVaultSession({ host, port, token, mountPath });
+        const kvVersion = await detectKvVersion(host, port, mountPath, token);
+        await saveVaultSession({ host, port, token, mountPath, kvVersion });
         return { success: true };
       } catch (err: any) {
         return { success: false, error: err.message || String(err) };
@@ -153,15 +181,20 @@ export function registerVaultHandlers(): void {
     }
   });
 
-  // ─── List secrets (KV v2 metadata list) ─────────────────────
+  // ─── List secrets ────────────────────────────────────────────
   ipcMain.handle('vault:list-secrets', async (_event, secretPath: string) => {
     try {
       const session = await loadVaultSession();
       if (!session) return { success: false, error: 'Not connected to Vault' };
 
-      const url = `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/metadata/${secretPath}?list=true`;
+      const kv = session.kvVersion ?? 2;
+      const listPath =
+        kv === 1
+          ? `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/${secretPath}?list=true`
+          : `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/metadata/${secretPath}?list=true`;
+
       const result = await vaultRequest<{ data: { keys: string[] } }>(
-        url,
+        listPath,
         session.token,
       );
 
@@ -180,12 +213,37 @@ export function registerVaultHandlers(): void {
     }
   });
 
-  // ─── Get secret (KV v2 data read) ──────────────────────────
+  // ─── Get secret ──────────────────────────────────────────────
   ipcMain.handle('vault:get-secret', async (_event, secretPath: string) => {
     try {
       const session = await loadVaultSession();
       if (!session) return { success: false, error: 'Not connected to Vault' };
 
+      const kv = session.kvVersion ?? 2;
+
+      if (kv === 1) {
+        const url = `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/${secretPath}`;
+        const result = await vaultRequest<{ data: Record<string, string> }>(
+          url,
+          session.token,
+        );
+        if (!result.ok) {
+          return {
+            success: false,
+            error: result.error,
+            status: result.status,
+            notFound: result.status === 404,
+          };
+        }
+        return {
+          success: true,
+          data: result.data?.data ?? {},
+          metadata: {},
+          status: result.status,
+        };
+      }
+
+      // KV v2
       const url = `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/data/${secretPath}`;
       const result = await vaultRequest<{
         data: { data: Record<string, string>; metadata: any };
@@ -211,7 +269,7 @@ export function registerVaultHandlers(): void {
     }
   });
 
-  // ─── Save secret (KV v2 data write) ────────────────────────
+  // ─── Save secret ─────────────────────────────────────────────
   ipcMain.handle(
     'vault:save-secret',
     async (_event, params: { path: string; data: Record<string, string> }) => {
@@ -220,10 +278,21 @@ export function registerVaultHandlers(): void {
         if (!session)
           return { success: false, error: 'Not connected to Vault' };
 
-        const url = `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/data/${params.path}`;
+        const kv = session.kvVersion ?? 2;
+
+        const url =
+          kv === 1
+            ? `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/${params.path}`
+            : `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/data/${params.path}`;
+
+        const body =
+          kv === 1
+            ? JSON.stringify(params.data)
+            : JSON.stringify({ data: params.data });
+
         const result = await vaultRequest<any>(url, session.token, {
-          method: 'POST',
-          body: JSON.stringify({ data: params.data }),
+          method: kv === 1 ? 'PUT' : 'POST',
+          body,
         });
 
         if (!result.ok) {
@@ -237,13 +306,21 @@ export function registerVaultHandlers(): void {
     },
   );
 
-  // ─── Delete secret (KV v2 metadata delete — permanent) ─────
+  // ─── Delete secret (permanent) ───────────────────────────────
   ipcMain.handle('vault:delete-secret', async (_event, secretPath: string) => {
     try {
       const session = await loadVaultSession();
       if (!session) return { success: false, error: 'Not connected to Vault' };
 
-      const url = `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/metadata/${secretPath}`;
+      const kv = session.kvVersion ?? 2;
+
+      // KV v1: DELETE /v1/<mount>/<path>
+      // KV v2: DELETE /v1/<mount>/metadata/<path>  (removes all versions permanently)
+      const url =
+        kv === 1
+          ? `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/${secretPath}`
+          : `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/metadata/${secretPath}`;
+
       const result = await vaultRequest<any>(url, session.token, {
         method: 'DELETE',
       });
@@ -258,21 +335,32 @@ export function registerVaultHandlers(): void {
     }
   });
 
-  // ─── Create folder (empty marker secret) ───────────────────
+  // ─── Create folder (empty marker secret) ────────────────────
   ipcMain.handle('vault:create-folder', async (_event, folderPath: string) => {
     try {
       const session = await loadVaultSession();
       if (!session) return { success: false, error: 'Not connected to Vault' };
 
-      // In KV v2, "folders" are just path prefixes.
-      // We create a hidden marker secret so the folder appears in listings.
+      const kv = session.kvVersion ?? 2;
       const markerPath = `${folderPath}/.folder`;
-      const url = `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/data/${markerPath}`;
+      const markerData = {
+        _type: 'folder',
+        _created: new Date().toISOString(),
+      };
+
+      const url =
+        kv === 1
+          ? `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/${markerPath}`
+          : `${vaultUrl(session.host, session.port)}/v1/${session.mountPath}/data/${markerPath}`;
+
+      const body =
+        kv === 1
+          ? JSON.stringify(markerData)
+          : JSON.stringify({ data: markerData });
+
       const result = await vaultRequest<any>(url, session.token, {
-        method: 'POST',
-        body: JSON.stringify({
-          data: { _type: 'folder', _created: new Date().toISOString() },
-        }),
+        method: kv === 1 ? 'PUT' : 'POST',
+        body,
       });
 
       if (!result.ok) {
