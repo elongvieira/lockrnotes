@@ -16,62 +16,12 @@
   overflow: hidden;
 }
 
-.tabs-area {
-  background: var(--bg-tertiary);
-  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-  margin: 0 4px;
-  box-shadow: 0 2px 8px var(--shadow-light);
-  backdrop-filter: blur(10px);
-  flex-shrink: 0; /* Prevent tabs from shrinking */
-  border: 1px solid var(--border-primary);
-}
-
-.MuiTabs-root {
-  min-height: var(--tab-height);
-  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-}
-
-.MuiTab-root {
-  min-height: var(--tab-height);
-  font-weight: 500;
-  text-transform: none;
-  font-size: 0.875rem;
-  color: var(--text-secondary) !important;
-  transition: all 0.2s ease;
-}
-
-.MuiTab-root.Mui-selected {
-  background-color: transparent;
-  color: var(--text-primary) !important;
-  font-weight: 600;
-}
-
-.MuiTab-root.Mui-disabled {
-  background-color: var(--disabled-bg);
-  color: var(--text-disabled) !important;
-}
-
-.MuiTabs-indicator {
-  background: linear-gradient(
-    90deg,
-    var(--primary-blue),
-    var(--primary-blue-dark)
-  ) !important;
-  height: 3px !important;
-  border-radius: 3px 3px 0 0;
-}
-
-.MuiTab-root:hover:not(.Mui-disabled) {
-  background-color: var(--hover-bg);
-  color: var(--text-primary) !important;
-}
-
 .files-card {
   background: var(--bg-secondary);
   color: var(--text-primary);
-  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+  border-radius: var(--border-radius-lg);
   padding: 5px;
-  margin: 0 4px;
+  margin: 4px;
   box-shadow: 0 4px 12px var(--shadow-medium);
   backdrop-filter: blur(10px);
   flex: 1;
@@ -80,8 +30,8 @@
   overflow: hidden;
   min-height: 0; /* Important for flex children to shrink */
   max-height: calc(
-    100vh - 142px
-  ); /* Prevent overflow, accounting for tabs and margins */
+    100vh - 110px
+  ); /* Prevent overflow, accounting for app bar and margins */
   border: 1px solid var(--border-primary);
 }
 

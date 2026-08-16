@@ -19,11 +19,7 @@
   },
   "sidebar": {
     "tabs": {
-      "aria": "Abas da barra lateral",
-      "local": "Local",
-      "files": "Arquivos",
-      "remote": "Remoto",
-      "vault": "Vault"
+      "files": "Arquivos"
     },
     "local": {
       "content": "Esta é a área de notas locais. Selecione ou crie uma nota para começar a editar."
@@ -233,8 +229,7 @@
     "move": "Mover",
     "copy": "Copiar",
     "delete": "Excluir",
-    "decrypt": "Descriptografar",
-    "copyToVault": "Copiar para o Vault"
+    "decrypt": "Descriptografar"
   },
   "notifications": {
     "fileCreated": "Arquivo criado com sucesso",
@@ -260,31 +255,7 @@
     "exportInProgress": "Exportando arquivos...",
     "importSuccess": "{{count}} arquivo(s) importado(s) com sucesso",
     "importError": "Erro ao selecionar arquivos para importar: {{error}}",
-    "importPartialError": "Erros durante a importação: {{errors}}",
-    "fileCopiedToVault": "Arquivo copiado para o Vault com sucesso",
-    "fileCopyToVaultError": "Erro ao copiar arquivo para o Vault"
-  },
-  "copyToVaultDialog": {
-    "title": "Copiar para o Vault",
-    "fileLabel": "Arquivo",
-    "vaultPathLabel": "Nome do segredo no Vault",
-    "vaultPathHelper": "Para salvar dentro de uma pasta, use o formato pasta/subpasta/nome-do-segredo.",
-    "vaultPathPlaceholder": "ex: financeiro/cartao-master",
-    "detectingEncryption": "Detectando criptografia...",
-    "managedEncryptionInfo": "Este arquivo está criptografado e será descriptografado automaticamente antes de ser enviado ao Vault.",
-    "passwordLabel": "Senha de descriptografia",
-    "confirm": "Copiar para o Vault",
-    "copying": "Copiando...",
-    "errors": {
-      "emptyPath": "O nome do segredo no Vault não pode ser vazio",
-      "secretAlreadyExists": "Já existe um segredo com esse nome nesta pasta",
-      "checkExistsFailed": "Falha ao verificar se o segredo já existe no Vault",
-      "passwordRequired": "É necessário informar a senha para descriptografar este arquivo",
-      "readFailed": "Falha ao ler o arquivo",
-      "invalidEncryptedFile": "O arquivo parece estar criptografado mas não pôde ser processado",
-      "decryptionFailed": "Falha na descriptografia. Verifique sua senha.",
-      "saveFailed": "Falha ao salvar o segredo no Vault"
-    }
+    "importPartialError": "Erros durante a importação: {{errors}}"
   },
   "status": {
     "saved": "Salvo",
@@ -295,7 +266,7 @@
     "title": "🔒 Bem-vindo ao LockrNotes",
     "subtitle": "Suas Notas Seguras e Criptografadas",
     "description": "LockrNotes é um aplicativo de anotações com foco em segurança e privacidade. Seus arquivos podem ser criptografados de forma automática e segura, mantendo suas informações protegidas.",
-    "features": "Recursos principais:\n• Criptografia gerenciada automática para seus arquivos\n• Suporte para arquivos de texto (.txt) e JSON estruturados (.json)\n• Interface moderna e intuitiva com tema escuro\n• Organização em pastas e armazenamento local ou remoto",
+    "features": "Recursos principais:\n• Criptografia gerenciada automática para seus arquivos\n• Suporte para arquivos de texto (.txt) e JSON estruturados (.json)\n• Interface moderna e intuitiva com tema escuro\n• Organização em pastas e armazenamento local",
     "storageTitle": "Local de Armazenamento",
     "storageDescription": "Escolha onde seus arquivos serão armazenados. Por padrão, usamos a pasta \"LockrNotes\" dentro de seus Documentos. Você pode alterar isso a qualquer momento nas configurações.",
     "defaultPath": "Pasta Padrão",
@@ -365,246 +336,5 @@
     "manage": "Gerenciar slots",
     "noItems": "Nenhum item configurado",
     "entry": "Entrada"
-  },
-  "community": {
-    "notConnected": "Conecte-se a um servidor community para acessar notas compartilhadas.",
-    "loginButton": "Conectar",
-    "logout": "Sair",
-    "login": {
-      "title": "Conectar ao Servidor Community",
-      "host": "Host / IP",
-      "port": "Porta",
-      "email": "E-mail / Login",
-      "password": "Senha",
-      "submit": "Entrar",
-      "errors": {
-        "hostRequired": "Host é obrigatório",
-        "portInvalid": "A porta deve estar entre 1 e 65535",
-        "emailRequired": "E-mail é obrigatório",
-        "passwordRequired": "Senha é obrigatória",
-        "loginFailed": "Falha no login. Verifique suas credenciais."
-      }
-    },
-    "logout": {
-      "title": "Sair",
-      "message": "Tem certeza de que deseja desconectar do servidor community?"
-    },
-    "changePassword": {
-      "title": "Alterar Senha",
-      "message": "Você deve alterar sua senha antes de continuar.",
-      "currentPassword": "Senha Atual",
-      "newPassword": "Nova Senha",
-      "confirmPassword": "Confirmar Senha",
-      "submit": "Alterar Senha",
-      "errors": {
-        "currentRequired": "Senha atual é obrigatória",
-        "newRequired": "Nova senha é obrigatória",
-        "confirmRequired": "Confirmação de senha é obrigatória",
-        "mismatch": "As senhas não coincidem",
-        "changeFailed": "Falha ao alterar a senha",
-        "currentIncorrect": "Senha atual está incorreta"
-      }
-    }
-  },
-  "admin": {
-    "menuTitle": "Administração",
-    "dialog": {
-      "title": "Administração",
-      "users": {
-        "title": "Usuários",
-        "newUser": "Novo Usuário",
-        "empty": "Nenhum usuário encontrado.",
-        "table": {
-          "name": "Nome",
-          "email": "E-mail",
-          "role": "Perfil",
-          "actions": "Ações",
-          "status": "Status"
-        },
-        "roles": {
-          "admin": "Admin",
-          "user": "Usuário"
-        },
-        "form": {
-          "titleCreate": "Novo Usuário",
-          "titleEdit": "Editar Usuário",
-          "name": "Nome",
-          "email": "E-mail",
-          "password": "Senha",
-          "role": "Perfil",
-          "save": "Salvar",
-          "cancel": "Cancelar",
-          "loginType": "Tipo de Login",
-          "forcePasswordChange": "Forçar troca de senha no primeiro login",
-          "isActive": "Conta ativa"
-        },
-        "delete": {
-          "title": "Excluir Usuário",
-          "message": "O usuário \"{{email}}\" será excluído permanentemente. Tem certeza?"
-        },
-        "errors": {
-          "loadFailed": "Falha ao carregar usuários",
-          "createFailed": "Falha ao criar usuário",
-          "updateFailed": "Falha ao atualizar usuário",
-          "deleteFailed": "Falha ao excluir usuário",
-          "nameRequired": "Nome é obrigatório",
-          "emailRequired": "E-mail é obrigatório",
-          "passwordRequired": "Senha é obrigatória para novos usuários",
-          "activateFailed": "Falha ao ativar usuário",
-          "deactivateFailed": "Falha ao desativar usuário",
-          "forcePasswordFailed": "Falha ao forçar troca de senha"
-        },
-        "status": {
-          "active": "Ativo",
-          "inactive": "Inativo"
-        },
-        "loginTypes": {
-          "password": "Senha",
-          "magicLink": "Magic Link"
-        },
-        "forcePassword": {
-          "buttonTooltip": "Forçar Troca de Senha",
-          "title": "Forçar Troca de Senha",
-          "message": "O usuário {{name}} será obrigado a trocar a senha no próximo login."
-        }
-      },
-      "groups": {
-        "title": "Grupos",
-        "newGroup": "Novo Grupo",
-        "empty": "Nenhum grupo encontrado.",
-        "table": {
-          "name": "Nome",
-          "actions": "Ações"
-        },
-        "form": {
-          "titleCreate": "Novo Grupo",
-          "titleEdit": "Editar Grupo",
-          "name": "Nome do Grupo",
-          "save": "Salvar",
-          "cancel": "Cancelar"
-        },
-        "members": {
-          "title": "Membros de \"{{name}}\"",
-          "empty": "Nenhum membro neste grupo.",
-          "add": "Adicionar",
-          "manage": "Gerenciar Membros",
-          "selectUser": "Usuário",            "noUsersAvailable": "Todos os usuários já são membros",          "remove": "Remover"
-        },
-        "delete": {
-          "title": "Excluir Grupo",
-          "message": "O grupo \"{{name}}\" será excluído permanentemente. Tem certeza?"
-        },
-        "errors": {
-          "loadFailed": "Falha ao carregar grupos",
-          "createFailed": "Falha ao criar grupo",
-          "updateFailed": "Falha ao atualizar grupo",
-          "deleteFailed": "Falha ao excluir grupo",
-          "nameRequired": "Nome do grupo é obrigatório",
-          "loadMembersFailed": "Falha ao carregar membros do grupo",
-          "addMemberFailed": "Falha ao adicionar membro",
-          "removeMemberFailed": "Falha ao remover membro"
-        }
-      }
-    }
-  },
-  "vault": {
-    "loginButton": "Conectar",
-    "notConnected": "Conecte-se a um servidor Vault para acessar segredos.",
-    "loginDialog": {
-      "title": "Conectar ao Vault",
-      "host": "Host / IP",
-      "port": "Porta",
-      "token": "Token",
-      "username": "Usuário",
-      "password": "Senha",
-      "methodToken": "Token",
-      "methodLdap": "LDAP",
-      "authMethod": "Método de Autenticação",
-      "connect": "Conectar",
-      "cancel": "Cancelar",
-      "connecting": "Conectando...",
-      "errors": {
-        "hostRequired": "Host é obrigatório",
-        "tokenRequired": "Token é obrigatório",
-        "usernameRequired": "Usuário é obrigatório",
-        "passwordRequired": "Senha é obrigatória",
-        "invalidPort": "A porta deve estar entre 1 e 65535",
-        "connectionFailed": "Falha ao conectar ao Vault"
-      }
-    },
-    "sidebar": {
-      "title": "Segredos"
-    },
-    "actions": {
-      "createSecret": "Criar segredo"
-    },
-    "transferDialog": {
-      "copyTitle": "Copiar Segredo",
-      "moveTitle": "Mover Segredo",
-      "destinationLabel": "Destino no Vault",
-      "destinationPlaceholder": "ex: pasta/subpasta/novo-nome",
-      "destinationHelper": "Informe o caminho completo do segredo de destino no Vault.",
-      "errors": {
-        "emptyPath": "Informe o caminho de destino",
-        "sameLocation": "O destino é o mesmo da localização atual",
-        "invalidPath": "O caminho de destino não pode terminar com /",
-        "fileExists": "Já existe um segredo com esse nome no destino",
-        "checkExistsFailed": "Falha ao validar o destino no Vault",
-        "readSourceFailed": "Falha ao ler o segredo de origem",
-        "saveFailed": "Falha ao salvar o segredo no destino",
-        "deleteFailed": "Falha ao remover o segredo de origem",
-        "failed": "Falha ao transferir segredo"
-      }
-    },
-    "dialog": {
-      "secretName": "Nome do Segredo",
-      "types": {
-        "default": {
-          "name": "Padrão do Vault",
-          "description": "Segredo padrão do Vault usando pares de chave-valor simples."
-        },
-        "json": {
-          "name": "Padrão JSON (Avançado)",
-          "description": "Permite entradas avançadas como chaves SSH, servidores RDP e mais opções estruturadas."
-        }
-      }
-    },
-    "chip": {
-      "tooltip": "Vault conectado",
-      "disconnect": "Desconectar do Vault"
-    },
-    "logoutDialog": {
-      "title": "Desconectar do Vault",
-      "message": "Tem certeza que deseja desconectar do Vault?"
-    },
-    "errors": {
-      "loadFailed": "Falha ao carregar segredos",
-      "readFailed": "Falha ao ler segredo",
-      "saveFailed": "Falha ao salvar segredo"
-    },
-    "editor": {
-      "title": "Editor Vault",
-      "caption": "Campos sensiveis ficam ocultos por padrao e podem ser copiados individualmente.",
-      "defaultPath": "Segredo Vault",
-      "search": "Pesquisar neste segredo...",
-      "showPasswords": "Mostrar senhas",
-      "hidePasswords": "Ocultar senhas",
-      "showField": "Mostrar campo",
-      "hideField": "Ocultar campo",
-      "copyField": "Copiar campo",
-      "copyError": "Falha ao copiar campo",
-      "moveUp": "Mover para cima",
-      "moveDown": "Mover para baixo",
-      "actions": "Ações",
-      "emptyTitle": "Nenhum campo ainda. Clique em \"Adicionar campo\" para começar.",
-      "emptyText": "Adicione pares chave-valor para armazenar credenciais, tokens ou qualquer dado do Vault.",
-      "noResultsTitle": "Nenhum resultado encontrado",
-      "noResultsText": "Ajuste a pesquisa para encontrar um campo específico.",
-      "addField": "Adicionar campo",
-      "keyLabel": "Chave",
-      "valueLabel": "Valor",
-      "deleteField": "Excluir campo",
-      "deleteConfirm": "Excluir o campo \"{key}\"?"
-    }
   }
 }
