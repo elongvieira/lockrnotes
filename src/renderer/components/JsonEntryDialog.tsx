@@ -7,13 +7,13 @@ import {
   TextField,
   Button,
   FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
+  InputLabel,
+  Select,
+  MenuItem,
   Box,
   IconButton,
   InputAdornment,
+  SelectChangeEvent,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -39,6 +39,20 @@ interface JsonEntryDialogProps {
   editingEntry: JsonEntry | null;
   duplicateData?: JsonEntry | null;
 }
+
+const ENTRY_TYPE_OPTIONS: { value: JsonEntryType; fallback: string }[] = [
+  { value: 'keyValue', fallback: 'Title + Value' },
+  { value: 'titleTwoValues', fallback: 'Title + Value 1 + Value 2' },
+  { value: 'titlePassword', fallback: 'Title + Password' },
+  { value: 'titleValuePassword', fallback: 'Title + Value + Password' },
+  {
+    value: 'titleTwoValuesPassword',
+    fallback: 'Title + Value 1 + Value 2 + Password',
+  },
+  { value: 'ssh', fallback: 'SSH' },
+  { value: 'rdp', fallback: 'RDP' },
+  { value: 'webLogin', fallback: 'Web Login' },
+];
 
 export default function JsonEntryDialog({
   open,
@@ -298,7 +312,7 @@ export default function JsonEntryDialog({
     onClose();
   };
 
-  const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTypeChange = (event: SelectChangeEvent<JsonEntryType>) => {
     setEntryType(event.target.value as JsonEntryType);
     setError('');
   };
@@ -330,61 +344,28 @@ export default function JsonEntryDialog({
           } as any
         }
       >
-        <FormControl component="fieldset" sx={{ mt: 2, mb: 2, width: '100%' }}>
-          <FormLabel component="legend" sx={{ mb: 1 }}>
+        <FormControl fullWidth sx={{ mt: 2, mb: 1 }}>
+          <InputLabel
+            id="entry-type-select-label"
+            sx={dialogStyles.selectLabel}
+          >
             {t('jsonEditor.entryType') || 'Entry Type'}
-          </FormLabel>
-          <RadioGroup value={entryType} onChange={handleTypeChange}>
-            <FormControlLabel
-              value="keyValue"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.keyValue') || 'Title + Value'}
-            />
-            <FormControlLabel
-              value="titleTwoValues"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={
-                t('jsonEditor.types.titleTwoValues') ||
-                'Title + Value 1 + Value 2'
-              }
-            />
-            <FormControlLabel
-              value="titlePassword"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.titlePassword') || 'Title + Password'}
-            />
-            <FormControlLabel
-              value="titleValuePassword"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={
-                t('jsonEditor.types.titleValuePassword') ||
-                'Title + Value + Password'
-              }
-            />
-            <FormControlLabel
-              value="titleTwoValuesPassword"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={
-                t('jsonEditor.types.titleTwoValuesPassword') ||
-                'Title + Value 1 + Value 2 + Password'
-              }
-            />
-            <FormControlLabel
-              value="ssh"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.ssh') || 'SSH'}
-            />
-            <FormControlLabel
-              value="rdp"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.rdp') || 'RDP'}
-            />
-            <FormControlLabel
-              value="webLogin"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.webLogin') || 'Web Login'}
-            />
-          </RadioGroup>
+          </InputLabel>
+          <Select
+            labelId="entry-type-select-label"
+            id="entry-type-select"
+            value={entryType}
+            label={t('jsonEditor.entryType') || 'Entry Type'}
+            onChange={handleTypeChange}
+            sx={dialogStyles.select}
+            MenuProps={{ PaperProps: { sx: dialogStyles.selectPaper } }}
+          >
+            {ENTRY_TYPE_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {t(`jsonEditor.types.${option.value}`) || option.fallback}
+              </MenuItem>
+            ))}
+          </Select>
         </FormControl>
 
         <TextField
