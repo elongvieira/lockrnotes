@@ -29,6 +29,7 @@ import {
   TitleTwoValuesPasswordEntry,
   SshEntry,
   RdpEntry,
+  WebLoginEntry,
 } from '../types/jsonEntry';
 
 interface JsonEntryDialogProps {
@@ -62,12 +63,18 @@ export default function JsonEntryDialog({
   const [rdpUser, setRdpUser] = useState<string>('');
   const [rdpPassword, setRdpPassword] = useState<string>('');
   const [rdpDomain, setRdpDomain] = useState<string>('');
+  const [webUrl, setWebUrl] = useState<string>('');
+  const [webUser, setWebUser] = useState<string>('');
+  const [webPassword, setWebPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   // Reset or populate fields when dialog opens
   useEffect(() => {
     if (open) {
+      setWebUrl('');
+      setWebUser('');
+      setWebPassword('');
       if (editingEntry) {
         setEntryType(editingEntry.type);
         setTitle(editingEntry.title);
@@ -115,6 +122,14 @@ export default function JsonEntryDialog({
           setRdpUser((editingEntry as RdpEntry).user);
           setRdpPassword((editingEntry as RdpEntry).password);
           setRdpDomain((editingEntry as RdpEntry).domain || '');
+        } else if (editingEntry.type === 'webLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setWebUrl((editingEntry as WebLoginEntry).url);
+          setWebUser((editingEntry as WebLoginEntry).user);
+          setWebPassword((editingEntry as WebLoginEntry).password);
         }
       } else if (duplicateData) {
         // Pre-fill from duplicated entry (including title, so user can modify it)
@@ -164,6 +179,14 @@ export default function JsonEntryDialog({
           setRdpUser((duplicateData as RdpEntry).user);
           setRdpPassword((duplicateData as RdpEntry).password);
           setRdpDomain((duplicateData as RdpEntry).domain || '');
+        } else if (duplicateData.type === 'webLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setWebUrl((duplicateData as WebLoginEntry).url);
+          setWebUser((duplicateData as WebLoginEntry).user);
+          setWebPassword((duplicateData as WebLoginEntry).password);
         }
       } else {
         setEntryType('keyValue');
@@ -181,6 +204,9 @@ export default function JsonEntryDialog({
         setRdpUser('');
         setRdpPassword('');
         setRdpDomain('');
+        setWebUrl('');
+        setWebUser('');
+        setWebPassword('');
       }
       setError('');
       setShowPassword(false);
@@ -192,6 +218,33 @@ export default function JsonEntryDialog({
     if (!title.trim()) {
       setError(t('jsonEditor.errors.emptyTitle') || 'Title is required');
       return;
+    }
+
+    if (entryType === 'webLogin') {
+      const rawUrl = webUrl.trim();
+      if (!rawUrl) {
+        setError(t('jsonEditor.errors.emptyUrl') || 'URL is required');
+        return;
+      }
+      const withProtocol = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(rawUrl)
+        ? rawUrl
+        : `https://${rawUrl}`;
+      try {
+        const parsed = new URL(withProtocol);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+          setError(
+            t('jsonEditor.errors.invalidUrl') ||
+              'Enter a valid http or https URL',
+          );
+          return;
+        }
+      } catch {
+        setError(
+          t('jsonEditor.errors.invalidUrl') ||
+            'Enter a valid http or https URL',
+        );
+        return;
+      }
     }
 
     // Build entry data
@@ -230,6 +283,15 @@ export default function JsonEntryDialog({
       (entryData as RdpEntry).user = rdpUser.trim();
       (entryData as RdpEntry).password = rdpPassword.trim();
       (entryData as RdpEntry).domain = rdpDomain.trim();
+    } else if (entryType === 'webLogin') {
+      const rawUrl = webUrl.trim();
+      (entryData as WebLoginEntry).url = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(
+        rawUrl,
+      )
+        ? rawUrl
+        : `https://${rawUrl}`;
+      (entryData as WebLoginEntry).user = webUser.trim();
+      (entryData as WebLoginEntry).password = webPassword.trim();
     }
 
     onConfirm(entryData);
@@ -317,13 +379,22 @@ export default function JsonEntryDialog({
               control={<Radio sx={dialogStyles.checkboxRadio} />}
               label={t('jsonEditor.types.rdp') || 'RDP'}
             />
+            <FormControlLabel
+              value="webLogin"
+              control={<Radio sx={dialogStyles.checkboxRadio} />}
+              label={t('jsonEditor.types.webLogin') || 'Web Login'}
+            />
           </RadioGroup>
         </FormControl>
 
         <TextField
           autoFocus
           margin="dense"
-          label={t('jsonEditor.fields.title') || 'Title'}
+          label={
+            entryType === 'webLogin'
+              ? t('jsonEditor.fields.siteName') || 'Site name'
+              : t('jsonEditor.fields.title') || 'Title'
+          }
           fullWidth
           variant="outlined"
           value={title}
@@ -539,6 +610,66 @@ export default function JsonEntryDialog({
               autoComplete="new-password"
               onChange={(e) => {
                 setRdpPassword(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleTogglePasswordVisibility}
+                      edge="end"
+                      size="small"
+                      sx={dialogStyles.passwordIcon}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </>
+        )}
+
+        {entryType === 'webLogin' && (
+          <>
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.url') || 'URL'}
+              fullWidth
+              variant="outlined"
+              value={webUrl}
+              autoComplete="off"
+              placeholder="https://example.com/login"
+              onChange={(e) => {
+                setWebUrl(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.login') || 'Login'}
+              fullWidth
+              variant="outlined"
+              value={webUser}
+              autoComplete="off"
+              onChange={(e) => {
+                setWebUser(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.password') || 'Password'}
+              fullWidth
+              variant="outlined"
+              type={showPassword ? 'text' : 'password'}
+              value={webPassword}
+              autoComplete="new-password"
+              onChange={(e) => {
+                setWebPassword(e.target.value);
                 setError('');
               }}
               sx={dialogStyles.textField}

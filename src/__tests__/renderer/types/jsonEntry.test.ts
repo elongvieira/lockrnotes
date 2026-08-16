@@ -76,6 +76,29 @@ describe('createEntry', () => {
     expect(entry1.id).not.toBe(entry2.id);
   });
 
+  it('should create a webLogin entry with defaults', () => {
+    const entry = createEntry('webLogin', {});
+    expect(entry.type).toBe('webLogin');
+    expect((entry as any).title).toBe('');
+    expect((entry as any).url).toBe('');
+    expect((entry as any).user).toBe('');
+    expect((entry as any).password).toBe('');
+  });
+
+  it('should create a webLogin entry with provided data', () => {
+    const entry = createEntry('webLogin', {
+      title: 'GitHub',
+      url: 'https://github.com/login',
+      user: 'me@example.com',
+      password: 'secret',
+    } as any);
+    expect(entry.type).toBe('webLogin');
+    expect((entry as any).title).toBe('GitHub');
+    expect((entry as any).url).toBe('https://github.com/login');
+    expect((entry as any).user).toBe('me@example.com');
+    expect((entry as any).password).toBe('secret');
+  });
+
   it('should throw on unknown entry type', () => {
     expect(() => createEntry('unknown' as any, {})).toThrow(
       'Unknown entry type',

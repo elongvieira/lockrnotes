@@ -9,7 +9,8 @@ export type JsonEntryType =
   | 'titleValuePassword'
   | 'titleTwoValuesPassword'
   | 'ssh'
-  | 'rdp';
+  | 'rdp'
+  | 'webLogin';
 
 export interface BaseEntry {
   id: string;
@@ -93,6 +94,17 @@ export interface RdpEntry extends BaseEntry {
   domain?: string;
 }
 
+/**
+ * Web login entry (site name + URL + login + password)
+ */
+export interface WebLoginEntry extends BaseEntry {
+  type: 'webLogin';
+  title: string;
+  url: string;
+  user: string;
+  password: string;
+}
+
 export type JsonEntry =
   | KeyValueEntry
   | TitleTwoValuesEntry
@@ -100,7 +112,8 @@ export type JsonEntry =
   | TitleValuePasswordEntry
   | TitleTwoValuesPasswordEntry
   | SshEntry
-  | RdpEntry;
+  | RdpEntry
+  | WebLoginEntry;
 
 /**
  * Structure of a JSON file content
@@ -178,6 +191,15 @@ export function createEntry(
         user: (data as RdpEntry).user || '',
         password: (data as RdpEntry).password || '',
         domain: (data as RdpEntry).domain || '',
+      };
+    case 'webLogin':
+      return {
+        id,
+        type: 'webLogin',
+        title: (data as WebLoginEntry).title || '',
+        url: (data as WebLoginEntry).url || '',
+        user: (data as WebLoginEntry).user || '',
+        password: (data as WebLoginEntry).password || '',
       };
     default:
       throw new Error(`Unknown entry type: ${type}`);

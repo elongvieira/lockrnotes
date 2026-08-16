@@ -183,7 +183,8 @@
       "titleValuePassword": "Title + Value + Password",
       "titleTwoValuesPassword": "Title + Value 1 + Value 2 + Password",
       "ssh": "SSH",
-      "rdp": "RDP"
+      "rdp": "RDP",
+      "webLogin": "Web Login"
     },
     "fields": {
       "title": "Title",
@@ -194,6 +195,9 @@
       "host": "Host",
       "port": "Port",
       "user": "User",
+      "login": "Login",
+      "url": "URL",
+      "siteName": "Site name",
       "domain": "Domain",
       "type": "Type"
     },
@@ -202,7 +206,9 @@
       "emptyValue": "Value is required",
       "emptyValue1": "Entry 1 is required",
       "emptyValue2": "Entry 2 is required",
-      "emptyPassword": "Password is required"
+      "emptyPassword": "Password is required",
+      "emptyUrl": "URL is required",
+      "invalidUrl": "Enter a valid http or https URL"
     },
     "deleteConfirm": {
       "title": "Delete Record",
@@ -222,6 +228,10 @@
   },
   "rdp": {
     "connect": "Connect RDP"
+  },
+  "webLogin": {
+    "open": "Open and fill login",
+    "openError": "Could not open the site"
   },
   "contextMenu": {
     "open": "Open",

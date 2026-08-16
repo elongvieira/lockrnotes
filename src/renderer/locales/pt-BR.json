@@ -183,7 +183,8 @@
       "titleValuePassword": "Título + Valor + Senha",
       "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha",
       "ssh": "SSH",
-      "rdp": "RDP"
+      "rdp": "RDP",
+      "webLogin": "Login Web"
     },
     "fields": {
       "title": "Título",
@@ -194,6 +195,9 @@
       "host": "Host",
       "port": "Porta",
       "user": "Usuário",
+      "login": "Login",
+      "url": "URL",
+      "siteName": "Nome do site",
       "domain": "Domínio",
       "type": "Tipo"
     },
@@ -202,7 +206,9 @@
       "emptyValue": "Valor é obrigatório",
       "emptyValue1": "Entrada 1 é obrigatória",
       "emptyValue2": "Entrada 2 é obrigatória",
-      "emptyPassword": "Senha é obrigatória"
+      "emptyPassword": "Senha é obrigatória",
+      "emptyUrl": "URL é obrigatória",
+      "invalidUrl": "Informe uma URL http ou https válida"
     },
     "deleteConfirm": {
       "title": "Excluir Registro",
@@ -222,6 +228,10 @@
   },
   "rdp": {
     "connect": "Conectar RDP"
+  },
+  "webLogin": {
+    "open": "Abrir e preencher login",
+    "openError": "Não foi possível abrir o site"
   },
   "contextMenu": {
     "open": "Abrir",
