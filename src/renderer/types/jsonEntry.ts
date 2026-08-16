@@ -10,7 +10,8 @@ export type JsonEntryType =
   | 'titleTwoValuesPassword'
   | 'ssh'
   | 'rdp'
-  | 'webLogin';
+  | 'webLogin'
+  | 'customLogin';
 
 export interface BaseEntry {
   id: string;
@@ -105,6 +106,35 @@ export interface WebLoginEntry extends BaseEntry {
   password: string;
 }
 
+export type CustomLoginClickStep = {
+  id: string;
+  kind: 'click';
+  label: string;
+  selector: string;
+  text?: string;
+};
+
+export type CustomLoginTypeStep = {
+  id: string;
+  kind: 'type';
+  label: string;
+  selector: string;
+  value: string;
+  isPassword?: boolean;
+};
+
+export type CustomLoginStep = CustomLoginClickStep | CustomLoginTypeStep;
+
+/**
+ * Custom login entry driven by a recorded macro (clicks + typed fields)
+ */
+export interface CustomLoginEntry extends BaseEntry {
+  type: 'customLogin';
+  title: string;
+  url: string;
+  steps: CustomLoginStep[];
+}
+
 export type JsonEntry =
   | KeyValueEntry
   | TitleTwoValuesEntry
@@ -113,7 +143,8 @@ export type JsonEntry =
   | TitleTwoValuesPasswordEntry
   | SshEntry
   | RdpEntry
-  | WebLoginEntry;
+  | WebLoginEntry
+  | CustomLoginEntry;
 
 /**
  * Structure of a JSON file content
@@ -200,6 +231,16 @@ export function createEntry(
         url: (data as WebLoginEntry).url || '',
         user: (data as WebLoginEntry).user || '',
         password: (data as WebLoginEntry).password || '',
+      };
+    case 'customLogin':
+      return {
+        id,
+        type: 'customLogin',
+        title: (data as CustomLoginEntry).title || '',
+        url: (data as CustomLoginEntry).url || '',
+        steps: Array.isArray((data as CustomLoginEntry).steps)
+          ? (data as CustomLoginEntry).steps
+          : [],
       };
     default:
       throw new Error(`Unknown entry type: ${type}`);

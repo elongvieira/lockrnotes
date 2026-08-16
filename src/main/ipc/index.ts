@@ -9,6 +9,7 @@ import { registerHotCopyHandlers } from './hotcopyHandlers';
 import { setupSshHandlers } from './sshHandlers';
 import { setupRdpHandlers } from './rdpHandlers';
 import { setupWebLoginHandlers } from './webLoginHandlers';
+import { setupCustomLoginHandlers } from './customLoginHandlers';
 
 /**
  * Setup all IPC handlers
@@ -24,6 +25,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   setupSshHandlers(mainWindow);
   setupRdpHandlers();
   setupWebLoginHandlers();
+  setupCustomLoginHandlers();
 }
 
 export * from './filesystemHandlers';

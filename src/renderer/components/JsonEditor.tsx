@@ -32,6 +32,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import TerminalIcon from '@mui/icons-material/Terminal';
 import LanguageIcon from '@mui/icons-material/Language';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CodeIcon from '@mui/icons-material/Code';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +49,7 @@ import {
   SshEntry,
   RdpEntry,
   WebLoginEntry,
+  CustomLoginEntry,
   parseJsonContent,
   serializeJsonContent,
   createEntry,
@@ -128,6 +130,13 @@ export default function JsonEditor({
     }
 
     if (entry.type === 'webLogin' && entry.url.toLowerCase().includes(query)) {
+      return true;
+    }
+
+    if (
+      entry.type === 'customLogin' &&
+      entry.url.toLowerCase().includes(query)
+    ) {
       return true;
     }
 
@@ -263,7 +272,8 @@ export default function JsonEditor({
         } else if (
           entry.type === 'ssh' ||
           entry.type === 'rdp' ||
-          entry.type === 'webLogin'
+          entry.type === 'webLogin' ||
+          entry.type === 'customLogin'
         ) {
           allValueIds.add(`${entry.id}-0`);
           allValueIds.add(`${entry.id}-1`);
@@ -1355,6 +1365,101 @@ export default function JsonEditor({
           </Box>
         );
       }
+      case 'customLogin': {
+        const customEntry = entry as CustomLoginEntry;
+        const customUrlVisible = visibleValues.has(`${entry.id}-0`);
+        const typeSteps = customEntry.steps.filter(
+          (step) => step.kind === 'type',
+        );
+        return (
+          <Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.url')}:{' '}
+                {maskValue(customEntry.url, customUrlVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {customUrlVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, customEntry.url, 0)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 0 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
+            {typeSteps.map((step, typeIndex) => {
+              const visible = visibleValues.has(`${entry.id}-${typeIndex + 1}`);
+              return (
+                <Box
+                  key={step.id}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 0.5,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'var(--text-primary)' }}
+                  >
+                    {step.label}:{' '}
+                    {maskValue(step.value, visible, Boolean(step.isPassword))}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      toggleValueVisibility(entry.id, typeIndex + 1)
+                    }
+                    sx={{
+                      color: 'var(--text-secondary)',
+                      '&:hover': { color: 'var(--primary-blue)' },
+                    }}
+                  >
+                    {visible ? (
+                      <VisibilityOffIcon fontSize="small" />
+                    ) : (
+                      <VisibilityIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      handleCopy(entry.id, step.value, typeIndex + 1)
+                    }
+                    className="json-editor-copy-btn"
+                  >
+                    {copied[entry.id] === typeIndex + 1 ? (
+                      <CheckIcon fontSize="small" />
+                    ) : (
+                      <ContentCopyIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                </Box>
+              );
+            })}
+          </Box>
+        );
+      }
       default:
         return null;
     }
@@ -1655,6 +1760,58 @@ export default function JsonEditor({
                             }}
                           >
                             <LanguageIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                        {entry.type === 'customLogin' && (
+                          <IconButton
+                            size="small"
+                            onClick={async () => {
+                              const customEntry = entry as CustomLoginEntry;
+                              const { customLoginAPI } = window;
+                              if (!customLoginAPI) {
+                                return;
+                              }
+                              showNotification(
+                                t('customLogin.playing') ||
+                                  'Running login, please wait…',
+                                'info',
+                              );
+                              try {
+                                const result = await customLoginAPI.play({
+                                  url: customEntry.url,
+                                  title: customEntry.title,
+                                  steps: customEntry.steps,
+                                  loadingMessage:
+                                    t('customLogin.playingLoading') ||
+                                    'Please wait, loading the site…',
+                                });
+                                if (!result?.success) {
+                                  showNotification(
+                                    result?.error ||
+                                      t('customLogin.playError') ||
+                                      'Could not run the recorded login',
+                                    'error',
+                                  );
+                                }
+                              } catch {
+                                showNotification(
+                                  t('customLogin.playError') ||
+                                    'Could not run the recorded login',
+                                  'error',
+                                );
+                              }
+                            }}
+                            title={
+                              t('customLogin.play') || 'Run recorded login'
+                            }
+                            sx={{
+                              color: '#cba6f7',
+                              '&:hover': {
+                                backgroundColor: 'rgba(203, 166, 247, 0.12)',
+                              },
+                            }}
+                          >
+                            <PlayArrowIcon fontSize="small" />
                           </IconButton>
                         )}
                         <IconButton

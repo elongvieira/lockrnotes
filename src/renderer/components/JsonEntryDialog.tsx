@@ -14,9 +14,12 @@ import {
   IconButton,
   InputAdornment,
   SelectChangeEvent,
+  Typography,
+  CircularProgress,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
 import {
@@ -30,6 +33,8 @@ import {
   SshEntry,
   RdpEntry,
   WebLoginEntry,
+  CustomLoginEntry,
+  CustomLoginStep,
 } from '../types/jsonEntry';
 
 interface JsonEntryDialogProps {
@@ -52,6 +57,7 @@ const ENTRY_TYPE_OPTIONS: { value: JsonEntryType; fallback: string }[] = [
   { value: 'ssh', fallback: 'SSH' },
   { value: 'rdp', fallback: 'RDP' },
   { value: 'webLogin', fallback: 'Web Login' },
+  { value: 'customLogin', fallback: 'Custom login' },
 ];
 
 export default function JsonEntryDialog({
@@ -80,6 +86,9 @@ export default function JsonEntryDialog({
   const [webUrl, setWebUrl] = useState<string>('');
   const [webUser, setWebUser] = useState<string>('');
   const [webPassword, setWebPassword] = useState<string>('');
+  const [customUrl, setCustomUrl] = useState<string>('');
+  const [customSteps, setCustomSteps] = useState<CustomLoginStep[]>([]);
+  const [recording, setRecording] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -89,6 +98,9 @@ export default function JsonEntryDialog({
       setWebUrl('');
       setWebUser('');
       setWebPassword('');
+      setCustomUrl('');
+      setCustomSteps([]);
+      setRecording(false);
       if (editingEntry) {
         setEntryType(editingEntry.type);
         setTitle(editingEntry.title);
@@ -144,6 +156,13 @@ export default function JsonEntryDialog({
           setWebUrl((editingEntry as WebLoginEntry).url);
           setWebUser((editingEntry as WebLoginEntry).user);
           setWebPassword((editingEntry as WebLoginEntry).password);
+        } else if (editingEntry.type === 'customLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setCustomUrl((editingEntry as CustomLoginEntry).url);
+          setCustomSteps((editingEntry as CustomLoginEntry).steps || []);
         }
       } else if (duplicateData) {
         // Pre-fill from duplicated entry (including title, so user can modify it)
@@ -201,6 +220,13 @@ export default function JsonEntryDialog({
           setWebUrl((duplicateData as WebLoginEntry).url);
           setWebUser((duplicateData as WebLoginEntry).user);
           setWebPassword((duplicateData as WebLoginEntry).password);
+        } else if (duplicateData.type === 'customLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setCustomUrl((duplicateData as CustomLoginEntry).url);
+          setCustomSteps((duplicateData as CustomLoginEntry).steps || []);
         }
       } else {
         setEntryType('keyValue');
@@ -221,6 +247,8 @@ export default function JsonEntryDialog({
         setWebUrl('');
         setWebUser('');
         setWebPassword('');
+        setCustomUrl('');
+        setCustomSteps([]);
       }
       setError('');
       setShowPassword(false);
@@ -234,8 +262,8 @@ export default function JsonEntryDialog({
       return;
     }
 
-    if (entryType === 'webLogin') {
-      const rawUrl = webUrl.trim();
+    if (entryType === 'webLogin' || entryType === 'customLogin') {
+      const rawUrl = (entryType === 'customLogin' ? customUrl : webUrl).trim();
       if (!rawUrl) {
         setError(t('jsonEditor.errors.emptyUrl') || 'URL is required');
         return;
@@ -259,6 +287,13 @@ export default function JsonEntryDialog({
         );
         return;
       }
+    }
+
+    if (entryType === 'customLogin' && customSteps.length === 0) {
+      setError(
+        t('jsonEditor.errors.emptyMacro') || 'Record a macro before saving',
+      );
+      return;
     }
 
     // Build entry data
@@ -306,6 +341,14 @@ export default function JsonEntryDialog({
         : `https://${rawUrl}`;
       (entryData as WebLoginEntry).user = webUser.trim();
       (entryData as WebLoginEntry).password = webPassword.trim();
+    } else if (entryType === 'customLogin') {
+      const rawUrl = customUrl.trim();
+      (entryData as CustomLoginEntry).url = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(
+        rawUrl,
+      )
+        ? rawUrl
+        : `https://${rawUrl}`;
+      (entryData as CustomLoginEntry).steps = customSteps;
     }
 
     onConfirm(entryData);
@@ -321,10 +364,62 @@ export default function JsonEntryDialog({
     setShowPassword(!showPassword);
   };
 
+  let customRecordLabel = t('customLogin.record') || 'Record macro';
+  if (recording) {
+    customRecordLabel = t('customLogin.recording') || 'Recording…';
+  } else if (customSteps.length > 0) {
+    customRecordLabel = t('customLogin.rerecord') || 'Record again';
+  }
+
+  const handleRecordMacro = async () => {
+    const rawUrl = customUrl.trim();
+    if (!rawUrl) {
+      setError(t('jsonEditor.errors.emptyUrl') || 'URL is required');
+      return;
+    }
+    const { customLoginAPI } = window;
+    if (!customLoginAPI) {
+      setError(t('customLogin.recordError') || 'Could not start recording');
+      return;
+    }
+    setError('');
+    setRecording(true);
+    try {
+      const result = await customLoginAPI.record({
+        url: rawUrl,
+        title: title.trim() || 'Login customizado',
+      });
+      if (result?.success && Array.isArray(result.steps)) {
+        setCustomSteps(result.steps);
+        if (result.steps.length === 0) {
+          setError(t('customLogin.cancelled') || 'Recording cancelled');
+        }
+      } else if (result?.error) {
+        setError(result.error);
+      }
+    } catch {
+      setError(t('customLogin.recordError') || 'Could not start recording');
+    } finally {
+      setRecording(false);
+    }
+  };
+
+  const updateCustomTypeStep = (stepId: string, nextValue: string) => {
+    setCustomSteps((prev) =>
+      prev.map((step) =>
+        step.kind === 'type' && step.id === stepId
+          ? { ...step, value: nextValue }
+          : step,
+      ),
+    );
+  };
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={() => {
+        if (!recording) onClose();
+      }}
       maxWidth="sm"
       fullWidth
       PaperProps={{
@@ -372,7 +467,7 @@ export default function JsonEntryDialog({
           autoFocus
           margin="dense"
           label={
-            entryType === 'webLogin'
+            entryType === 'webLogin' || entryType === 'customLogin'
               ? t('jsonEditor.fields.siteName') || 'Site name'
               : t('jsonEditor.fields.title') || 'Title'
           }
@@ -672,15 +767,128 @@ export default function JsonEntryDialog({
           </>
         )}
 
+        {entryType === 'customLogin' && (
+          <>
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.url') || 'URL'}
+              fullWidth
+              variant="outlined"
+              value={customUrl}
+              autoComplete="off"
+              placeholder="https://example.com/login"
+              disabled={recording}
+              onChange={(e) => {
+                setCustomUrl(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+            <Box sx={{ mt: 1.5, mb: 1 }}>
+              <Button
+                variant="outlined"
+                startIcon={
+                  recording ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : (
+                    <FiberManualRecordIcon />
+                  )
+                }
+                onClick={handleRecordMacro}
+                disabled={recording || !customUrl.trim()}
+                sx={dialogStyles.cancelButton}
+              >
+                {customRecordLabel}
+              </Button>
+              {recording && (
+                <Typography
+                  variant="body2"
+                  sx={{ color: 'var(--text-secondary)', mt: 1 }}
+                >
+                  {t('customLogin.recordingHint') ||
+                    'Complete the login in the window, then press Stop'}
+                </Typography>
+              )}
+            </Box>
+            {customSteps.length > 0 && (
+              <Box
+                sx={{
+                  mt: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+              >
+                {customSteps.map((step, index) =>
+                  step.kind === 'click' ? (
+                    <Typography
+                      key={step.id}
+                      variant="body2"
+                      sx={{ color: 'var(--text-secondary)', py: 0.5 }}
+                    >
+                      {index + 1}. {t('customLogin.click') || 'Click'} “
+                      {step.label}”
+                    </Typography>
+                  ) : (
+                    <TextField
+                      key={step.id}
+                      margin="dense"
+                      label={`${index + 1}. ${step.label}`}
+                      fullWidth
+                      variant="outlined"
+                      value={step.value}
+                      autoComplete="off"
+                      type={
+                        step.isPassword && !showPassword ? 'password' : 'text'
+                      }
+                      onChange={(e) =>
+                        updateCustomTypeStep(step.id, e.target.value)
+                      }
+                      sx={dialogStyles.textField}
+                      InputProps={
+                        step.isPassword
+                          ? {
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={handleTogglePasswordVisibility}
+                                    edge="end"
+                                    size="small"
+                                    sx={dialogStyles.passwordIcon}
+                                  >
+                                    {showPassword ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }
+                          : undefined
+                      }
+                    />
+                  ),
+                )}
+              </Box>
+            )}
+          </>
+        )}
+
         {error && <Box sx={dialogStyles.errorText}>{error}</Box>}
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
-        <Button onClick={onClose} sx={dialogStyles.cancelButton}>
+        <Button
+          onClick={onClose}
+          disabled={recording}
+          sx={dialogStyles.cancelButton}
+        >
           {t('dialog.actions.cancel') || 'Cancel'}
         </Button>
         <Button
           onClick={handleConfirm}
           variant="contained"
+          disabled={recording}
           sx={dialogStyles.confirmButton}
         >
           {editingEntry

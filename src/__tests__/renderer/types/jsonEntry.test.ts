@@ -99,6 +99,35 @@ describe('createEntry', () => {
     expect((entry as any).password).toBe('secret');
   });
 
+  it('should create a customLogin entry with defaults', () => {
+    const entry = createEntry('customLogin', {});
+    expect(entry.type).toBe('customLogin');
+    expect((entry as any).title).toBe('');
+    expect((entry as any).url).toBe('');
+    expect((entry as any).steps).toEqual([]);
+  });
+
+  it('should create a customLogin entry with provided steps', () => {
+    const steps = [
+      { id: 's1', kind: 'click', label: 'SSO', selector: 'button.sso' },
+      {
+        id: 's2',
+        kind: 'type',
+        label: 'Organization',
+        selector: '#org',
+        value: 'acme',
+      },
+    ];
+    const entry = createEntry('customLogin', {
+      title: 'Okta',
+      url: 'https://example.com',
+      steps,
+    } as any);
+    expect(entry.type).toBe('customLogin');
+    expect((entry as any).url).toBe('https://example.com');
+    expect((entry as any).steps).toEqual(steps);
+  });
+
   it('should throw on unknown entry type', () => {
     expect(() => createEntry('unknown' as any, {})).toThrow(
       'Unknown entry type',

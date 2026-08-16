@@ -184,7 +184,8 @@
       "titleTwoValuesPassword": "Title + Value 1 + Value 2 + Password",
       "ssh": "SSH",
       "rdp": "RDP",
-      "webLogin": "Web Login"
+      "webLogin": "Web Login",
+      "customLogin": "Custom login"
     },
     "fields": {
       "title": "Title",
@@ -208,7 +209,8 @@
       "emptyValue2": "Entry 2 is required",
       "emptyPassword": "Password is required",
       "emptyUrl": "URL is required",
-      "invalidUrl": "Enter a valid http or https URL"
+      "invalidUrl": "Enter a valid http or https URL",
+      "emptyMacro": "Record a macro before saving"
     },
     "deleteConfirm": {
       "title": "Delete Record",
@@ -232,6 +234,21 @@
   "webLogin": {
     "open": "Open and fill login",
     "openError": "Could not open the site"
+  },
+  "customLogin": {
+    "record": "Record macro",
+    "recording": "Recording…",
+    "recordingHint": "Complete the login in the window, then press Stop",
+    "rerecord": "Record again",
+    "stop": "Stop",
+    "overlayTitle": "Recording login macro",
+    "click": "Click",
+    "play": "Run recorded login",
+    "playing": "Running login, please wait…",
+    "playingLoading": "Please wait, loading the site…",
+    "playError": "Could not run the recorded login",
+    "recordError": "Could not start recording",
+    "cancelled": "Recording cancelled"
   },
   "contextMenu": {
     "open": "Open",

@@ -184,7 +184,8 @@
       "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha",
       "ssh": "SSH",
       "rdp": "RDP",
-      "webLogin": "Login Web"
+      "webLogin": "Login Web",
+      "customLogin": "Login customizado"
     },
     "fields": {
       "title": "Título",
@@ -208,7 +209,8 @@
       "emptyValue2": "Entrada 2 é obrigatória",
       "emptyPassword": "Senha é obrigatória",
       "emptyUrl": "URL é obrigatória",
-      "invalidUrl": "Informe uma URL http ou https válida"
+      "invalidUrl": "Informe uma URL http ou https válida",
+      "emptyMacro": "Grave uma macro antes de salvar"
     },
     "deleteConfirm": {
       "title": "Excluir Registro",
@@ -232,6 +234,21 @@
   "webLogin": {
     "open": "Abrir e preencher login",
     "openError": "Não foi possível abrir o site"
+  },
+  "customLogin": {
+    "record": "Gravar macro",
+    "recording": "Gravando…",
+    "recordingHint": "Complete o login na janela e clique em Parar",
+    "rerecord": "Gravar novamente",
+    "stop": "Parar",
+    "overlayTitle": "Gravando macro de login",
+    "click": "Clicar em",
+    "play": "Executar login gravado",
+    "playing": "Executando login, aguarde…",
+    "playingLoading": "Aguarde, carregando o site…",
+    "playError": "Não foi possível executar o login gravado",
+    "recordError": "Não foi possível iniciar a gravação",
+    "cancelled": "Gravação cancelada"
   },
   "contextMenu": {
     "open": "Abrir",
