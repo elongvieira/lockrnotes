@@ -4,7 +4,6 @@ import type {
   FileCreationService,
 } from '../types/fileCreation';
 import { LocalFileCreator } from './LocalFileCreator';
-import { RemoteFileCreator } from './RemoteFileCreator';
 
 class FileCreationServiceImpl implements FileCreationService {
   private templates: Record<string, FileTemplate> = {
@@ -91,14 +90,9 @@ Data de criação: ${new Date().toLocaleDateString('pt-BR')}`;
       const filename = `${cleanFilename}${originalExtension}`;
       const content = template.generateContent(cleanFilename);
 
-      let strategy: import('../types/fileCreation').FileCreatorStrategy;
-      if (targetPath === 'remote') {
-        strategy = new RemoteFileCreator();
-      } else {
-        strategy = new LocalFileCreator();
-      }
+      const creator = new LocalFileCreator();
 
-      return await strategy.createFile(
+      return await creator.createFile(
         targetPath,
         fileData,
         filename,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -6,38 +6,24 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Chip from '@mui/material/Chip';
-import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import CloudIcon from '@mui/icons-material/Cloud';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
 import HotCopyBar from './HotCopyBar';
 import HotCopyManageDialog from './HotCopyManageDialog';
 import ImportDialog from './ImportDialog';
-import AdminDialog from './admin/AdminDialog';
-import ConfirmDialog from './ConfirmDialog';
 import { HotCopyItem } from '../types/hotcopy';
 import type { ImportFileInfo } from '../../main/preload/importApi';
 import { useAppContext } from '../contexts/AppContext';
-import { dialogStyles } from '../styles/dialogStyles';
 import './AppBar.css';
 
 export default function AppBar() {
   const { t, i18n } = useTranslation();
-  const {
-    refreshSidebar,
-    communitySession,
-    setCommunitySession,
-    vaultSession,
-    setVaultSession,
-  } = useAppContext();
+  const { refreshSidebar } = useAppContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hotCopyManageOpen, setHotCopyManageOpen] = useState(false);
   const [hotCopyItems, setHotCopyItems] = useState<HotCopyItem[]>([]);
@@ -45,51 +31,6 @@ export default function AppBar() {
   const [filesToImport, setFilesToImport] = useState<ImportFileInfo[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [langAnchor, setLangAnchor] = React.useState<null | HTMLElement>(null);
-  const [adminOpen, setAdminOpen] = useState(false);
-  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
-  const [vaultLogoutConfirmOpen, setVaultLogoutConfirmOpen] = useState(false);
-
-  // Load persisted community session on mount
-  useEffect(() => {
-    window.communityAuthAPI
-      ?.getSession()
-      .then((res) => {
-        if (res.success && res.session) setCommunitySession(res.session);
-        return res;
-      })
-      .catch(() => {});
-  }, [setCommunitySession]);
-
-  // Load persisted vault session on mount
-  useEffect(() => {
-    window.vaultAPI
-      ?.getSession()
-      .then((res) => {
-        if (res.success && res.session) setVaultSession(res.session);
-        return res;
-      })
-      .catch(() => {});
-  }, [setVaultSession]);
-
-  const handleCommunityLogout = async () => {
-    try {
-      await window.communityAuthAPI?.logout();
-      setCommunitySession(null);
-      setLogoutConfirmOpen(false);
-    } catch {
-      // ignore
-    }
-  };
-
-  const handleVaultLogout = async () => {
-    try {
-      await window.vaultAPI?.logout();
-      setVaultSession(null);
-      setVaultLogoutConfirmOpen(false);
-    } catch {
-      // ignore
-    }
-  };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -316,66 +257,6 @@ export default function AppBar() {
             </MenuItem>
           </Menu>
 
-          {/* Community server connection indicator */}
-          {communitySession && (
-            <Tooltip
-              title={`${communitySession.email} @ ${communitySession.host}:${communitySession.port}`}
-            >
-              <Chip
-                icon={<CloudIcon sx={dialogStyles.iconMedium} />}
-                onDelete={() => setLogoutConfirmOpen(true)}
-                deleteIcon={
-                  <Tooltip title={t('community.logout') || 'Logout'}>
-                    <LogoutIcon sx={dialogStyles.iconSmall} />
-                  </Tooltip>
-                }
-                sx={{
-                  height: 32,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: 'var(--primary-blue)',
-                  backgroundColor: 'var(--primary-blue-light)',
-                  webkitAppRegion: 'no-drag',
-                  '& .MuiChip-icon': { color: 'var(--primary-blue)' },
-                  '& .MuiChip-deleteIcon': {
-                    color: 'var(--text-secondary)',
-                    '&:hover': { color: 'var(--text-primary)' },
-                  },
-                }}
-              />
-            </Tooltip>
-          )}
-
-          {/* Vault connection indicator */}
-          {vaultSession && (
-            <Tooltip
-              title={`Vault @ ${vaultSession.host}:${vaultSession.port}`}
-            >
-              <Chip
-                icon={<VpnKeyIcon sx={dialogStyles.iconMedium} />}
-                onDelete={() => setVaultLogoutConfirmOpen(true)}
-                deleteIcon={
-                  <Tooltip title={t('vault.logout') || 'Disconnect'}>
-                    <LogoutIcon sx={dialogStyles.iconSmall} />
-                  </Tooltip>
-                }
-                sx={{
-                  height: 32,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: 'var(--primary-blue)',
-                  backgroundColor: 'var(--primary-blue-light)',
-                  webkitAppRegion: 'no-drag',
-                  '& .MuiChip-icon': { color: 'var(--primary-blue)' },
-                  '& .MuiChip-deleteIcon': {
-                    color: 'var(--text-secondary)',
-                    '&:hover': { color: 'var(--text-primary)' },
-                  },
-                }}
-              />
-            </Tooltip>
-          )}
-
           <button type="button" className="window-btn" onClick={handleMinimize}>
             —
           </button>
@@ -419,20 +300,6 @@ export default function AppBar() {
             </ListItemIcon>
             {t('settings.title') || 'Configurações'}
           </MenuItem>
-          {communitySession?.isAdmin && (
-            <MenuItem
-              onClick={() => {
-                setAdminOpen(true);
-                handleMenuClose();
-              }}
-              className="app-menu-item"
-            >
-              <ListItemIcon className="app-menu-icon">
-                <AdminPanelSettingsIcon fontSize="small" />
-              </ListItemIcon>
-              {t('admin.menuTitle')}
-            </MenuItem>
-          )}
           <MenuItem onClick={handleExport} className="app-menu-item">
             <ListItemIcon className="app-menu-icon">
               <DownloadIcon fontSize="small" />
@@ -473,27 +340,6 @@ export default function AppBar() {
           onClose={() => setImportDialogOpen(false)}
           files={filesToImport}
           onImportComplete={handleImportComplete}
-        />
-        <AdminDialog open={adminOpen} onClose={() => setAdminOpen(false)} />
-        <ConfirmDialog
-          open={logoutConfirmOpen}
-          title={t('community.logout.title') || 'Logout'}
-          message={
-            t('community.logout.message') ||
-            'Are you sure you want to disconnect?'
-          }
-          onConfirm={handleCommunityLogout}
-          onClose={() => setLogoutConfirmOpen(false)}
-        />
-        <ConfirmDialog
-          open={vaultLogoutConfirmOpen}
-          title={t('vault.logoutDialog.title') || 'Disconnect from Vault'}
-          message={
-            t('vault.logoutDialog.message') ||
-            'Are you sure you want to disconnect from the Vault server?'
-          }
-          onConfirm={handleVaultLogout}
-          onClose={() => setVaultLogoutConfirmOpen(false)}
         />
       </Toolbar>
     </MuiAppBar>

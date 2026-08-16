@@ -4,47 +4,31 @@ import {
   FileSystemService,
 } from '../types/filesystem';
 import { LocalFileSystemProvider } from './LocalFileSystemProvider';
-import { RemoteFileSystemProvider } from './RemoteFileSystemProvider';
-import { VaultFileSystemProvider } from './VaultFileSystemProvider';
 
 class FileSystemDispatcher implements FileSystemService {
   private localProvider = new LocalFileSystemProvider();
-
-  private remoteProvider = new RemoteFileSystemProvider();
-
-  private vaultProvider = new VaultFileSystemProvider();
-
-  private getProvider(path?: string): FileSystemService {
-    if (path && path.startsWith('remote://')) {
-      return this.remoteProvider;
-    }
-    if (path && path.startsWith('vault://')) {
-      return this.vaultProvider;
-    }
-    return this.localProvider;
-  }
 
   async readDirectory(
     path: string,
     options?: DirectoryReadOptions,
   ): Promise<FileSystemItem[]> {
-    return this.getProvider(path).readDirectory(path, options);
+    return this.localProvider.readDirectory(path, options);
   }
 
   async getItem(path: string): Promise<FileSystemItem | null> {
-    return this.getProvider(path).getItem(path);
+    return this.localProvider.getItem(path);
   }
 
   async createDirectory(path: string): Promise<boolean> {
-    return this.getProvider(path).createDirectory(path);
+    return this.localProvider.createDirectory(path);
   }
 
   async createFile(path: string, content?: string): Promise<boolean> {
-    return this.getProvider(path).createFile(path, content);
+    return this.localProvider.createFile(path, content);
   }
 
   async saveFile(path: string, content: string): Promise<boolean> {
-    return this.getProvider(path).saveFile(path, content);
+    return this.localProvider.saveFile(path, content);
   }
 
   async saveFileWithEncryption(
@@ -53,7 +37,7 @@ class FileSystemDispatcher implements FileSystemService {
     isEncrypted: boolean,
     originalExtension?: string,
   ): Promise<boolean> {
-    return this.getProvider(path).saveFileWithEncryption(
+    return this.localProvider.saveFileWithEncryption(
       path,
       content,
       isEncrypted,
@@ -62,15 +46,15 @@ class FileSystemDispatcher implements FileSystemService {
   }
 
   async readFile(path: string): Promise<string | null> {
-    return this.getProvider(path).readFile(path);
+    return this.localProvider.readFile(path);
   }
 
   async deleteItem(path: string): Promise<boolean> {
-    return this.getProvider(path).deleteItem(path);
+    return this.localProvider.deleteItem(path);
   }
 
   async renameItem(oldPath: string, newPath: string): Promise<boolean> {
-    return this.getProvider(oldPath).renameItem(oldPath, newPath);
+    return this.localProvider.renameItem(oldPath, newPath);
   }
 
   async getDefaultNotesDirectory(): Promise<string> {
@@ -78,7 +62,7 @@ class FileSystemDispatcher implements FileSystemService {
   }
 
   async itemExists(dirPath: string, filename: string): Promise<boolean> {
-    return this.getProvider(dirPath).itemExists(dirPath, filename);
+    return this.localProvider.itemExists(dirPath, filename);
   }
 
   convertToTreeItems(items: FileSystemItem[]): any[] {
@@ -122,7 +106,7 @@ class FileSystemDispatcher implements FileSystemService {
     sourceDir: string,
     destDir: string,
   ): Promise<boolean> {
-    return this.getProvider(sourceDir).copyFolderContent(sourceDir, destDir);
+    return this.localProvider.copyFolderContent(sourceDir, destDir);
   }
 }
 

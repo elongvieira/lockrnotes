@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import '../theme.css';
 import './Sidebar.css';
 import Box from '@mui/material/Box';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -20,12 +18,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTranslation } from 'react-i18next';
-import RemoteSidebar from './RemoteSidebar';
-import VaultSidebar from './VaultSidebar';
 import { fileSystemService } from '../services/fileSystemService';
 import { fileCreationService } from '../services/fileCreationService';
 import type { FileCreationData } from '../types/fileCreation';
@@ -38,7 +33,6 @@ import MoveDialog from './MoveDialog';
 import ConfirmDialog from './ConfirmDialog';
 import PasswordDialog from './PasswordDialog';
 import TreeItemLabel from './TreeItemLabel';
-import CopyToVaultDialog from './CopyToVaultDialog';
 import { useAppContext } from '../contexts/AppContext';
 import { dialogStyles } from '../styles/dialogStyles';
 
@@ -51,10 +45,8 @@ export default function Sidebar() {
     setTabs,
     activeTab,
     setActiveTab,
-    vaultSession,
   } = useAppContext();
   const { t } = useTranslation();
-  const [value, setValue] = useState<number>(0);
   const [directoryItems, setDirectoryItems] = useState<FileSystemItem[]>([]);
   const [currentPath, setCurrentPath] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -83,12 +75,6 @@ export default function Sidebar() {
   const [_copyDialogOpen, setCopyDialogOpen] = useState<boolean>(false);
   const [itemToCopy, setItemToCopy] = useState<FileSystemItem | null>(null);
 
-  // Copy to Vault dialog state
-  const [copyToVaultDialogOpen, setCopyToVaultDialogOpen] =
-    useState<boolean>(false);
-  const [itemToCopyToVault, setItemToCopyToVault] =
-    useState<FileSystemItem | null>(null);
-
   // Password dialog state for manual encryption
   const [passwordDialogOpen, setPasswordDialogOpen] = useState<boolean>(false);
   const [pendingFileData, setPendingFileData] = useState<{
@@ -98,10 +84,6 @@ export default function Sidebar() {
     originalExtension: string;
   } | null>(null);
   const [passwordError, setPasswordError] = useState<string>('');
-
-  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
 
   const loadDirectory = async (path?: string) => {
     if (!window.electron?.filesystem) {
@@ -473,14 +455,6 @@ export default function Sidebar() {
     if (contextMenu?.item) {
       setItemToCopy(contextMenu.item);
       setCopyDialogOpen(true);
-    }
-    handleContextMenuClose();
-  };
-
-  const handleContextMenuCopyToVault = () => {
-    if (contextMenu?.item) {
-      setItemToCopyToVault(contextMenu.item);
-      setCopyToVaultDialogOpen(true);
     }
     handleContextMenuClose();
   };
@@ -955,118 +929,51 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="tabs-area">
-        <Box sx={{ width: '100%' }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label={t('sidebar.tabs.aria') ?? 'Sidebar Tabs'}
-            variant="fullWidth"
-          >
-            <Tab
-              label={t('sidebar.tabs.local')}
-              id="tab-local"
-              aria-controls="tabpanel-local"
-            />
-            <Tab
-              label={t('sidebar.tabs.remote')}
-              id="tab-remote"
-              aria-controls="tabpanel-remote"
-            />
-            <Tab
-              label={t('sidebar.tabs.vault')}
-              id="tab-vault"
-              aria-controls="tabpanel-vault"
-            />
-          </Tabs>
-        </Box>
-      </div>
-
-      <div
-        role="tabpanel"
-        hidden={value !== 0}
-        id="tabpanel-local"
-        aria-labelledby="tab-local"
-        style={{
-          flex: 1,
-          display: value === 0 ? 'flex' : 'none',
-          flexDirection: 'column',
-        }}
-      >
-        <div className="files-card">
-          <div className="files-card-header">
-            <h4>{t('sidebar.tabs.files')}</h4>
-            <div className="header-actions">
-              <IconButton
-                size="small"
-                title={t('sidebar.actions.createFolder') || 'Create folder'}
-                onClick={handleCreateFolder}
-              >
-                <CreateNewFolderIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                title={t('sidebar.actions.createFile') || 'Create file'}
-                onClick={handleCreateFile}
-              >
-                <NoteAddIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                title={t('sidebar.actions.refresh') || 'Refresh'}
-                onClick={handleRefresh}
-              >
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-            </div>
-          </div>
-          <div className="tree-container">
-            <SimpleTreeView
-              aria-label={t('sidebar.tree.aria') ?? 'notes tree'}
-              multiSelect
-              defaultExpandedItems={[]}
-              defaultSelectedItems={[]}
-              onItemClick={(event, itemId) => {
-                handleFileClick(itemId);
-              }}
-              sx={{
-                flex: 1,
-                overflow: 'auto',
-                ...dialogStyles.scrollbar,
-              }}
+      <div className="files-card">
+        <div className="files-card-header">
+          <h4>{t('sidebar.tabs.files')}</h4>
+          <div className="header-actions">
+            <IconButton
+              size="small"
+              title={t('sidebar.actions.createFolder') || 'Create folder'}
+              onClick={handleCreateFolder}
             >
-              {renderTreeContent()}
-            </SimpleTreeView>
+              <CreateNewFolderIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              title={t('sidebar.actions.createFile') || 'Create file'}
+              onClick={handleCreateFile}
+            >
+              <NoteAddIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              title={t('sidebar.actions.refresh') || 'Refresh'}
+              onClick={handleRefresh}
+            >
+              <RefreshIcon fontSize="small" />
+            </IconButton>
           </div>
         </div>
-      </div>
-
-      <div
-        role="tabpanel"
-        hidden={value !== 1}
-        id="tabpanel-remote"
-        aria-labelledby="tab-remote"
-        style={{
-          flex: 1,
-          display: value === 1 ? 'flex' : 'none',
-          flexDirection: 'column',
-        }}
-      >
-        <RemoteSidebar />
-      </div>
-
-      <div
-        role="tabpanel"
-        hidden={value !== 2}
-        id="tabpanel-vault"
-        aria-labelledby="tab-vault"
-        style={{
-          flex: 1,
-          display: value === 2 ? 'flex' : 'none',
-          flexDirection: 'column',
-        }}
-      >
-        <VaultSidebar />
+        <div className="tree-container">
+          <SimpleTreeView
+            aria-label={t('sidebar.tree.aria') ?? 'notes tree'}
+            multiSelect
+            defaultExpandedItems={[]}
+            defaultSelectedItems={[]}
+            onItemClick={(event, itemId) => {
+              handleFileClick(itemId);
+            }}
+            sx={{
+              flex: 1,
+              overflow: 'auto',
+              ...dialogStyles.scrollbar,
+            }}
+          >
+            {renderTreeContent()}
+          </SimpleTreeView>
+        </div>
       </div>
 
       <FolderDialog
@@ -1137,17 +1044,6 @@ export default function Sidebar() {
             <ListItemText>{t('contextMenu.decrypt') || 'Decrypt'}</ListItemText>
           </MenuItem>
         )}
-        {contextMenu?.item?.type === 'file' && vaultSession?.host && (
-          <MenuItem
-            onClick={handleContextMenuCopyToVault}
-            className="app-menu-item"
-          >
-            <ListItemIcon className="app-menu-icon">
-              <VpnKeyIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>{t('contextMenu.copyToVault')}</ListItemText>
-          </MenuItem>
-        )}
         <MenuItem onClick={handleContextMenuDelete} className="app-menu-item">
           <ListItemIcon className="app-menu-icon">
             <DeleteIcon fontSize="small" />
@@ -1204,15 +1100,6 @@ export default function Sidebar() {
         onConfirm={handlePasswordConfirm}
         filename={pendingFileData?.item.name}
         error={passwordError}
-      />
-
-      <CopyToVaultDialog
-        open={copyToVaultDialogOpen}
-        onClose={() => setCopyToVaultDialogOpen(false)}
-        file={itemToCopyToVault}
-        onCopyComplete={() =>
-          showNotification(t('notifications.fileCopiedToVault'), 'success')
-        }
       />
     </aside>
   );

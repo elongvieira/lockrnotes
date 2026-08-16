@@ -6,10 +6,6 @@ import type { importApi } from '../main/preload/importApi';
 import type { hotCopyApi } from '../main/preload/hotcopyApi';
 import type { SshAPI } from '../main/preload/sshApi';
 import type { RdpAPI } from '../main/preload/rdpApi';
-import type { CommunityAuthAPI } from '../main/preload/communityAuthApi';
-import type { CommunityAdminAPI } from '../main/preload/communityAdminApi';
-import type { CommunityFilesAPI } from '../main/preload/communityFilesApi';
-import type { VaultAPI } from '../main/preload/vaultApi';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -22,10 +18,6 @@ declare global {
     hotCopyAPI: typeof hotCopyApi;
     sshAPI: SshAPI;
     rdpAPI: RdpAPI;
-    communityAuthAPI: CommunityAuthAPI;
-    communityAdminAPI: CommunityAdminAPI;
-    communityFilesAPI: CommunityFilesAPI;
-    vaultAPI: VaultAPI;
   }
 
   namespace NodeJS {

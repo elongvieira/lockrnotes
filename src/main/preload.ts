@@ -11,10 +11,6 @@ import {
 import { hotCopyApi } from './preload/hotcopyApi';
 import { sshApi } from './preload/sshApi';
 import { rdpApi } from './preload/rdpApi';
-import { communityAuthApi } from './preload/communityAuthApi';
-import { communityAdminApi } from './preload/communityAdminApi';
-import { communityFilesApi } from './preload/communityFilesApi';
-import { vaultApi } from './preload/vaultApi';
 import './preload/encryptionApi';
 import './preload/manualEncryptionApi';
 
@@ -33,9 +29,5 @@ contextBridge.exposeInMainWorld('importAPI', importApi);
 contextBridge.exposeInMainWorld('hotCopyAPI', hotCopyApi);
 contextBridge.exposeInMainWorld('sshAPI', sshApi);
 contextBridge.exposeInMainWorld('rdpAPI', rdpApi);
-contextBridge.exposeInMainWorld('communityAuthAPI', communityAuthApi);
-contextBridge.exposeInMainWorld('communityAdminAPI', communityAdminApi);
-contextBridge.exposeInMainWorld('communityFilesAPI', communityFilesApi);
-contextBridge.exposeInMainWorld('vaultAPI', vaultApi);
 
 export type ElectronHandler = typeof electronHandler;

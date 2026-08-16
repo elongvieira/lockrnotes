@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -13,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import FileCreationDialog from './FileCreationDialog';
 import PasswordDialog from './PasswordDialog';
 import JsonEditor from './JsonEditor';
-import VaultSecretEditor from './VaultSecretEditor';
 import { fileCreationService } from '../services/fileCreationService';
 import type { FileCreationData } from '../types/fileCreation';
 import { fileSystemService } from '../services/fileSystemService';
@@ -471,9 +469,7 @@ export default function Editor() {
             let diskContent: string | null = null;
 
             if (fileContent !== null) {
-              if (targetTab.filePath.startsWith('vault://')) {
-                diskContent = fileContent;
-              } else if (targetTab.isEncrypted) {
+              if (targetTab.isEncrypted) {
                 if (targetTab.encryptedPassword) {
                   const isManuallyEncrypted =
                     await window.manualEncryptionAPI.isManuallyEncrypted(
@@ -634,7 +630,6 @@ export default function Editor() {
 
   // Obter aba ativa
   const currentTab = tabs.find((tab) => tab.id === activeTab);
-  const isVaultTab = currentTab?.filePath.startsWith('vault://') || false;
   const isJsonTab =
     currentTab?.filePath.endsWith('.json') ||
     (!!currentTab?.isEncrypted && currentTab?.originalExtension === '.json') ||
@@ -810,15 +805,7 @@ export default function Editor() {
         <Card className="editor-card" elevation={2}>
           {/* Container do editor */}
           <Box className="editor-content">
-            {isVaultTab ? (
-              <VaultSecretEditor
-                content={currentTab.content}
-                onContentChange={(newContent) =>
-                  updateTabContent(currentTab.id, newContent)
-                }
-                filePath={currentTab.filePath}
-              />
-            ) : isJsonTab ? (
+            {isJsonTab ? (
               <JsonEditor
                 content={currentTab.content}
                 onContentChange={(newContent) =>

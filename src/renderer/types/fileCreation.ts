@@ -4,7 +4,6 @@ export interface FileCreationData {
   encrypted: boolean;
   encryptionType?: 'managed' | 'manual';
   password?: string;
-  parentId?: string;
 }
 
 export interface FileTemplate {
