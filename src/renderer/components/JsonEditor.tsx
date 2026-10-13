@@ -31,6 +31,8 @@ import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import TerminalIcon from '@mui/icons-material/Terminal';
+import LanguageIcon from '@mui/icons-material/Language';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CodeIcon from '@mui/icons-material/Code';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import { useTranslation } from 'react-i18next';
@@ -46,9 +48,12 @@ import {
   TitleTwoValuesPasswordEntry,
   SshEntry,
   RdpEntry,
+  WebLoginEntry,
+  CustomLoginEntry,
   parseJsonContent,
   serializeJsonContent,
   createEntry,
+  loginSessionOptions,
 } from '../types/jsonEntry';
 import JsonEntryDialog from './JsonEntryDialog';
 import ConfirmDialog from './ConfirmDialog';
@@ -122,6 +127,17 @@ export default function JsonEditor({
     const query = searchQuery.toLowerCase();
 
     if ('title' in entry && entry.title.toLowerCase().includes(query)) {
+      return true;
+    }
+
+    if (entry.type === 'webLogin' && entry.url.toLowerCase().includes(query)) {
+      return true;
+    }
+
+    if (
+      entry.type === 'customLogin' &&
+      entry.url.toLowerCase().includes(query)
+    ) {
       return true;
     }
 
@@ -252,6 +268,14 @@ export default function JsonEditor({
         } else if (entry.type === 'titleValuePassword') {
           allValueIds.add(`${entry.id}-0`);
         } else if (entry.type === 'titleTwoValuesPassword') {
+          allValueIds.add(`${entry.id}-0`);
+          allValueIds.add(`${entry.id}-1`);
+        } else if (
+          entry.type === 'ssh' ||
+          entry.type === 'rdp' ||
+          entry.type === 'webLogin' ||
+          entry.type === 'customLogin'
+        ) {
           allValueIds.add(`${entry.id}-0`);
           allValueIds.add(`${entry.id}-1`);
         }
@@ -1193,6 +1217,250 @@ export default function JsonEditor({
           </Box>
         );
       }
+      case 'webLogin': {
+        const webEntry = entry as WebLoginEntry;
+        const webPasswordVisible = visiblePasswords.has(entry.id);
+        const webUrlVisible = visibleValues.has(`${entry.id}-0`);
+        const webUserVisible = visibleValues.has(`${entry.id}-1`);
+        return (
+          <Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.url')}:{' '}
+                {maskValue(webEntry.url, webUrlVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {webUrlVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, webEntry.url, 0)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 0 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'url', webEntry.url)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.login')}:{' '}
+                {maskValue(webEntry.user, webUserVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 1)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {webUserVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, webEntry.user, 1)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 1 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'user', webEntry.user)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'var(--text-secondary)' }}
+              >
+                {t('jsonEditor.fields.password')}:{' '}
+                {maskValue(webEntry.password, webPasswordVisible, true)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => togglePasswordVisibility(entry.id)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {webPasswordVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, webEntry.password, 2)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 2 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleAddToHotCopy(entryIndex, 'password', webEntry.password)
+                }
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+                title={t('hotcopy.addToHotCopy') || 'Add to quick copy'}
+              >
+                <BookmarkAddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+        );
+      }
+      case 'customLogin': {
+        const customEntry = entry as CustomLoginEntry;
+        const customUrlVisible = visibleValues.has(`${entry.id}-0`);
+        const typeSteps = customEntry.steps.filter(
+          (step) => step.kind === 'type',
+        );
+        return (
+          <Box>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
+              <Typography variant="body2" sx={{ color: 'var(--text-primary)' }}>
+                {t('jsonEditor.fields.url')}:{' '}
+                {maskValue(customEntry.url, customUrlVisible)}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => toggleValueVisibility(entry.id, 0)}
+                sx={{
+                  color: 'var(--text-secondary)',
+                  '&:hover': { color: 'var(--primary-blue)' },
+                }}
+              >
+                {customUrlVisible ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(entry.id, customEntry.url, 0)}
+                className="json-editor-copy-btn"
+              >
+                {copied[entry.id] === 0 ? (
+                  <CheckIcon fontSize="small" />
+                ) : (
+                  <ContentCopyIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
+            {typeSteps.map((step, typeIndex) => {
+              const visible = visibleValues.has(`${entry.id}-${typeIndex + 1}`);
+              return (
+                <Box
+                  key={step.id}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 0.5,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'var(--text-primary)' }}
+                  >
+                    {step.label}:{' '}
+                    {maskValue(step.value, visible, Boolean(step.isPassword))}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      toggleValueVisibility(entry.id, typeIndex + 1)
+                    }
+                    sx={{
+                      color: 'var(--text-secondary)',
+                      '&:hover': { color: 'var(--primary-blue)' },
+                    }}
+                  >
+                    {visible ? (
+                      <VisibilityOffIcon fontSize="small" />
+                    ) : (
+                      <VisibilityIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      handleCopy(entry.id, step.value, typeIndex + 1)
+                    }
+                    className="json-editor-copy-btn"
+                  >
+                    {copied[entry.id] === typeIndex + 1 ? (
+                      <CheckIcon fontSize="small" />
+                    ) : (
+                      <ContentCopyIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                </Box>
+              );
+            })}
+          </Box>
+        );
+      }
       default:
         return null;
     }
@@ -1450,6 +1718,103 @@ export default function JsonEditor({
                             }}
                           >
                             <TerminalIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                        {entry.type === 'webLogin' && (
+                          <IconButton
+                            size="small"
+                            onClick={async () => {
+                              const webEntry = entry as WebLoginEntry;
+                              const { webLoginAPI } = window;
+                              if (!webLoginAPI) {
+                                return;
+                              }
+                              try {
+                                const result = await webLoginAPI.open({
+                                  url: webEntry.url,
+                                  user: webEntry.user,
+                                  password: webEntry.password,
+                                  title: webEntry.title,
+                                  ...loginSessionOptions(webEntry),
+                                });
+                                if (!result?.success) {
+                                  showNotification(
+                                    result?.error ||
+                                      t('webLogin.openError') ||
+                                      'Could not open the site',
+                                    'error',
+                                  );
+                                }
+                              } catch {
+                                showNotification(
+                                  t('webLogin.openError') ||
+                                    'Could not open the site',
+                                  'error',
+                                );
+                              }
+                            }}
+                            title={t('webLogin.open') || 'Open and fill login'}
+                            sx={{
+                              color: '#94e2d5',
+                              '&:hover': {
+                                backgroundColor: 'rgba(148, 226, 213, 0.12)',
+                              },
+                            }}
+                          >
+                            <LanguageIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                        {entry.type === 'customLogin' && (
+                          <IconButton
+                            size="small"
+                            onClick={async () => {
+                              const customEntry = entry as CustomLoginEntry;
+                              const { customLoginAPI } = window;
+                              if (!customLoginAPI) {
+                                return;
+                              }
+                              showNotification(
+                                t('customLogin.playing') ||
+                                  'Running login, please wait…',
+                                'info',
+                              );
+                              try {
+                                const result = await customLoginAPI.play({
+                                  url: customEntry.url,
+                                  title: customEntry.title,
+                                  steps: customEntry.steps,
+                                  loadingMessage:
+                                    t('customLogin.playingLoading') ||
+                                    'Please wait, loading the site…',
+                                  ...loginSessionOptions(customEntry),
+                                });
+                                if (!result?.success) {
+                                  showNotification(
+                                    result?.error ||
+                                      t('customLogin.playError') ||
+                                      'Could not run the recorded login',
+                                    'error',
+                                  );
+                                }
+                              } catch {
+                                showNotification(
+                                  t('customLogin.playError') ||
+                                    'Could not run the recorded login',
+                                  'error',
+                                );
+                              }
+                            }}
+                            title={
+                              t('customLogin.play') || 'Run recorded login'
+                            }
+                            sx={{
+                              color: '#cba6f7',
+                              '&:hover': {
+                                backgroundColor: 'rgba(203, 166, 247, 0.12)',
+                              },
+                            }}
+                          >
+                            <PlayArrowIcon fontSize="small" />
                           </IconButton>
                         )}
                         <IconButton

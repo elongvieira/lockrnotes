@@ -7,16 +7,21 @@ import {
   TextField,
   Button,
   FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
+  InputLabel,
+  Select,
+  MenuItem,
   Box,
   IconButton,
   InputAdornment,
+  SelectChangeEvent,
+  Typography,
+  CircularProgress,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
 import {
@@ -29,6 +34,10 @@ import {
   TitleTwoValuesPasswordEntry,
   SshEntry,
   RdpEntry,
+  WebLoginEntry,
+  CustomLoginEntry,
+  CustomLoginStep,
+  createLoginSessionId,
 } from '../types/jsonEntry';
 
 interface JsonEntryDialogProps {
@@ -38,6 +47,21 @@ interface JsonEntryDialogProps {
   editingEntry: JsonEntry | null;
   duplicateData?: JsonEntry | null;
 }
+
+const ENTRY_TYPE_OPTIONS: { value: JsonEntryType; fallback: string }[] = [
+  { value: 'keyValue', fallback: 'Title + Value' },
+  { value: 'titleTwoValues', fallback: 'Title + Value 1 + Value 2' },
+  { value: 'titlePassword', fallback: 'Title + Password' },
+  { value: 'titleValuePassword', fallback: 'Title + Value + Password' },
+  {
+    value: 'titleTwoValuesPassword',
+    fallback: 'Title + Value 1 + Value 2 + Password',
+  },
+  { value: 'ssh', fallback: 'SSH' },
+  { value: 'rdp', fallback: 'RDP' },
+  { value: 'webLogin', fallback: 'Web Login' },
+  { value: 'customLogin', fallback: 'Custom login' },
+];
 
 export default function JsonEntryDialog({
   open,
@@ -62,12 +86,28 @@ export default function JsonEntryDialog({
   const [rdpUser, setRdpUser] = useState<string>('');
   const [rdpPassword, setRdpPassword] = useState<string>('');
   const [rdpDomain, setRdpDomain] = useState<string>('');
+  const [webUrl, setWebUrl] = useState<string>('');
+  const [webUser, setWebUser] = useState<string>('');
+  const [webPassword, setWebPassword] = useState<string>('');
+  const [customUrl, setCustomUrl] = useState<string>('');
+  const [customSteps, setCustomSteps] = useState<CustomLoginStep[]>([]);
+  const [shareSession, setShareSession] = useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string>('');
+  const [recording, setRecording] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   // Reset or populate fields when dialog opens
   useEffect(() => {
     if (open) {
+      setWebUrl('');
+      setWebUser('');
+      setWebPassword('');
+      setCustomUrl('');
+      setCustomSteps([]);
+      setShareSession(false);
+      setSessionId(createLoginSessionId());
+      setRecording(false);
       if (editingEntry) {
         setEntryType(editingEntry.type);
         setTitle(editingEntry.title);
@@ -115,6 +155,33 @@ export default function JsonEntryDialog({
           setRdpUser((editingEntry as RdpEntry).user);
           setRdpPassword((editingEntry as RdpEntry).password);
           setRdpDomain((editingEntry as RdpEntry).domain || '');
+        } else if (editingEntry.type === 'webLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setWebUrl((editingEntry as WebLoginEntry).url);
+          setWebUser((editingEntry as WebLoginEntry).user);
+          setWebPassword((editingEntry as WebLoginEntry).password);
+          setShareSession(
+            Boolean((editingEntry as WebLoginEntry).shareSession),
+          );
+          setSessionId(
+            (editingEntry as WebLoginEntry).sessionId || editingEntry.id,
+          );
+        } else if (editingEntry.type === 'customLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setCustomUrl((editingEntry as CustomLoginEntry).url);
+          setShareSession(
+            Boolean((editingEntry as CustomLoginEntry).shareSession),
+          );
+          setSessionId(
+            (editingEntry as CustomLoginEntry).sessionId || editingEntry.id,
+          );
+          setCustomSteps((editingEntry as CustomLoginEntry).steps || []);
         }
       } else if (duplicateData) {
         // Pre-fill from duplicated entry (including title, so user can modify it)
@@ -164,6 +231,27 @@ export default function JsonEntryDialog({
           setRdpUser((duplicateData as RdpEntry).user);
           setRdpPassword((duplicateData as RdpEntry).password);
           setRdpDomain((duplicateData as RdpEntry).domain || '');
+        } else if (duplicateData.type === 'webLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setWebUrl((duplicateData as WebLoginEntry).url);
+          setWebUser((duplicateData as WebLoginEntry).user);
+          setWebPassword((duplicateData as WebLoginEntry).password);
+          setShareSession(
+            Boolean((duplicateData as WebLoginEntry).shareSession),
+          );
+        } else if (duplicateData.type === 'customLogin') {
+          setValue('');
+          setValue1('');
+          setValue2('');
+          setPassword('');
+          setCustomUrl((duplicateData as CustomLoginEntry).url);
+          setCustomSteps((duplicateData as CustomLoginEntry).steps || []);
+          setShareSession(
+            Boolean((duplicateData as CustomLoginEntry).shareSession),
+          );
         }
       } else {
         setEntryType('keyValue');
@@ -181,6 +269,11 @@ export default function JsonEntryDialog({
         setRdpUser('');
         setRdpPassword('');
         setRdpDomain('');
+        setWebUrl('');
+        setWebUser('');
+        setWebPassword('');
+        setCustomUrl('');
+        setCustomSteps([]);
       }
       setError('');
       setShowPassword(false);
@@ -191,6 +284,40 @@ export default function JsonEntryDialog({
     // Validation
     if (!title.trim()) {
       setError(t('jsonEditor.errors.emptyTitle') || 'Title is required');
+      return;
+    }
+
+    if (entryType === 'webLogin' || entryType === 'customLogin') {
+      const rawUrl = (entryType === 'customLogin' ? customUrl : webUrl).trim();
+      if (!rawUrl) {
+        setError(t('jsonEditor.errors.emptyUrl') || 'URL is required');
+        return;
+      }
+      const withProtocol = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(rawUrl)
+        ? rawUrl
+        : `https://${rawUrl}`;
+      try {
+        const parsed = new URL(withProtocol);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+          setError(
+            t('jsonEditor.errors.invalidUrl') ||
+              'Enter a valid http or https URL',
+          );
+          return;
+        }
+      } catch {
+        setError(
+          t('jsonEditor.errors.invalidUrl') ||
+            'Enter a valid http or https URL',
+        );
+        return;
+      }
+    }
+
+    if (entryType === 'customLogin' && customSteps.length === 0) {
+      setError(
+        t('jsonEditor.errors.emptyMacro') || 'Record a macro before saving',
+      );
       return;
     }
 
@@ -230,13 +357,36 @@ export default function JsonEntryDialog({
       (entryData as RdpEntry).user = rdpUser.trim();
       (entryData as RdpEntry).password = rdpPassword.trim();
       (entryData as RdpEntry).domain = rdpDomain.trim();
+    } else if (entryType === 'webLogin') {
+      const rawUrl = webUrl.trim();
+      (entryData as WebLoginEntry).url = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(
+        rawUrl,
+      )
+        ? rawUrl
+        : `https://${rawUrl}`;
+      (entryData as WebLoginEntry).user = webUser.trim();
+      (entryData as WebLoginEntry).password = webPassword.trim();
+      (entryData as WebLoginEntry).shareSession = shareSession;
+      (entryData as WebLoginEntry).sessionId =
+        sessionId || createLoginSessionId();
+    } else if (entryType === 'customLogin') {
+      const rawUrl = customUrl.trim();
+      (entryData as CustomLoginEntry).url = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(
+        rawUrl,
+      )
+        ? rawUrl
+        : `https://${rawUrl}`;
+      (entryData as CustomLoginEntry).steps = customSteps;
+      (entryData as CustomLoginEntry).shareSession = shareSession;
+      (entryData as CustomLoginEntry).sessionId =
+        sessionId || createLoginSessionId();
     }
 
     onConfirm(entryData);
     onClose();
   };
 
-  const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTypeChange = (event: SelectChangeEvent<JsonEntryType>) => {
     setEntryType(event.target.value as JsonEntryType);
     setError('');
   };
@@ -245,10 +395,93 @@ export default function JsonEntryDialog({
     setShowPassword(!showPassword);
   };
 
+  let customRecordLabel = t('customLogin.record') || 'Record macro';
+  if (recording) {
+    customRecordLabel = t('customLogin.recording') || 'Recording…';
+  } else if (customSteps.length > 0) {
+    customRecordLabel = t('customLogin.rerecord') || 'Record again';
+  }
+
+  const handleRecordMacro = async () => {
+    const rawUrl = customUrl.trim();
+    if (!rawUrl) {
+      setError(t('jsonEditor.errors.emptyUrl') || 'URL is required');
+      return;
+    }
+    const { customLoginAPI } = window;
+    if (!customLoginAPI) {
+      setError(t('customLogin.recordError') || 'Could not start recording');
+      return;
+    }
+    setError('');
+    setRecording(true);
+    const recordSessionId = sessionId || createLoginSessionId();
+    if (!sessionId) {
+      setSessionId(recordSessionId);
+    }
+    try {
+      const result = await customLoginAPI.record({
+        url: rawUrl,
+        title: title.trim() || 'Login customizado',
+        shareSession,
+        sessionId: recordSessionId,
+      });
+      if (result?.success && Array.isArray(result.steps)) {
+        setCustomSteps(result.steps);
+        if (result.steps.length === 0) {
+          setError(t('customLogin.cancelled') || 'Recording cancelled');
+        }
+      } else if (result?.error) {
+        setError(result.error);
+      }
+    } catch {
+      setError(t('customLogin.recordError') || 'Could not start recording');
+    } finally {
+      setRecording(false);
+    }
+  };
+
+  const updateCustomTypeStep = (stepId: string, nextValue: string) => {
+    setCustomSteps((prev) =>
+      prev.map((step) =>
+        step.kind === 'type' && step.id === stepId
+          ? { ...step, value: nextValue }
+          : step,
+      ),
+    );
+  };
+
+  const renderShareSessionField = () => (
+    <FormControlLabel
+      sx={{ mt: 1.5, alignItems: 'flex-start', mr: 0 }}
+      control={
+        <Checkbox
+          checked={shareSession}
+          onChange={(e) => setShareSession(e.target.checked)}
+          sx={dialogStyles.checkboxRadio}
+        />
+      }
+      label={
+        <Box sx={{ mt: 0.25 }}>
+          <Typography sx={dialogStyles.primaryText}>
+            {t('jsonEditor.fields.shareSession') ||
+              'Share browser session with other logins'}
+          </Typography>
+          <Typography variant="body2" sx={dialogStyles.secondaryText}>
+            {t('jsonEditor.fields.shareSessionHint') ||
+              'Each entry keeps its own cookies by default. Enable only to reuse a login across entries.'}
+          </Typography>
+        </Box>
+      }
+    />
+  );
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={() => {
+        if (!recording) onClose();
+      }}
       maxWidth="sm"
       fullWidth
       PaperProps={{
@@ -268,62 +501,38 @@ export default function JsonEntryDialog({
           } as any
         }
       >
-        <FormControl component="fieldset" sx={{ mt: 2, mb: 2, width: '100%' }}>
-          <FormLabel component="legend" sx={{ mb: 1 }}>
+        <FormControl fullWidth sx={{ mt: 2, mb: 1 }}>
+          <InputLabel
+            id="entry-type-select-label"
+            sx={dialogStyles.selectLabel}
+          >
             {t('jsonEditor.entryType') || 'Entry Type'}
-          </FormLabel>
-          <RadioGroup value={entryType} onChange={handleTypeChange}>
-            <FormControlLabel
-              value="keyValue"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.keyValue') || 'Title + Value'}
-            />
-            <FormControlLabel
-              value="titleTwoValues"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={
-                t('jsonEditor.types.titleTwoValues') ||
-                'Title + Value 1 + Value 2'
-              }
-            />
-            <FormControlLabel
-              value="titlePassword"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.titlePassword') || 'Title + Password'}
-            />
-            <FormControlLabel
-              value="titleValuePassword"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={
-                t('jsonEditor.types.titleValuePassword') ||
-                'Title + Value + Password'
-              }
-            />
-            <FormControlLabel
-              value="titleTwoValuesPassword"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={
-                t('jsonEditor.types.titleTwoValuesPassword') ||
-                'Title + Value 1 + Value 2 + Password'
-              }
-            />
-            <FormControlLabel
-              value="ssh"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.ssh') || 'SSH'}
-            />
-            <FormControlLabel
-              value="rdp"
-              control={<Radio sx={dialogStyles.checkboxRadio} />}
-              label={t('jsonEditor.types.rdp') || 'RDP'}
-            />
-          </RadioGroup>
+          </InputLabel>
+          <Select
+            labelId="entry-type-select-label"
+            id="entry-type-select"
+            value={entryType}
+            label={t('jsonEditor.entryType') || 'Entry Type'}
+            onChange={handleTypeChange}
+            sx={dialogStyles.select}
+            MenuProps={{ PaperProps: { sx: dialogStyles.selectPaper } }}
+          >
+            {ENTRY_TYPE_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {t(`jsonEditor.types.${option.value}`) || option.fallback}
+              </MenuItem>
+            ))}
+          </Select>
         </FormControl>
 
         <TextField
           autoFocus
           margin="dense"
-          label={t('jsonEditor.fields.title') || 'Title'}
+          label={
+            entryType === 'webLogin' || entryType === 'customLogin'
+              ? t('jsonEditor.fields.siteName') || 'Site name'
+              : t('jsonEditor.fields.title') || 'Title'
+          }
           fullWidth
           variant="outlined"
           value={title}
@@ -560,15 +769,190 @@ export default function JsonEntryDialog({
           </>
         )}
 
+        {entryType === 'webLogin' && (
+          <>
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.url') || 'URL'}
+              fullWidth
+              variant="outlined"
+              value={webUrl}
+              autoComplete="off"
+              placeholder="https://example.com/login"
+              onChange={(e) => {
+                setWebUrl(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.login') || 'Login'}
+              fullWidth
+              variant="outlined"
+              value={webUser}
+              autoComplete="off"
+              onChange={(e) => {
+                setWebUser(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.password') || 'Password'}
+              fullWidth
+              variant="outlined"
+              type={showPassword ? 'text' : 'password'}
+              value={webPassword}
+              autoComplete="new-password"
+              onChange={(e) => {
+                setWebPassword(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleTogglePasswordVisibility}
+                      edge="end"
+                      size="small"
+                      sx={dialogStyles.passwordIcon}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            {renderShareSessionField()}
+          </>
+        )}
+
+        {entryType === 'customLogin' && (
+          <>
+            <TextField
+              margin="dense"
+              label={t('jsonEditor.fields.url') || 'URL'}
+              fullWidth
+              variant="outlined"
+              value={customUrl}
+              autoComplete="off"
+              placeholder="https://example.com/login"
+              disabled={recording}
+              onChange={(e) => {
+                setCustomUrl(e.target.value);
+                setError('');
+              }}
+              sx={dialogStyles.textField}
+            />
+            <Box sx={{ mt: 1.5, mb: 1 }}>
+              <Button
+                variant="outlined"
+                startIcon={
+                  recording ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : (
+                    <FiberManualRecordIcon />
+                  )
+                }
+                onClick={handleRecordMacro}
+                disabled={recording || !customUrl.trim()}
+                sx={dialogStyles.cancelButton}
+              >
+                {customRecordLabel}
+              </Button>
+              {recording && (
+                <Typography
+                  variant="body2"
+                  sx={{ color: 'var(--text-secondary)', mt: 1 }}
+                >
+                  {t('customLogin.recordingHint') ||
+                    'Complete the login in the window, then press Stop'}
+                </Typography>
+              )}
+            </Box>
+            {customSteps.length > 0 && (
+              <Box
+                sx={{
+                  mt: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+              >
+                {customSteps.map((step, index) =>
+                  step.kind === 'click' ? (
+                    <Typography
+                      key={step.id}
+                      variant="body2"
+                      sx={{ color: 'var(--text-secondary)', py: 0.5 }}
+                    >
+                      {index + 1}. {t('customLogin.click') || 'Click'} “
+                      {step.label}”
+                    </Typography>
+                  ) : (
+                    <TextField
+                      key={step.id}
+                      margin="dense"
+                      label={`${index + 1}. ${step.label}`}
+                      fullWidth
+                      variant="outlined"
+                      value={step.value}
+                      autoComplete="off"
+                      type={
+                        step.isPassword && !showPassword ? 'password' : 'text'
+                      }
+                      onChange={(e) =>
+                        updateCustomTypeStep(step.id, e.target.value)
+                      }
+                      sx={dialogStyles.textField}
+                      InputProps={
+                        step.isPassword
+                          ? {
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={handleTogglePasswordVisibility}
+                                    edge="end"
+                                    size="small"
+                                    sx={dialogStyles.passwordIcon}
+                                  >
+                                    {showPassword ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }
+                          : undefined
+                      }
+                    />
+                  ),
+                )}
+              </Box>
+            )}
+            {renderShareSessionField()}
+          </>
+        )}
+
         {error && <Box sx={dialogStyles.errorText}>{error}</Box>}
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
-        <Button onClick={onClose} sx={dialogStyles.cancelButton}>
+        <Button
+          onClick={onClose}
+          disabled={recording}
+          sx={dialogStyles.cancelButton}
+        >
           {t('dialog.actions.cancel') || 'Cancel'}
         </Button>
         <Button
           onClick={handleConfirm}
           variant="contained"
+          disabled={recording}
           sx={dialogStyles.confirmButton}
         >
           {editingEntry

@@ -1,5 +1,7 @@
 import {
   createEntry,
+  createLoginSessionId,
+  loginSessionOptions,
   parseJsonContent,
   serializeJsonContent,
   JsonEntry,
@@ -76,6 +78,89 @@ describe('createEntry', () => {
     expect(entry1.id).not.toBe(entry2.id);
   });
 
+  it('should create a webLogin entry with defaults', () => {
+    const entry = createEntry('webLogin', {});
+    expect(entry.type).toBe('webLogin');
+    expect((entry as any).title).toBe('');
+    expect((entry as any).url).toBe('');
+    expect((entry as any).user).toBe('');
+    expect((entry as any).password).toBe('');
+    expect((entry as any).shareSession).toBe(false);
+    expect((entry as any).sessionId).toMatch(/^sess_/);
+  });
+
+  it('should create a webLogin entry with provided data', () => {
+    const entry = createEntry('webLogin', {
+      title: 'GitHub',
+      url: 'https://github.com/login',
+      user: 'me@example.com',
+      password: 'secret',
+    } as any);
+    expect(entry.type).toBe('webLogin');
+    expect((entry as any).title).toBe('GitHub');
+    expect((entry as any).url).toBe('https://github.com/login');
+    expect((entry as any).user).toBe('me@example.com');
+    expect((entry as any).password).toBe('secret');
+    expect((entry as any).shareSession).toBe(false);
+  });
+
+  it('should keep webLogin session options when provided', () => {
+    const entry = createEntry('webLogin', {
+      title: 'GitHub',
+      url: 'https://github.com/login',
+      user: 'me@example.com',
+      password: 'secret',
+      shareSession: true,
+      sessionId: 'sess_shared_1',
+    } as any);
+    expect((entry as any).shareSession).toBe(true);
+    expect((entry as any).sessionId).toBe('sess_shared_1');
+  });
+
+  it('should create a customLogin entry with defaults', () => {
+    const entry = createEntry('customLogin', {});
+    expect(entry.type).toBe('customLogin');
+    expect((entry as any).title).toBe('');
+    expect((entry as any).url).toBe('');
+    expect((entry as any).steps).toEqual([]);
+    expect((entry as any).shareSession).toBe(false);
+    expect((entry as any).sessionId).toMatch(/^sess_/);
+  });
+
+  it('should create a customLogin entry with provided steps', () => {
+    const steps = [
+      { id: 's1', kind: 'click', label: 'SSO', selector: 'button.sso' },
+      {
+        id: 's2',
+        kind: 'type',
+        label: 'Organization',
+        selector: '#org',
+        value: 'acme',
+      },
+    ];
+    const entry = createEntry('customLogin', {
+      title: 'Okta',
+      url: 'https://example.com',
+      steps,
+    } as any);
+    expect(entry.type).toBe('customLogin');
+    expect((entry as any).url).toBe('https://example.com');
+    expect((entry as any).steps).toEqual(steps);
+    expect((entry as any).shareSession).toBe(false);
+  });
+
+  it('should keep customLogin session options when provided', () => {
+    const entry = createEntry('customLogin', {
+      title: 'Okta',
+      url: 'https://example.com',
+      steps: [],
+      shareSession: true,
+      sessionId: 'sess_okta',
+    } as any);
+    expect((entry as any).shareSession).toBe(true);
+    expect((entry as any).sessionId).toBe('sess_okta');
+  });
+
   it('should throw on unknown entry type', () => {
     expect(() => createEntry('unknown' as any, {})).toThrow(
       'Unknown entry type',
@@ -146,5 +231,34 @@ describe('serializeJsonContent', () => {
     const serialized = serializeJsonContent(entries);
     const parsed = parseJsonContent(serialized);
     expect(parsed).toEqual(entries);
+  });
+});
+
+describe('loginSessionOptions', () => {
+  it('isolates by sessionId and falls back to entry id', () => {
+    expect(
+      loginSessionOptions({
+        id: 'entry_1',
+        sessionId: 'sess_abc',
+      }),
+    ).toEqual({ shareSession: false, sessionId: 'sess_abc' });
+    expect(loginSessionOptions({ id: 'entry_legacy' })).toEqual({
+      shareSession: false,
+      sessionId: 'entry_legacy',
+    });
+  });
+
+  it('keeps the share flag when enabled', () => {
+    expect(
+      loginSessionOptions({
+        id: 'entry_1',
+        shareSession: true,
+        sessionId: 'sess_abc',
+      }),
+    ).toEqual({ shareSession: true, sessionId: 'sess_abc' });
+  });
+
+  it('creates unique login session ids', () => {
+    expect(createLoginSessionId()).not.toBe(createLoginSessionId());
   });
 });

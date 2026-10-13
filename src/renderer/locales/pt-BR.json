@@ -183,7 +183,9 @@
       "titleValuePassword": "Título + Valor + Senha",
       "titleTwoValuesPassword": "Título + Valor 1 + Valor 2 + Senha",
       "ssh": "SSH",
-      "rdp": "RDP"
+      "rdp": "RDP",
+      "webLogin": "Login Web",
+      "customLogin": "Login customizado"
     },
     "fields": {
       "title": "Título",
@@ -194,15 +196,23 @@
       "host": "Host",
       "port": "Porta",
       "user": "Usuário",
+      "login": "Login",
+      "url": "URL",
+      "siteName": "Nome do site",
       "domain": "Domínio",
-      "type": "Tipo"
+      "type": "Tipo",
+      "shareSession": "Compartilhar sessão do navegador com outros logins",
+      "shareSessionHint": "Por padrão cada entrada usa cookies isolados. Marque só se quiser reutilizar o mesmo login entre entradas."
     },
     "errors": {
       "emptyTitle": "Título é obrigatório",
       "emptyValue": "Valor é obrigatório",
       "emptyValue1": "Entrada 1 é obrigatória",
       "emptyValue2": "Entrada 2 é obrigatória",
-      "emptyPassword": "Senha é obrigatória"
+      "emptyPassword": "Senha é obrigatória",
+      "emptyUrl": "URL é obrigatória",
+      "invalidUrl": "Informe uma URL http ou https válida",
+      "emptyMacro": "Grave uma macro antes de salvar"
     },
     "deleteConfirm": {
       "title": "Excluir Registro",
@@ -222,6 +232,25 @@
   },
   "rdp": {
     "connect": "Conectar RDP"
+  },
+  "webLogin": {
+    "open": "Abrir e preencher login",
+    "openError": "Não foi possível abrir o site"
+  },
+  "customLogin": {
+    "record": "Gravar macro",
+    "recording": "Gravando…",
+    "recordingHint": "Complete o login na janela e clique em Parar",
+    "rerecord": "Gravar novamente",
+    "stop": "Parar",
+    "overlayTitle": "Gravando macro de login",
+    "click": "Clicar em",
+    "play": "Executar login gravado",
+    "playing": "Executando login, aguarde…",
+    "playingLoading": "Aguarde, carregando o site…",
+    "playError": "Não foi possível executar o login gravado",
+    "recordError": "Não foi possível iniciar a gravação",
+    "cancelled": "Gravação cancelada"
   },
   "contextMenu": {
     "open": "Abrir",
