@@ -53,6 +53,7 @@ import {
   parseJsonContent,
   serializeJsonContent,
   createEntry,
+  loginSessionOptions,
 } from '../types/jsonEntry';
 import JsonEntryDialog from './JsonEntryDialog';
 import ConfirmDialog from './ConfirmDialog';
@@ -1734,6 +1735,7 @@ export default function JsonEditor({
                                   user: webEntry.user,
                                   password: webEntry.password,
                                   title: webEntry.title,
+                                  ...loginSessionOptions(webEntry),
                                 });
                                 if (!result?.success) {
                                   showNotification(
@@ -1784,6 +1786,7 @@ export default function JsonEditor({
                                   loadingMessage:
                                     t('customLogin.playingLoading') ||
                                     'Please wait, loading the site…',
+                                  ...loginSessionOptions(customEntry),
                                 });
                                 if (!result?.success) {
                                   showNotification(

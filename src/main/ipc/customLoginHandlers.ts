@@ -9,7 +9,10 @@ import {
   buildLoginStatusOverlayRemoveScript,
   buildLoginStatusOverlayScript,
 } from '../services/loginStatusOverlay';
-import { createLoginWindow } from '../services/loginWindow';
+import {
+  createLoginWindow,
+  resolveLoginPartition,
+} from '../services/loginWindow';
 import { normalizeWebLoginUrl } from '../services/webLoginUrl';
 
 function injectRecorder(contents: WebContents) {
@@ -48,7 +51,12 @@ export function setupCustomLoginHandlers() {
     'custom-login:record',
     async (
       _event,
-      config: { url: string; title?: string },
+      config: {
+        url: string;
+        title?: string;
+        shareSession?: boolean;
+        sessionId?: string;
+      },
     ): Promise<{
       success: boolean;
       steps?: CustomLoginStep[];
@@ -59,7 +67,13 @@ export function setupCustomLoginHandlers() {
         return { success: false, error: 'Invalid URL' };
       }
 
-      const win = createLoginWindow(config.title || 'Gravando macro');
+      const win = createLoginWindow(
+        config.title || 'Gravando macro',
+        resolveLoginPartition({
+          shareSession: config?.shareSession,
+          sessionId: config?.sessionId,
+        }),
+      );
       win.show();
       const steps: CustomLoginStep[] = [];
       let finished = false;
@@ -178,6 +192,8 @@ export function setupCustomLoginHandlers() {
         title?: string;
         steps: CustomLoginStep[];
         loadingMessage?: string;
+        shareSession?: boolean;
+        sessionId?: string;
       },
     ) => {
       const url = normalizeWebLoginUrl(config?.url || '');
@@ -189,7 +205,13 @@ export function setupCustomLoginHandlers() {
         return { success: false, error: 'Empty macro' };
       }
 
-      const win = createLoginWindow(config.title || 'Login customizado');
+      const win = createLoginWindow(
+        config.title || 'Login customizado',
+        resolveLoginPartition({
+          shareSession: config?.shareSession,
+          sessionId: config?.sessionId,
+        }),
+      );
       const loadingMessage =
         config.loadingMessage || 'Aguarde, carregando o site…';
       let statusMessage = loadingMessage;

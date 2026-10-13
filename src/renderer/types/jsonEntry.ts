@@ -104,6 +104,8 @@ export interface WebLoginEntry extends BaseEntry {
   url: string;
   user: string;
   password: string;
+  shareSession?: boolean;
+  sessionId?: string;
 }
 
 export type CustomLoginClickStep = {
@@ -133,6 +135,8 @@ export interface CustomLoginEntry extends BaseEntry {
   title: string;
   url: string;
   steps: CustomLoginStep[];
+  shareSession?: boolean;
+  sessionId?: string;
 }
 
 export type JsonEntry =
@@ -151,6 +155,24 @@ export type JsonEntry =
  */
 export interface JsonFileContent {
   entries: JsonEntry[];
+}
+
+/**
+ * Stable id used as the isolated browser-session partition for a login entry.
+ */
+export function createLoginSessionId(): string {
+  return `sess_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+export function loginSessionOptions(entry: {
+  id: string;
+  shareSession?: boolean;
+  sessionId?: string;
+}): { shareSession: boolean; sessionId: string } {
+  return {
+    shareSession: Boolean(entry.shareSession),
+    sessionId: entry.sessionId || entry.id,
+  };
 }
 
 /**
@@ -231,6 +253,8 @@ export function createEntry(
         url: (data as WebLoginEntry).url || '',
         user: (data as WebLoginEntry).user || '',
         password: (data as WebLoginEntry).password || '',
+        shareSession: Boolean((data as WebLoginEntry).shareSession),
+        sessionId: (data as WebLoginEntry).sessionId || createLoginSessionId(),
       };
     case 'customLogin':
       return {
@@ -241,6 +265,9 @@ export function createEntry(
         steps: Array.isArray((data as CustomLoginEntry).steps)
           ? (data as CustomLoginEntry).steps
           : [],
+        shareSession: Boolean((data as CustomLoginEntry).shareSession),
+        sessionId:
+          (data as CustomLoginEntry).sessionId || createLoginSessionId(),
       };
     default:
       throw new Error(`Unknown entry type: ${type}`);

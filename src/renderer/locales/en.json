@@ -200,7 +200,9 @@
       "url": "URL",
       "siteName": "Site name",
       "domain": "Domain",
-      "type": "Type"
+      "type": "Type",
+      "shareSession": "Share browser session with other logins",
+      "shareSessionHint": "Each entry keeps its own cookies by default. Enable only to reuse a login across entries."
     },
     "errors": {
       "emptyTitle": "Title is required",

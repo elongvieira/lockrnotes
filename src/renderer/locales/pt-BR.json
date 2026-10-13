@@ -200,7 +200,9 @@
       "url": "URL",
       "siteName": "Nome do site",
       "domain": "Domínio",
-      "type": "Tipo"
+      "type": "Tipo",
+      "shareSession": "Compartilhar sessão do navegador com outros logins",
+      "shareSessionHint": "Por padrão cada entrada usa cookies isolados. Marque só se quiser reutilizar o mesmo login entre entradas."
     },
     "errors": {
       "emptyTitle": "Título é obrigatório",

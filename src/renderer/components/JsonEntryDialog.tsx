@@ -16,6 +16,8 @@ import {
   SelectChangeEvent,
   Typography,
   CircularProgress,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -35,6 +37,7 @@ import {
   WebLoginEntry,
   CustomLoginEntry,
   CustomLoginStep,
+  createLoginSessionId,
 } from '../types/jsonEntry';
 
 interface JsonEntryDialogProps {
@@ -88,6 +91,8 @@ export default function JsonEntryDialog({
   const [webPassword, setWebPassword] = useState<string>('');
   const [customUrl, setCustomUrl] = useState<string>('');
   const [customSteps, setCustomSteps] = useState<CustomLoginStep[]>([]);
+  const [shareSession, setShareSession] = useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string>('');
   const [recording, setRecording] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -100,6 +105,8 @@ export default function JsonEntryDialog({
       setWebPassword('');
       setCustomUrl('');
       setCustomSteps([]);
+      setShareSession(false);
+      setSessionId(createLoginSessionId());
       setRecording(false);
       if (editingEntry) {
         setEntryType(editingEntry.type);
@@ -156,12 +163,24 @@ export default function JsonEntryDialog({
           setWebUrl((editingEntry as WebLoginEntry).url);
           setWebUser((editingEntry as WebLoginEntry).user);
           setWebPassword((editingEntry as WebLoginEntry).password);
+          setShareSession(
+            Boolean((editingEntry as WebLoginEntry).shareSession),
+          );
+          setSessionId(
+            (editingEntry as WebLoginEntry).sessionId || editingEntry.id,
+          );
         } else if (editingEntry.type === 'customLogin') {
           setValue('');
           setValue1('');
           setValue2('');
           setPassword('');
           setCustomUrl((editingEntry as CustomLoginEntry).url);
+          setShareSession(
+            Boolean((editingEntry as CustomLoginEntry).shareSession),
+          );
+          setSessionId(
+            (editingEntry as CustomLoginEntry).sessionId || editingEntry.id,
+          );
           setCustomSteps((editingEntry as CustomLoginEntry).steps || []);
         }
       } else if (duplicateData) {
@@ -220,6 +239,9 @@ export default function JsonEntryDialog({
           setWebUrl((duplicateData as WebLoginEntry).url);
           setWebUser((duplicateData as WebLoginEntry).user);
           setWebPassword((duplicateData as WebLoginEntry).password);
+          setShareSession(
+            Boolean((duplicateData as WebLoginEntry).shareSession),
+          );
         } else if (duplicateData.type === 'customLogin') {
           setValue('');
           setValue1('');
@@ -227,6 +249,9 @@ export default function JsonEntryDialog({
           setPassword('');
           setCustomUrl((duplicateData as CustomLoginEntry).url);
           setCustomSteps((duplicateData as CustomLoginEntry).steps || []);
+          setShareSession(
+            Boolean((duplicateData as CustomLoginEntry).shareSession),
+          );
         }
       } else {
         setEntryType('keyValue');
@@ -341,6 +366,9 @@ export default function JsonEntryDialog({
         : `https://${rawUrl}`;
       (entryData as WebLoginEntry).user = webUser.trim();
       (entryData as WebLoginEntry).password = webPassword.trim();
+      (entryData as WebLoginEntry).shareSession = shareSession;
+      (entryData as WebLoginEntry).sessionId =
+        sessionId || createLoginSessionId();
     } else if (entryType === 'customLogin') {
       const rawUrl = customUrl.trim();
       (entryData as CustomLoginEntry).url = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(
@@ -349,6 +377,9 @@ export default function JsonEntryDialog({
         ? rawUrl
         : `https://${rawUrl}`;
       (entryData as CustomLoginEntry).steps = customSteps;
+      (entryData as CustomLoginEntry).shareSession = shareSession;
+      (entryData as CustomLoginEntry).sessionId =
+        sessionId || createLoginSessionId();
     }
 
     onConfirm(entryData);
@@ -384,10 +415,16 @@ export default function JsonEntryDialog({
     }
     setError('');
     setRecording(true);
+    const recordSessionId = sessionId || createLoginSessionId();
+    if (!sessionId) {
+      setSessionId(recordSessionId);
+    }
     try {
       const result = await customLoginAPI.record({
         url: rawUrl,
         title: title.trim() || 'Login customizado',
+        shareSession,
+        sessionId: recordSessionId,
       });
       if (result?.success && Array.isArray(result.steps)) {
         setCustomSteps(result.steps);
@@ -413,6 +450,31 @@ export default function JsonEntryDialog({
       ),
     );
   };
+
+  const renderShareSessionField = () => (
+    <FormControlLabel
+      sx={{ mt: 1.5, alignItems: 'flex-start', mr: 0 }}
+      control={
+        <Checkbox
+          checked={shareSession}
+          onChange={(e) => setShareSession(e.target.checked)}
+          sx={dialogStyles.checkboxRadio}
+        />
+      }
+      label={
+        <Box sx={{ mt: 0.25 }}>
+          <Typography sx={dialogStyles.primaryText}>
+            {t('jsonEditor.fields.shareSession') ||
+              'Share browser session with other logins'}
+          </Typography>
+          <Typography variant="body2" sx={dialogStyles.secondaryText}>
+            {t('jsonEditor.fields.shareSessionHint') ||
+              'Each entry keeps its own cookies by default. Enable only to reuse a login across entries.'}
+          </Typography>
+        </Box>
+      }
+    />
+  );
 
   return (
     <Dialog
@@ -764,6 +826,7 @@ export default function JsonEntryDialog({
                 ),
               }}
             />
+            {renderShareSessionField()}
           </>
         )}
 
@@ -872,6 +935,7 @@ export default function JsonEntryDialog({
                 )}
               </Box>
             )}
+            {renderShareSessionField()}
           </>
         )}
 

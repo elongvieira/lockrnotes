@@ -6,6 +6,8 @@ export const webLoginApi = {
     user: string;
     password: string;
     title?: string;
+    shareSession?: boolean;
+    sessionId?: string;
   }): Promise<{ success: boolean; error?: string }> {
     return ipcRenderer.invoke('web-login:open', config);
   },
