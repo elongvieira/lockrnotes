@@ -14,8 +14,6 @@
 [![Github Tag][github-tag-image]][github-tag-url]
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/Fjy3vfgy5q)
 
-[![Website](https://img.shields.io/badge/website-lockrnotes.com-blue)](https://lockrnotes.com)
-
 </div>
 
 ## Install
@@ -28,7 +26,7 @@ cd lockrnotes
 npm install
 ```
 
-Issues or feedback? Open an issue on the repo or visit https://lockrnotes.com
+Issues or feedback? Open an issue at https://github.com/elongvieira/lockrnotes/issues
 
 ## Starting Development
 
@@ -62,17 +60,17 @@ Version bumps happen in CI after the commit reaches `main`, not at local commit 
 
 ## Docs
 
-Visit https://lockrnotes.com for updates and docs
+Updates and docs live in this repository: https://github.com/elongvieira/lockrnotes
 
 ## Community
 
-Website: https://lockrnotes.com
+Repository: https://github.com/elongvieira/lockrnotes
 
 Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately, as described in [SECURITY.md](SECURITY.md).
 
 ## About
 
-Lockr Notes is a lightweight, fast note-taking app. Learn more at https://lockrnotes.com
+Lockr Notes is a lightweight, fast note-taking app. Source and issues: https://github.com/elongvieira/lockrnotes
 
 ## 🧩 Sobre o projeto base
 

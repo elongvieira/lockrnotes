@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": {
     "name": "Lockr Notes Team",
-    "url": "https://lockrnotes.com"
+    "url": "https://github.com/elongvieira/lockrnotes"
   },
   "main": "./dist/main/main.js",
   "scripts": {
