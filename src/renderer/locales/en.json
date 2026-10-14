@@ -321,8 +321,22 @@
     "privacyLocal": "✓ 100% Local",
     "privacyNoServer": "✓ No servers",
     "privacyNoTracking": "✓ Zero tracking",
-    "privacyEncrypted": "✓ Strong encryption",
-    "terms": "Lockr Notes is open source software. The author is not liable for use, misuse, data loss, damage to equipment, or other harm arising from its use."
+    "privacyEncrypted": "✓ Strong encryption"
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "summaryIntro": "Summary of what you accept by continuing:",
+    "readFull": "Read full terms",
+    "acceptLabel": "I have read and accept the Lockr Notes Terms of Use",
+    "acceptRequired": "You must accept the terms to continue.",
+    "fullTitle": "Full Terms of Use",
+    "fullIntro": "Read carefully before accepting. These terms govern use of Lockr Notes on this device.",
+    "closeFull": "Close",
+    "reacceptTitle": "Terms of Use update",
+    "reacceptMessage": "The Terms of Use have been updated. Review the summary, read the full text if you wish, and accept to keep using Lockr Notes.",
+    "continue": "Continue",
+    "licensePrefix": "Software license:",
+    "viewMitLicense": "MIT — view LICENSE on GitHub"
   },
   "settings": {
     "title": "Settings",
