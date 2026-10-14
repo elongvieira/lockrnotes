@@ -2,12 +2,28 @@
   "app": {
     "title": "Lockr Notes"
   },
+  "about": {
+    "title": "About Lockr Notes",
+    "version": "Version {{version}}",
+    "description": "A local note-taking app with optional encryption and open source code.",
+    "authorLabel": "Author:",
+    "licenseLabel": "License:",
+    "licenseLink": "MIT — view LICENSE on GitHub",
+    "repositoryLabel": "Source code:",
+    "issuesLabel": "Issues and ideas:",
+    "issuesLink": "Open an issue",
+    "termsLabel": "Terms of use:",
+    "termsLink": "Read the terms",
+    "copyright": "© 2025 Elon Gomes Vieira",
+    "close": "Close"
+  },
   "menu": {
     "new": "New Note",
     "save": "Save",
     "delete": "Delete",
     "export": "Export All",
     "import": "Import Files",
+    "about": "About",
     "exit": "Exit"
   },
   "editor": {

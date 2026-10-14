@@ -1,9 +1,7 @@
 <h1 align="center">Lockr Notes</h1>
 
-<br>
-
-<p>
-  Lockr Notes is built with <a href="https://electronjs.org/">Electron</a> and <a href="https://react.dev/">React</a>.
+<p align="center">
+  Aplicativo de anotações local, com foco em privacidade, criptografia opcional e código aberto.
 </p>
 
 <br>
@@ -16,9 +14,56 @@
 
 </div>
 
-## Install
+<br>
 
-Clone the repo and install dependencies:
+## O que é
+
+**Lockr Notes** é um app desktop para guardar notas e dados estruturados no **seu próprio computador**. Você escolhe a pasta de armazenamento, organiza arquivos em árvore de pastas e pode proteger conteúdo com criptografia quando fizer sentido para você.
+
+O projeto é **open source** ([MIT](LICENSE)) e o código está em [github.com/elongvieira/lockrnotes](https://github.com/elongvieira/lockrnotes).
+
+## Recursos principais
+
+- **Armazenamento local** — por padrão, pasta `LockrNotes` em Documentos (caminho configurável).
+- **Notas em texto** (`.txt`) e **entradas JSON** (`.json`) para dados estruturados (logins, SSH, RDP, etc.).
+- **Criptografia gerenciada** — AES-256-GCM; chave mestra protegida no cofre do Windows ou, opcionalmente, na pasta do app.
+- **Criptografia manual** — arquivos protegidos com senha definida por você.
+- **Interface** — tema escuro, abas, auto-save, idiomas **pt-BR** e **en**.
+- **Integrações opcionais** — terminal SSH, RDP, login web in-app (só quando você usar esses recursos).
+- **Importar / exportar** — backup e migração da sua pasta de notas.
+
+## Privacidade e segurança
+
+Lockr Notes foi pensado para quem quer **controle local** sobre as próprias anotações:
+
+| Aspecto | Comportamento |
+|--------|----------------|
+| **Onde ficam os dados** | Nas pastas que você define no disco; o app não hospeda suas notas em servidor próprio. |
+| **Configuração do app** | Arquivo `config.enc` criptografado na pasta de dados do usuário (Electron `userData`). |
+| **Criptografia de arquivos** | Opcional; algoritmo **AES-256-GCM** com derivação de chave (PBKDF2). |
+| **Chave de criptografia** | Modo recomendado: cofre seguro do Windows (`safeStorage`). Alternativa: chave na pasta do Lockr Notes (mais portável, menos isolada). |
+| **Telemetria de conteúdo** | O app **não envia o texto das suas notas** para serviços do Lockr Notes. |
+| **Rede** | Conexões podem ocorrer quando **você** usa login web, SSH, RDP ou quando a **versão instalada** verifica atualizações no GitHub. |
+| **Backups** | **Sua responsabilidade.** Perda de disco, exclusão acidental ou perda da chave pode tornar dados irrecuperáveis. |
+
+Leia também [TERMS.md](TERMS.md) (termos de uso) e [SECURITY.md](SECURITY.md) (como reportar vulnerabilidades em privado).
+
+> **Importante:** Criptografia e boas práticas reduzem riscos, mas nenhum software elimina todos os cenários de perda de dados ou uso indevido. Use por sua conta e risco.
+
+## Feedback
+
+- **Issues e ideias:** [github.com/elongvieira/lockrnotes/issues](https://github.com/elongvieira/lockrnotes/issues)
+- **Discord:** [discord.gg/Fjy3vfgy5q](https://discord.gg/Fjy3vfgy5q)
+
+Contribuições seguem [CONTRIBUTING.md](CONTRIBUTING.md) e o [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+## Desenvolvimento
+
+Stack: [Electron](https://electronjs.org/) + [React](https://react.dev/) + TypeScript.
+
+### Clonar e instalar
 
 ```bash
 git clone --depth 1 --branch main https://github.com/elongvieira/lockrnotes.git
@@ -26,61 +71,49 @@ cd lockrnotes
 npm install
 ```
 
-Issues or feedback? Open an issue at https://github.com/elongvieira/lockrnotes/issues
-
-## Starting Development
-
-Start the app in the `dev` environment:
+### Rodar em desenvolvimento
 
 ```bash
-npm start
+npm run dev
 ```
 
-## Packaging for Production
+Equivalente a `npm start` (webpack + Electron).
 
-To package apps for the local platform:
+### Empacotar
 
 ```bash
 npm run package
 ```
 
-## Semantic Release
-
-This repository uses `semantic-release` on pushes to `main`.
-
-Use Conventional Commits so the next version can be calculated automatically:
+### Testes e lint
 
 ```bash
-feat: add SSH terminal shortcuts
-fix: prevent sidebar tree crash
-feat!: replace legacy import flow
+npm test
+npm run lint
 ```
 
-Version bumps happen in CI after the commit reaches `main`, not at local commit time.
+### Semantic Release
 
-## Docs
+Commits na `main` seguem [Conventional Commits](https://www.conventionalcommits.org/) para versionamento automático via CI:
 
-Updates and docs live in this repository: https://github.com/elongvieira/lockrnotes
+```bash
+feat: add a new entry type
+fix: prevent sidebar crash on empty folder
+chore: update dependencies
+```
 
-## Community
+---
 
-Repository: https://github.com/elongvieira/lockrnotes
+## Projeto base
 
-Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately, as described in [SECURITY.md](SECURITY.md).
+Este repositório evoluiu a partir do [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) (MIT).  
+Modificações e funcionalidades atuais: **Elon Gomes Vieira**.
 
-## About
+## Licença
 
-Lockr Notes is a lightweight, fast note-taking app. Source and issues: https://github.com/elongvieira/lockrnotes
+MIT © 2025 Elon Gomes Vieira — veja [LICENSE](https://github.com/elongvieira/lockrnotes/blob/main/LICENSE).
 
-## 🧩 Sobre o projeto base
-
-Este projeto foi **construído a partir do** [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate),  
-um projeto open source licenciado sob a **MIT License**.
-
-As modificações e novas funcionalidades foram desenvolvidas por **Elon G. Vieira (2025)**.
-
-## License
-
-MIT © 2025 Elon Gomes Vieira
-
-Consulte o arquivo `LICENSE` para mais detalhes. Os termos de uso estão em [TERMS.md](TERMS.md).
+[github-actions-status]: https://github.com/elongvieira/lockrnotes/workflows/Test/badge.svg
+[github-actions-url]: https://github.com/elongvieira/lockrnotes/actions
+[github-tag-image]: https://img.shields.io/github/tag/elongvieira/lockrnotes.svg?label=version
+[github-tag-url]: https://github.com/elongvieira/lockrnotes/tags
