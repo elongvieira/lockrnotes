@@ -15,8 +15,10 @@ coverage
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
-# OSX
+# OS
 .DS_Store
+Thumbs.db
+Desktop.ini
 
 release/app/dist
 release/build
@@ -31,3 +33,12 @@ npm-debug.log.*
 # Ignore runtime notes folder and local config
 notes/
 config.json
+
+# Local secrets and signing material
+.env
+.env.*
+!.env.example
+*.pem
+*.pfx
+*.p12
+*.key

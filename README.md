@@ -68,6 +68,8 @@ Visit https://lockrnotes.com for updates and docs
 
 Website: https://lockrnotes.com
 
+Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately, as described in [SECURITY.md](SECURITY.md).
+
 ## About
 
 Lockr Notes is a lightweight, fast note-taking app. Learn more at https://lockrnotes.com
