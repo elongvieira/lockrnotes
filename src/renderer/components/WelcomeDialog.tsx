@@ -423,6 +423,19 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
             </Box>
           </RadioGroup>
         </Box>
+
+        <Typography
+          variant="caption"
+          sx={{
+            ...dialogStyles.secondaryText,
+            display: 'block',
+            mt: 2,
+            lineHeight: 1.5,
+          }}
+        >
+          {t('welcome.terms') ||
+            'O Lockr Notes é um software de código aberto. O autor não se responsabiliza pelo uso, pelo uso indevido, pela perda de dados, por danos a equipamentos ou por outros prejuízos decorrentes do uso.'}
+        </Typography>
       </DialogContent>
 
       <DialogActions sx={dialogStyles.dialogActions}>

@@ -321,7 +321,8 @@
     "privacyLocal": "✓ 100% Local",
     "privacyNoServer": "✓ Sem servidores",
     "privacyNoTracking": "✓ Zero rastreamento",
-    "privacyEncrypted": "✓ Criptografia forte"
+    "privacyEncrypted": "✓ Criptografia forte",
+    "terms": "O Lockr Notes é um software de código aberto. O autor não se responsabiliza pelo uso, pelo uso indevido, pela perda de dados, por danos a equipamentos ou por outros prejuízos decorrentes do uso."
   },
   "settings": {
     "title": "Configurações",

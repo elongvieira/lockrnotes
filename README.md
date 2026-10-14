@@ -83,4 +83,4 @@ As modificações e novas funcionalidades foram desenvolvidas por **Elon G. Viei
 
 MIT © 2025 Elon Gomes Vieira
 
-Consulte o arquivo `LICENSE` para mais detalhes.
+Consulte o arquivo `LICENSE` para mais detalhes. Os termos de uso estão em [TERMS.md](TERMS.md).
