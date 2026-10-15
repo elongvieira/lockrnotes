@@ -97,6 +97,12 @@ export const dialogStyles = {
     textUnderlineOffset: '2px',
     cursor: 'pointer',
     verticalAlign: 'baseline',
+    display: 'inline',
+    minWidth: 0,
+    padding: 0,
+    fontSize: 'inherit',
+    lineHeight: 'inherit',
+    textTransform: 'none',
     '&:hover': {
       color: 'var(--primary-blue-dark)',
     },

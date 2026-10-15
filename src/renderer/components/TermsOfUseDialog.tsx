@@ -7,7 +7,6 @@ import {
   Typography,
   Box,
   Divider,
-  Link,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
@@ -57,14 +56,13 @@ export default function TermsOfUseDialog({
         </Typography>
         <Typography variant="body2" sx={{ ...dialogStyles.primaryText, mb: 2 }}>
           {t('terms.licensePrefix') || 'Licença do software:'}{' '}
-          <Link
-            component="button"
+          <Button
             type="button"
             onClick={() => openExternalUrl(PROJECT_LICENSE_URL)}
             sx={dialogStyles.externalTextLink}
           >
             {t('terms.viewMitLicense') || 'MIT — ver LICENSE no GitHub'}
-          </Link>
+          </Button>
         </Typography>
         {sections.map((section, index) => (
           <Box key={section.id} sx={{ mb: 2.5 }}>
@@ -94,7 +92,11 @@ export default function TermsOfUseDialog({
         ))}
       </DialogContent>
       <DialogActions sx={dialogStyles.dialogActions}>
-        <Button onClick={onClose} variant="contained" sx={dialogStyles.confirmButton}>
+        <Button
+          onClick={onClose}
+          variant="contained"
+          sx={dialogStyles.confirmButton}
+        >
           {t('terms.closeFull') || 'Fechar'}
         </Button>
       </DialogActions>

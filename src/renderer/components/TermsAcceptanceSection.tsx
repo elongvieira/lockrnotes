@@ -6,7 +6,6 @@ import {
   FormControlLabel,
   Typography,
   Alert,
-  Link,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
@@ -52,8 +51,7 @@ export default function TermsAcceptanceSection({
         variant="caption"
         sx={{ ...dialogStyles.secondaryText, display: 'block', mb: 1.5 }}
       >
-        {t('terms.summaryIntro') ||
-          'Resumo do que você aceita ao continuar:'}
+        {t('terms.summaryIntro') || 'Resumo do que você aceita ao continuar:'}
       </Typography>
       <Box component="ul" sx={{ m: 0, pl: 2.5, mb: 1.5 }}>
         {summary.map((item) => (
@@ -95,17 +93,19 @@ export default function TermsAcceptanceSection({
         sx={{ ...dialogStyles.secondaryText, display: 'block', mt: 1 }}
       >
         {t('terms.licensePrefix') || 'Licença do software:'}{' '}
-        <Link
-          component="button"
+        <Button
           type="button"
           onClick={() => openExternalUrl(PROJECT_LICENSE_URL)}
-          sx={{ ...dialogStyles.externalTextLink, fontSize: 'inherit' }}
+          sx={dialogStyles.externalTextLink}
         >
           {t('terms.viewMitLicense') || 'MIT — ver LICENSE no GitHub'}
-        </Link>
+        </Button>
       </Typography>
       {showError && !accepted ? (
-        <Alert severity="warning" sx={{ mt: 1.5, ...dialogStyles.warningAlert }}>
+        <Alert
+          severity="warning"
+          sx={{ mt: 1.5, ...dialogStyles.warningAlert }}
+        >
           {t('terms.acceptRequired') ||
             'Você precisa aceitar os termos para continuar.'}
         </Alert>

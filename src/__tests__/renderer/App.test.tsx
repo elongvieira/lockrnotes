@@ -16,9 +16,9 @@ beforeAll(async () => {
 Object.defineProperty(window, 'electron', {
   value: {
     filesystem: {
-      readConfig: jest.fn().mockImplementation(() =>
-        Promise.resolve(acceptedConfig),
-      ),
+      readConfig: jest
+        .fn()
+        .mockImplementation(() => Promise.resolve(acceptedConfig)),
       readDirectory: jest.fn().mockResolvedValue([]),
       getItem: jest.fn().mockResolvedValue(null),
       writeConfig: jest.fn().mockResolvedValue(undefined),

@@ -7,7 +7,6 @@ import {
   Button,
   Typography,
   Box,
-  Link,
   Divider,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -26,22 +25,15 @@ interface AboutDialogProps {
   onClose: () => void;
 }
 
-function AboutLink({
-  label,
-  url,
-}: {
-  label: string;
-  url: string;
-}) {
+function AboutLink({ label, url }: { label: string; url: string }) {
   return (
-    <Link
-      component="button"
+    <Button
       type="button"
       onClick={() => openExternalUrl(url)}
       sx={dialogStyles.externalTextLink}
     >
       {label}
-    </Link>
+    </Button>
   );
 }
 
@@ -133,14 +125,13 @@ export default function AboutDialog({ open, onClose }: AboutDialogProps) {
             </Typography>
             <Typography variant="body2" sx={dialogStyles.primaryText}>
               {t('about.termsLabel') || 'Termos de uso:'}{' '}
-              <Link
-                component="button"
+              <Button
                 type="button"
                 onClick={() => setTermsOpen(true)}
                 sx={dialogStyles.externalTextLink}
               >
                 {t('about.termsLink') || 'Ler os termos'}
-              </Link>
+              </Button>
             </Typography>
           </Box>
 
