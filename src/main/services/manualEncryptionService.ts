@@ -1,4 +1,11 @@
 import * as crypto from 'crypto';
+import {
+  CURRENT_FILE_VERSION,
+  FILE_CIPHER,
+  open,
+  pbkdf2Key,
+  seal,
+} from './fileCipher';
 
 export interface ManualEncryptedFileData {
   type: 'lockrnotes-manual-encrypted';
@@ -13,25 +20,9 @@ export interface ManualEncryptedFileData {
 }
 
 class ManualEncryptionService {
-  private readonly algorithm = 'aes-256-gcm';
+  private readonly algorithm = FILE_CIPHER;
 
-  private readonly keyLength = 32; // 256 bits
-
-  private readonly ivLength = 16; // 128 bits
-
-  private readonly saltLength = 32; // 256 bits
-
-  private readonly iterations = 100000; // PBKDF2 iterations
-
-  private deriveKey(password: string, salt: Buffer): Buffer {
-    return crypto.pbkdf2Sync(
-      password,
-      salt,
-      this.iterations,
-      this.keyLength,
-      'sha256',
-    );
-  }
+  private readonly saltLength = 32;
 
   async encryptContent(
     content: string,
@@ -39,28 +30,18 @@ class ManualEncryptionService {
     originalExtension: string,
   ): Promise<ManualEncryptedFileData> {
     const salt = crypto.randomBytes(this.saltLength);
-    const iv = crypto.randomBytes(this.ivLength);
+    const key = await pbkdf2Key(password, salt, CURRENT_FILE_VERSION);
+    const sealed = seal(key, content, CURRENT_FILE_VERSION, originalExtension);
 
-    const key = this.deriveKey(password, salt);
-
-    const cipher = crypto.createCipheriv(this.algorithm, key, iv);
-    let encrypted = cipher.update(content, 'utf8', 'base64');
-    encrypted += cipher.final('base64');
-    const authTag = cipher.getAuthTag();
-
-    const result: ManualEncryptedFileData = {
+    return {
       type: 'lockrnotes-manual-encrypted',
       algorithm: this.algorithm,
-      version: '1.0',
+      version: CURRENT_FILE_VERSION,
       originalExtension,
-      encrypted,
-      iv: iv.toString('base64'),
-      authTag: authTag.toString('base64'),
       salt: salt.toString('base64'),
       created: new Date().toISOString(),
+      ...sealed,
     };
-
-    return result;
   }
 
   async decryptContent(
@@ -74,22 +55,12 @@ class ManualEncryptionService {
       throw new Error('Invalid encrypted file format');
     }
 
+    const version = encryptedData.version || '1.0';
     const salt = Buffer.from(encryptedData.salt, 'base64');
-    const iv = Buffer.from(encryptedData.iv, 'base64');
-    const authTag = Buffer.from(encryptedData.authTag, 'base64');
-
-    const key = this.deriveKey(password, salt);
+    const key = await pbkdf2Key(password, salt, version);
 
     try {
-      const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
-      decipher.setAuthTag(authTag);
-      let decrypted = decipher.update(
-        encryptedData.encrypted,
-        'base64',
-        'utf8',
-      );
-      decrypted += decipher.final('utf8');
-      return decrypted;
+      return open(key, encryptedData);
     } catch {
       throw new Error('Failed to decrypt - wrong password or corrupted file');
     }

@@ -168,12 +168,12 @@ export const validatePassword = (password: string): ValidationResult => {
     };
   }
 
-  // Check minimum length
-  if (password.length < 6) {
+  // Length matters more than a required symbol.
+  if (password.length < 12) {
     return {
       isValid: false,
       errorKey: 'dialog.file.errors.weakPassword',
-      fallbackMessage: 'Password must be at least 6 characters',
+      fallbackMessage: 'Password must be at least 12 characters',
     };
   }
 
@@ -183,16 +183,6 @@ export const validatePassword = (password: string): ValidationResult => {
       isValid: false,
       errorKey: 'dialog.file.errors.passwordTooLong',
       fallbackMessage: 'Password is too long (maximum 128 characters)',
-    };
-  }
-
-  // Check for at least one special character (optional but recommended)
-  const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
-  if (!hasSpecialChar) {
-    return {
-      isValid: false,
-      errorKey: 'dialog.file.errors.passwordSpecialChars',
-      fallbackMessage: 'Password should contain at least one special character',
     };
   }
 

@@ -3,6 +3,13 @@ import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { readConfigFile, updateConfigFile } from '../config';
+import {
+  CURRENT_FILE_VERSION,
+  FILE_CIPHER,
+  managedFileKey,
+  open,
+  seal,
+} from './fileCipher';
 import { headerLooksManaged, resolveMasterKeyPath } from './masterKeyLocation';
 
 export interface EncryptedFileData {
@@ -18,15 +25,11 @@ export interface EncryptedFileData {
 }
 
 class ManagedEncryptionService {
-  private readonly algorithm = 'aes-256-gcm';
+  private readonly algorithm = FILE_CIPHER;
 
   private readonly keyLength = 32; // 256 bits
 
-  private readonly ivLength = 16; // 128 bits
-
   private readonly saltLength = 32; // 256 bits
-
-  private readonly iterations = 100000; // PBKDF2 iterations
 
   private masterKey: Buffer | null = null;
 
@@ -191,51 +194,30 @@ class ManagedEncryptionService {
     }
   }
 
-  private deriveFileKey(
-    masterKey: Buffer,
-    _filePath: string, // mantido para compatibilidade de assinatura
-    salt: Buffer,
-  ): Buffer {
-    // Deriva a chave apenas do masterKey e salt, sem path
-    return crypto.pbkdf2Sync(
-      masterKey,
-      salt,
-      this.iterations,
-      this.keyLength,
-      'sha256',
-    );
-  }
-
   async encryptContent(
     content: string,
-    filePath: string,
+    _filePath: string,
     originalExtension: string,
   ): Promise<EncryptedFileData> {
     const masterKey = await this.getMasterKey();
     const salt = crypto.randomBytes(this.saltLength);
-    const iv = crypto.randomBytes(this.ivLength);
+    const fileKey = await managedFileKey(masterKey, salt, CURRENT_FILE_VERSION);
+    const sealed = seal(
+      fileKey,
+      content,
+      CURRENT_FILE_VERSION,
+      originalExtension,
+    );
 
-    const fileKey = this.deriveFileKey(masterKey, '', salt);
-
-    const cipher = crypto.createCipheriv(this.algorithm, fileKey, iv);
-    let encrypted = cipher.update(content, 'utf8', 'base64');
-    encrypted += cipher.final('base64');
-    const authTag = cipher.getAuthTag();
-
-    const result: EncryptedFileData = {
+    return {
       type: 'lockrnotes-encrypted',
       algorithm: this.algorithm,
-      version: '1.0',
+      version: CURRENT_FILE_VERSION,
       originalExtension,
-      encrypted,
-      iv: iv.toString('base64'),
-      authTag: authTag.toString('base64'),
       salt: salt.toString('base64'),
       created: new Date().toISOString(),
+      ...sealed,
     };
-
-    // Encryption successful
-    return result;
   }
 
   async decryptContent(
@@ -246,26 +228,16 @@ class ManagedEncryptionService {
       encryptedData.type !== 'lockrnotes-encrypted' ||
       encryptedData.algorithm !== this.algorithm
     ) {
-      console.error('Invalid encrypted file format');
       throw new Error('Invalid encrypted file format');
     }
 
     const masterKey = await this.getMasterKey();
     const salt = Buffer.from(encryptedData.salt, 'base64');
-    const iv = Buffer.from(encryptedData.iv, 'base64');
-    const authTag = Buffer.from(encryptedData.authTag, 'base64');
+    const version = encryptedData.version || '1.0';
+    const fileKey = await managedFileKey(masterKey, salt, version);
 
     try {
-      const fileKey = this.deriveFileKey(masterKey, '', salt);
-      const decipher = crypto.createDecipheriv(this.algorithm, fileKey, iv);
-      decipher.setAuthTag(authTag);
-      let decrypted = decipher.update(
-        encryptedData.encrypted,
-        'base64',
-        'utf8',
-      );
-      decrypted += decipher.final('utf8');
-      return decrypted;
+      return open(fileKey, encryptedData);
     } catch (error: any) {
       throw new Error(
         `Failed to decrypt content: ${error?.message || 'unknown error'}`,

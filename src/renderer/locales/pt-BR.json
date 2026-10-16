@@ -98,7 +98,7 @@
         "reservedName": "Este é um nome reservado do sistema",
         "startsWithDot": "Nome do arquivo não pode começar com ponto",
         "emptyPassword": "Senha é obrigatória",
-        "weakPassword": "Senha deve ter pelo menos 6 caracteres",
+        "weakPassword": "Senha deve ter pelo menos 12 caracteres",
         "passwordMismatch": "Senhas não coincidem",
         "passwordTooLong": "Senha é muito longa (máximo 128 caracteres)",
         "passwordSpecialChars": "Senha deve conter pelo menos um caractere especial",

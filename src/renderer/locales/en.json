@@ -98,7 +98,7 @@
         "reservedName": "This is a reserved system name",
         "startsWithDot": "File name cannot start with a dot",
         "emptyPassword": "Password is required",
-        "weakPassword": "Password must be at least 6 characters",
+        "weakPassword": "Password must be at least 12 characters",
         "passwordMismatch": "Passwords do not match",
         "passwordTooLong": "Password is too long (maximum 128 characters)",
         "passwordSpecialChars": "Password must contain at least one special character",
