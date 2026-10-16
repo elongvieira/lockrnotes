@@ -14,7 +14,10 @@ export interface EncryptionAPI {
   isContentEncrypted: (content: string) => Promise<boolean>;
   getOriginalExtension: (content: string) => Promise<string | null>;
   resetEncryption: () => Promise<void>;
-  migrateKeyStorage: (newStorageType: string) => Promise<void>;
+  migrateKeyStorage: (
+    newStorageType: string,
+    defaultPath?: string,
+  ) => Promise<void>;
 }
 
 const encryptionApi: EncryptionAPI = {
@@ -76,10 +79,14 @@ const encryptionApi: EncryptionAPI = {
     }
   },
 
-  async migrateKeyStorage(newStorageType: string): Promise<void> {
+  async migrateKeyStorage(
+    newStorageType: string,
+    defaultPath?: string,
+  ): Promise<void> {
     const result = await ipcRenderer.invoke(
       'encryption:migrateKeyStorage',
       newStorageType,
+      defaultPath,
     );
     if (!result.success) {
       throw new Error(result.error || 'Failed to migrate key storage');

@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { readConfigFile, updateConfigFile } from '../config';
+import { headerLooksManaged, resolveMasterKeyPath } from './masterKeyLocation';
 
 export interface EncryptedFileData {
   type: 'lockrnotes-encrypted';
@@ -27,9 +28,9 @@ class ManagedEncryptionService {
 
   private readonly iterations = 100000; // PBKDF2 iterations
 
-  private readonly keyFileName = '.lockrnotes_key';
-
   private masterKey: Buffer | null = null;
+
+  private cachedKeyPath: string | null = null;
 
   private generateMasterKey(): Buffer {
     return crypto.randomBytes(this.keyLength);
@@ -46,15 +47,11 @@ class ManagedEncryptionService {
 
   private async getKeyFilePath(): Promise<string> {
     const storageType = await this.getKeyStorageType();
-
+    let defaultPath: string | undefined;
     if (storageType === 'folder') {
-      // Use the defaultPath from config
       try {
         const config = await readConfigFile();
-        if (config?.defaultPath) {
-          const keyDir = path.join(config.defaultPath, '.lockrnotes');
-          return path.join(keyDir, this.keyFileName);
-        }
+        defaultPath = config?.defaultPath;
       } catch (err) {
         console.warn(
           'Failed to read config for folder storage, falling back to system',
@@ -62,33 +59,32 @@ class ManagedEncryptionService {
         );
       }
     }
+    return resolveMasterKeyPath({
+      storageType: defaultPath ? storageType : 'system',
+      defaultPath,
+      userDataPath: app.getPath('userData'),
+    });
+  }
 
-    // Default: use userData path
-    const userDataPath = app.getPath('userData');
-    const keyDir = path.join(userDataPath, 'encryption');
-    return path.join(keyDir, this.keyFileName);
+  private async writeKeyFile(keyFilePath: string, key: Buffer): Promise<void> {
+    if (!safeStorage.isEncryptionAvailable()) {
+      throw new Error('System encryption is not available');
+    }
+    const keyDir = path.dirname(keyFilePath);
+    await fs.mkdir(keyDir, { recursive: true });
+    const encryptedKey = safeStorage.encryptString(key.toString('base64'));
+    const keyData = {
+      type: 'lockrnotes-master-key',
+      version: '1.0',
+      encrypted: encryptedKey.toString('base64'),
+      created: new Date().toISOString(),
+    };
+    await fs.writeFile(keyFilePath, JSON.stringify(keyData, null, 2));
   }
 
   private async storeMasterKey(key: Buffer): Promise<void> {
     try {
-      const keyFilePath = await this.getKeyFilePath();
-      const keyDir = path.dirname(keyFilePath);
-      await fs.mkdir(keyDir, { recursive: true });
-
-      if (!safeStorage.isEncryptionAvailable()) {
-        throw new Error('System encryption is not available');
-      }
-
-      const encryptedKey = safeStorage.encryptString(key.toString('base64'));
-
-      const keyData = {
-        type: 'lockrnotes-master-key',
-        version: '1.0',
-        encrypted: encryptedKey.toString('base64'),
-        created: new Date().toISOString(),
-      };
-
-      await fs.writeFile(keyFilePath, JSON.stringify(keyData, null, 2));
+      await this.writeKeyFile(await this.getKeyFilePath(), key);
     } catch (error) {
       console.error('Failed to store master key:', error);
       throw new Error('Could not store encryption key');
@@ -124,20 +120,72 @@ class ManagedEncryptionService {
     }
   }
 
+  private async directoryHasManagedFiles(root: string): Promise<boolean> {
+    let entries;
+    try {
+      entries = await fs.readdir(root, { withFileTypes: true });
+    } catch {
+      return false;
+    }
+    for (const entry of entries) {
+      if (entry.name === '.lockrnotes') continue;
+      const fullPath = path.join(root, entry.name);
+      if (entry.isDirectory()) {
+        if (await this.directoryHasManagedFiles(fullPath)) return true;
+        continue;
+      }
+      const extension = path.extname(entry.name).toLowerCase();
+      if (!['.ltxt', '.ljson', '.lenc'].includes(extension)) continue;
+      try {
+        const file = await fs.open(fullPath, 'r');
+        const buffer = Buffer.alloc(512);
+        await file.read(buffer, 0, buffer.length, 0);
+        await file.close();
+        if (headerLooksManaged(buffer.toString('utf8'))) return true;
+      } catch {
+        // unreadable file is not proof of a managed note
+      }
+    }
+    return false;
+  }
+
   private async getMasterKey(): Promise<Buffer> {
-    if (this.masterKey) return this.masterKey;
+    const keyFilePath = await this.getKeyFilePath();
+    if (this.masterKey && this.cachedKeyPath === keyFilePath) {
+      return this.masterKey;
+    }
+    this.masterKey = null;
+    this.cachedKeyPath = null;
 
     try {
-      this.masterKey = await this.retrieveMasterKey();
-      if (!this.masterKey) {
-        this.masterKey = this.generateMasterKey();
-        await this.storeMasterKey(this.masterKey);
-        // New master key generated and stored
-      } else {
-        // Master key loaded from system keychain
+      const existing = await this.retrieveMasterKey();
+      if (existing) {
+        this.masterKey = existing;
+        this.cachedKeyPath = keyFilePath;
+        return existing;
       }
+
+      const config = await readConfigFile();
+      if (
+        config?.defaultPath &&
+        (await this.directoryHasManagedFiles(config.defaultPath))
+      ) {
+        throw new Error(
+          'Encryption key is missing. Refusing to create a new key while encrypted files exist.',
+        );
+      }
+
+      this.masterKey = this.generateMasterKey();
+      await this.storeMasterKey(this.masterKey);
+      this.cachedKeyPath = keyFilePath;
       return this.masterKey;
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.startsWith('Encryption key is missing')
+      ) {
+        throw error;
+      }
       console.error('Master key management failed:', error);
       throw new Error('Encryption system initialization failed');
     }
@@ -254,48 +302,64 @@ class ManagedEncryptionService {
       const keyFilePath = await this.getKeyFilePath();
       await fs.unlink(keyFilePath);
       this.masterKey = null;
+      this.cachedKeyPath = null;
     } catch (error) {
       console.warn('Could not delete master key file:', error);
     }
   }
 
-  async migrateKeyStorage(newStorageType: string): Promise<void> {
+  async migrateKeyStorage(
+    newStorageType: string,
+    nextDefaultPath?: string,
+  ): Promise<void> {
     if (newStorageType !== 'system' && newStorageType !== 'folder') {
       throw new Error('Invalid storage type');
     }
 
     try {
-      // Get the current storage type
       const currentStorageType = await this.getKeyStorageType();
-
-      if (currentStorageType === newStorageType) {
+      const config = await readConfigFile();
+      const source = await this.getKeyFilePath();
+      const destination = resolveMasterKeyPath({
+        storageType: newStorageType,
+        defaultPath: nextDefaultPath || config?.defaultPath,
+        userDataPath: app.getPath('userData'),
+      });
+      const samePlace = path.resolve(source) === path.resolve(destination);
+      if (samePlace && currentStorageType === newStorageType) {
         return;
       }
 
       const masterKey = await this.getMasterKey();
-      if (!masterKey) {
-        throw new Error('No master key found to migrate');
+      if (!samePlace) {
+        await this.writeKeyFile(destination, masterKey);
       }
 
-      await updateConfigFile({ keyStorageType: newStorageType });
+      await updateConfigFile({
+        keyStorageType: newStorageType,
+        ...(nextDefaultPath ? { defaultPath: nextDefaultPath } : {}),
+      });
+      this.masterKey = masterKey;
+      this.cachedKeyPath = destination;
 
-      // Reset the cached master key so it will be treated as not yet stored
-      this.masterKey = null;
-      await this.storeMasterKey(masterKey);
-
-      // Delete the old key file
-      if (currentStorageType === 'folder' && newStorageType === 'system') {
+      if (
+        !samePlace &&
+        currentStorageType === 'folder' &&
+        newStorageType === 'system'
+      ) {
         try {
-          const config = await readConfigFile();
-          if (config?.defaultPath) {
-            const oldKeyDir = path.join(config.defaultPath, '.lockrnotes');
-            await fs.rm(oldKeyDir, { recursive: true, force: true });
-          }
+          await fs.rm(path.dirname(source), { recursive: true, force: true });
         } catch (deleteErr) {
           console.warn('Could not delete local key directory:', deleteErr);
         }
       }
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.startsWith('Encryption key is missing')
+      ) {
+        throw error;
+      }
       console.error('Error migrating key storage:', error);
       throw new Error(`Failed to migrate key storage: ${String(error)}`);
     }

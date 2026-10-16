@@ -134,16 +134,30 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
       // Check if keyStorageType has changed
       const config = await fileSystemService.readConfig();
       const oldKeyStorageType = config?.keyStorageType || 'system';
+      const oldPath = config?.defaultPath || '';
+      const typeChanged = keyStorageType !== oldKeyStorageType;
+      const pathChanged = defaultPath !== oldPath;
+      const keyLocationChanges =
+        typeChanged ||
+        (pathChanged &&
+          (keyStorageType === 'folder' || oldKeyStorageType === 'folder'));
 
-      // If keyStorageType changed, perform migration
-      if (keyStorageType !== oldKeyStorageType) {
+      // Move the existing key before the new folder becomes active, so a
+      // missing file is not replaced with a brand new key.
+      if (keyLocationChanges) {
         try {
-          await window.encryptionAPI.migrateKeyStorage(keyStorageType);
+          await window.encryptionAPI.migrateKeyStorage(
+            keyStorageType,
+            defaultPath,
+          );
         } catch (migrationError) {
           // eslint-disable-next-line no-console
           console.error('Failed to migrate key storage:', migrationError);
+          const detail =
+            migrationError instanceof Error ? migrationError.message : '';
           throw new Error(
-            t('settings.keyStorageMigrationError') ||
+            detail ||
+              t('settings.keyStorageMigrationError') ||
               'Failed to migrate encryption key storage',
           );
         }
