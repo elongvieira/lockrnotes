@@ -10,17 +10,9 @@ export function registerHotCopyHandlers() {
     'hotcopy:getValue',
     async (_event, filePath: string, entryIndex: number, fieldName: string) => {
       try {
-        console.log('HotCopy getValue called with:', {
-          filePath,
-          entryIndex,
-          fieldName,
-        });
-
-        // Check if file exists
         try {
           await fs.access(filePath);
         } catch {
-          console.error('File does not exist:', filePath);
           return null;
         }
 
@@ -36,9 +28,7 @@ export function registerHotCopyHandlers() {
               encryptedData,
               filePath,
             );
-            console.log('HotCopy: File decrypted successfully');
-          } catch (decryptError) {
-            console.error('HotCopy: Failed to decrypt file:', decryptError);
+          } catch {
             return null;
           }
         }
@@ -48,12 +38,10 @@ export function registerHotCopyHandlers() {
         // Navigate to entries array and get the specific entry
         const { entries } = jsonData;
         if (!Array.isArray(entries)) {
-          console.error('entries is not an array in file:', filePath);
           return null;
         }
 
         if (entryIndex < 0 || entryIndex >= entries.length) {
-          console.error('entryIndex out of bounds:', entryIndex);
           return null;
         }
 
@@ -61,19 +49,11 @@ export function registerHotCopyHandlers() {
         const value = entry[fieldName];
 
         if (value === undefined) {
-          console.log(
-            'Field not found at entry:',
-            entryIndex,
-            'field:',
-            fieldName,
-          );
           return null;
         }
 
-        console.log('HotCopy getValue result:', value);
         return value;
-      } catch (error) {
-        console.error('Error getting hot copy value:', error);
+      } catch {
         return null;
       }
     },

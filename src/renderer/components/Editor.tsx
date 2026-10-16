@@ -527,75 +527,36 @@ export default function Editor() {
 
         // Check if file has a password (manual encryption)
         if (targetTab.encryptedPassword) {
-          // eslint-disable-next-line no-console
-          console.log(
-            'Saving manually encrypted file:',
-            targetTab.filename,
-            'Password stored:',
-            !!targetTab.encryptedPassword,
-          );
-
-          // Decrypt the password from memory
           let password: string;
           try {
             password = await sessionKeyService.decryptPassword(
               targetTab.encryptedPassword,
             );
-            // eslint-disable-next-line no-console
-            console.log('Password decrypted successfully');
-          } catch (decryptErr) {
-            // eslint-disable-next-line no-console
-            console.error(
-              'Failed to decrypt password from memory:',
-              decryptErr,
-            );
+          } catch {
             throw new Error('Failed to retrieve stored password');
           }
 
-          // Get original extension
           const originalExt = targetTab.originalExtension || '.txt';
-          // eslint-disable-next-line no-console
-          console.log('Original extension:', originalExt);
-
-          // Encrypt content with password
           const encryptResult = await window.manualEncryptionAPI.encryptContent(
             targetTab.content,
             password,
             originalExt,
           );
 
-          // eslint-disable-next-line no-console
-          console.log('Encryption result:', encryptResult.success);
-
           if (encryptResult.success && encryptResult.data) {
-            // Save encrypted content
             const encryptedContent = JSON.stringify(
               encryptResult.data,
               null,
               2,
             );
-            // eslint-disable-next-line no-console
-            console.log(
-              'Saving to disk:',
-              targetTab.filePath,
-              'Content length:',
-              encryptedContent.length,
-            );
-
             success = await fileSystemService.saveFile(
               targetTab.filePath,
               encryptedContent,
             );
-            // eslint-disable-next-line no-console
-            console.log('File saved to disk:', targetTab.filename, success);
           } else {
             throw new Error(encryptResult.error || 'Encryption failed');
           }
         } else {
-          // eslint-disable-next-line no-console
-          console.log('Saving managed encrypted file:', targetTab.filename);
-
-          // Use standard save with managed encryption
           success = await fileSystemService.saveFileWithEncryption(
             targetTab.filePath,
             targetTab.content,
