@@ -226,7 +226,21 @@
   },
   "overrides": {
     "minimatch": "^9.0.7",
-    "npm": "^11.14.1"
+    "npm": "^11.14.1",
+    "proxy-addr": "2.0.8",
+    "compression": "1.8.2",
+    "source-map-js": "1.2.2",
+    "handlebars": "4.7.10",
+    "fast-uri": "3.1.8",
+    "cssnano-utils": "5.0.3",
+    "postcss-selector-parser": "7.1.6",
+    "postcss-modules-local-by-default": "4.2.0",
+    "postcss-modules-scope": "3.2.1",
+    "postcss-discard-comments": "7.0.8",
+    "stylehacks": "7.0.11",
+    "postcss-merge-rules": "7.0.11",
+    "postcss-minify-selectors": "7.1.2",
+    "postcss-unique-selectors": "7.0.7"
   },
   "devEngines": {
     "runtime": {
