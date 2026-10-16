@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import {
@@ -162,10 +162,34 @@ app.on('window-all-closed', () => {
   }
 });
 
+const PACKAGED_CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "frame-ancestors 'none'",
+].join('; ');
+
+function installPackagedContentSecurityPolicy() {
+  if (!app.isPackaged) return;
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const responseHeaders = {
+      ...details.responseHeaders,
+      'Content-Security-Policy': [PACKAGED_CSP],
+    };
+    callback({ responseHeaders });
+  });
+}
+
 app
   .whenReady()
   .then(async () => {
     try {
+      installPackagedContentSecurityPolicy();
       // Migrate legacy plaintext config.json → encrypted config.enc, then ensure config exists
       await migrateConfigIfNeeded();
       await ensureConfigFile();

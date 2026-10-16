@@ -296,6 +296,7 @@
     "fileDeleteError": "Error deleting file",
     "fileDecrypted": "File decrypted successfully",
     "fileDecryptError": "Error decrypting file",
+    "weakOsEncryption": "The operating system is not protecting the encryption key. Managed notes can be read by anyone with access to this account.",
     "exportSuccess": "Export completed! {{count}} files exported to {{path}}",
     "exportError": "Error exporting files: {{error}}",
     "exportNoFolder": "No folder selected for export",

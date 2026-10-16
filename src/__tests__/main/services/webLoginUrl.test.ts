@@ -1,5 +1,6 @@
 import {
   isHttpUrl,
+  isReplayOriginAllowed,
   normalizeWebLoginUrl,
 } from '../../../main/services/webLoginUrl';
 
@@ -29,6 +30,29 @@ describe('normalizeWebLoginUrl', () => {
     expect(normalizeWebLoginUrl(javascriptUrl)).toBeNull();
     expect(normalizeWebLoginUrl('file:///etc/passwd')).toBeNull();
     expect(normalizeWebLoginUrl('ftp://example.com')).toBeNull();
+  });
+});
+
+describe('isReplayOriginAllowed', () => {
+  it('requires the recorded origin when the step has one', () => {
+    expect(
+      isReplayOriginAllowed(
+        'https://login.example/session',
+        'https://login.example',
+      ),
+    ).toBe(true);
+    expect(
+      isReplayOriginAllowed(
+        'https://evil.example/phish',
+        'https://login.example',
+      ),
+    ).toBe(false);
+  });
+
+  it('allows older macros that did not record an origin', () => {
+    expect(isReplayOriginAllowed('https://anywhere.example', undefined)).toBe(
+      true,
+    );
   });
 });
 

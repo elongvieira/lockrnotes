@@ -296,6 +296,7 @@
     "fileDeleteError": "Erro ao excluir arquivo",
     "fileDecrypted": "Arquivo descriptografado com sucesso",
     "fileDecryptError": "Erro ao descriptografar arquivo",
+    "weakOsEncryption": "O sistema não está protegendo a chave de criptografia. Notas com criptografia gerenciada podem ser lidas por quem tiver acesso a esta conta.",
     "exportSuccess": "Exportação concluída! {{count}} arquivos exportados para {{path}}",
     "exportError": "Erro ao exportar arquivos: {{error}}",
     "exportNoFolder": "Nenhuma pasta selecionada para exportação",

@@ -13,6 +13,7 @@ export interface EncryptionAPI {
   ) => Promise<string>;
   isContentEncrypted: (content: string) => Promise<boolean>;
   getOriginalExtension: (content: string) => Promise<string | null>;
+  getStorageStatus: () => Promise<{ backend: string; weak: boolean }>;
   resetEncryption: () => Promise<void>;
   migrateKeyStorage: (
     newStorageType: string,
@@ -70,6 +71,10 @@ const encryptionApi: EncryptionAPI = {
       throw new Error(result.error || 'Failed to get original extension');
     }
     return result.data;
+  },
+
+  async getStorageStatus(): Promise<{ backend: string; weak: boolean }> {
+    return ipcRenderer.invoke('encryption:storage-status');
   },
 
   async resetEncryption(): Promise<void> {
