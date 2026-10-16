@@ -40,8 +40,10 @@ Lockr Notes foi pensado para quem quer **controle local** sobre as próprias ano
 |--------|----------------|
 | **Onde ficam os dados** | Nas pastas que você define no disco; o app não hospeda suas notas em servidor próprio. |
 | **Configuração do app** | Arquivo `config.enc` criptografado na pasta de dados do usuário (Electron `userData`). |
-| **Criptografia de arquivos** | Opcional; algoritmo **AES-256-GCM** com derivação de chave (PBKDF2). |
-| **Chave de criptografia** | Modo recomendado: cofre seguro do Windows (`safeStorage`). Alternativa: chave na pasta do Lockr Notes (mais portável, menos isolada). |
+| **Criptografia de arquivos** | Opcional. AES-256-GCM. Arquivos novos usam HKDF (criptografia gerenciada) ou PBKDF2 com 600 mil iterações (senha). Arquivos antigos continuam abrindo. |
+| **Chave de criptografia** | Modo recomendado: cofre do sistema (`safeStorage`: DPAPI no Windows, Keychain no macOS). Guardar a chave na pasta não torna o cofre portátil: o arquivo continua cifrado pelo sistema, preso a este usuário e a este computador. |
+| **Sem recuperação da chave** | Reinstalar o sistema ou perder o cofre deixa a criptografia gerenciada ilegível. Não há senha de recuperação. Para notas que precisam sobreviver a isso, use criptografia manual com senha. |
+| **Exportação** | O ZIP de exportação contém as notas em claro. O app pede confirmação antes de gerá-lo. |
 | **Telemetria de conteúdo** | O app **não envia o texto das suas notas** para serviços do Lockr Notes. |
 | **Rede** | Conexões podem ocorrer quando **você** usa login web, SSH, RDP ou quando a **versão instalada** verifica atualizações no GitHub. |
 | **Backups** | **Sua responsabilidade.** Perda de disco, exclusão acidental ou perda da chave pode tornar dados irrecuperáveis. |

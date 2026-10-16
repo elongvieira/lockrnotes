@@ -11,6 +11,18 @@ function getConfigPath(): string {
   return path.join(app.getPath('userData'), CONFIG_FILE_NAME);
 }
 
+let configWriteChain: Promise<unknown> = Promise.resolve();
+
+/** Serializes read-modify-write so two updates cannot drop each other's fields. */
+function withConfigLock<T>(task: () => Promise<T>): Promise<T> {
+  const run = configWriteChain.then(task, task);
+  configWriteChain = run.then(
+    () => undefined,
+    () => undefined,
+  );
+  return run;
+}
+
 /** Internal helper: encrypt and atomically write the config object to disk. */
 async function writeEncryptedConfig(config: any): Promise<void> {
   const configPath = getConfigPath();
@@ -39,33 +51,35 @@ async function writeEncryptedConfig(config: any): Promise<void> {
  * Silently no-ops when no legacy file is found.
  */
 export async function migrateConfigIfNeeded(): Promise<void> {
-  const legacyPath = path.join(process.cwd(), 'config.json');
-  try {
-    await fs.promises.access(legacyPath, fs.constants.F_OK);
-  } catch {
-    return; // no legacy file — nothing to migrate
-  }
-
-  try {
-    const raw = await fs.promises.readFile(legacyPath, 'utf8');
-    const parsed = JSON.parse(raw);
-
-    if (!safeStorage.isEncryptionAvailable()) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        'safeStorage unavailable during migration — keeping legacy config',
-      );
-      return;
+  return withConfigLock(async () => {
+    const legacyPath = path.join(process.cwd(), 'config.json');
+    try {
+      await fs.promises.access(legacyPath, fs.constants.F_OK);
+    } catch {
+      return; // no legacy file — nothing to migrate
     }
 
-    await writeEncryptedConfig(parsed);
-    await fs.promises.unlink(legacyPath);
-    // eslint-disable-next-line no-console
-    console.log('Migrated legacy config.json to encrypted config.enc');
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to migrate legacy config:', error);
-  }
+    try {
+      const raw = await fs.promises.readFile(legacyPath, 'utf8');
+      const parsed = JSON.parse(raw);
+
+      if (!safeStorage.isEncryptionAvailable()) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          'safeStorage unavailable during migration — keeping legacy config',
+        );
+        return;
+      }
+
+      await writeEncryptedConfig(parsed);
+      await fs.promises.unlink(legacyPath);
+      // eslint-disable-next-line no-console
+      console.log('Migrated legacy config.json to encrypted config.enc');
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to migrate legacy config:', error);
+    }
+  });
 }
 
 /**
@@ -73,42 +87,44 @@ export async function migrateConfigIfNeeded(): Promise<void> {
  * Creates it with defaults if missing.
  */
 export async function ensureConfigFile(): Promise<void> {
-  try {
-    const configPath = getConfigPath();
-
+  return withConfigLock(async () => {
     try {
-      await fs.promises.access(configPath, fs.constants.F_OK);
+      const configPath = getConfigPath();
+
+      try {
+        await fs.promises.access(configPath, fs.constants.F_OK);
+        // eslint-disable-next-line no-console
+        console.log('Config file already exists at', configPath);
+        return;
+      } catch {
+        // File does not exist — proceed to create
+      }
+
+      if (!safeStorage.isEncryptionAvailable()) {
+        throw new Error('System encryption is not available');
+      }
+
+      const defaultPath = path.join(app.getPath('documents'), 'LockrNotes');
+
+      const defaultConfig = {
+        defaultPath,
+        keyStorageType: 'system',
+        language: 'pt-BR',
+        autoSave: true,
+        firstRun: true,
+        openTabs: [],
+        activeTabId: null,
+        windowSize: { width: 1200, height: 800 },
+      };
+
+      await writeEncryptedConfig(defaultConfig);
       // eslint-disable-next-line no-console
-      console.log('Config file already exists at', configPath);
-      return;
-    } catch {
-      // File does not exist — proceed to create
+      console.log('Created encrypted config at', configPath);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to ensure config file:', error);
     }
-
-    if (!safeStorage.isEncryptionAvailable()) {
-      throw new Error('System encryption is not available');
-    }
-
-    const defaultPath = path.join(app.getPath('documents'), 'LockrNotes');
-
-    const defaultConfig = {
-      defaultPath,
-      keyStorageType: 'system',
-      language: 'pt-BR',
-      autoSave: true,
-      firstRun: true,
-      openTabs: [],
-      activeTabId: null,
-      windowSize: { width: 1200, height: 800 },
-    };
-
-    await writeEncryptedConfig(defaultConfig);
-    // eslint-disable-next-line no-console
-    console.log('Created encrypted config at', configPath);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to ensure config file:', error);
-  }
+  });
 }
 
 /**
@@ -149,23 +165,25 @@ export async function readConfigFile(): Promise<any | null> {
  * Returns true if successful, false otherwise.
  */
 export async function updateConfigFile(updates: any): Promise<boolean> {
-  try {
-    if (!safeStorage.isEncryptionAvailable()) {
-      throw new Error('System encryption is not available');
+  return withConfigLock(async () => {
+    try {
+      if (!safeStorage.isEncryptionAvailable()) {
+        throw new Error('System encryption is not available');
+      }
+
+      const existingConfig = (await readConfigFile()) || {};
+      const newConfig = { ...existingConfig, ...updates };
+
+      await writeEncryptedConfig(newConfig);
+      // eslint-disable-next-line no-console
+      console.log('Updated config file successfully');
+      return true;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to update config file:', error);
+      return false;
     }
-
-    const existingConfig = (await readConfigFile()) || {};
-    const newConfig = { ...existingConfig, ...updates };
-
-    await writeEncryptedConfig(newConfig);
-    // eslint-disable-next-line no-console
-    console.log('Updated config file successfully');
-    return true;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to update config file:', error);
-    return false;
-  }
+  });
 }
 
 /**
