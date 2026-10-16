@@ -1668,17 +1668,32 @@ export default function JsonEditor({
                         {entry.type === 'ssh' && (
                           <IconButton
                             size="small"
-                            onClick={() => {
+                            onClick={async () => {
                               const sshEntry = entry as SshEntry;
                               const { sshAPI } = window as any;
-                              if (sshAPI) {
-                                sshAPI.openWindow({
+                              if (!sshAPI) return;
+                              try {
+                                const result = await sshAPI.openWindow({
                                   host: sshEntry.host,
                                   port: sshEntry.port,
                                   user: sshEntry.user,
                                   password: sshEntry.password,
                                   title: sshEntry.title,
                                 });
+                                if (!result?.success) {
+                                  showNotification(
+                                    result?.error ||
+                                      t('ssh.connectError') ||
+                                      'Could not open the SSH connection',
+                                    'error',
+                                  );
+                                }
+                              } catch {
+                                showNotification(
+                                  t('ssh.connectError') ||
+                                    'Could not open the SSH connection',
+                                  'error',
+                                );
                               }
                             }}
                             title={t('ssh.connect') || 'Connect'}
@@ -1695,11 +1710,12 @@ export default function JsonEditor({
                         {entry.type === 'rdp' && (
                           <IconButton
                             size="small"
-                            onClick={() => {
+                            onClick={async () => {
                               const rdpEntry = entry as RdpEntry;
                               const { rdpAPI } = window as any;
-                              if (rdpAPI) {
-                                rdpAPI.connect({
+                              if (!rdpAPI) return;
+                              try {
+                                const result = await rdpAPI.connect({
                                   host: rdpEntry.host,
                                   port: rdpEntry.port,
                                   user: rdpEntry.user,
@@ -1707,6 +1723,20 @@ export default function JsonEditor({
                                   domain: rdpEntry.domain,
                                   title: rdpEntry.title,
                                 });
+                                if (!result?.success) {
+                                  showNotification(
+                                    result?.error ||
+                                      t('rdp.connectError') ||
+                                      'Could not open the RDP connection',
+                                    'error',
+                                  );
+                                }
+                              } catch {
+                                showNotification(
+                                  t('rdp.connectError') ||
+                                    'Could not open the RDP connection',
+                                  'error',
+                                );
                               }
                             }}
                             title={t('rdp.connect') || 'Connect RDP'}

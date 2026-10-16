@@ -1,6 +1,7 @@
 import path from 'path';
 import { ipcMain, BrowserWindow, app, type WebContents } from 'electron';
 import { Client, ClientChannel } from 'ssh2';
+import { parseRemoteTarget } from '../services/remoteConnection';
 import { resolveHtmlPath } from '../util';
 
 const sshConnections = new Map<
@@ -35,8 +36,18 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
         title: string;
       },
     ) => {
+      const target = parseRemoteTarget(config, 22);
+      if (!target) {
+        return { success: false, error: 'Invalid SSH target' };
+      }
       const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      pendingConfigs.set(token, config);
+      pendingConfigs.set(token, {
+        ...config,
+        host: target.host,
+        user: target.user,
+        password: target.password,
+        port: target.port,
+      });
 
       const preloadPath = app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -81,6 +92,10 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
       event,
       config: { host: string; user: string; password: string; port?: number },
     ) => {
+      const target = parseRemoteTarget(config, 22);
+      if (!target) {
+        return { success: false, error: 'Invalid SSH target' };
+      }
       const sessionId = `ssh_${Date.now()}_${++sessionCounter}`;
       const client = new Client();
       const { sender } = event;
@@ -129,15 +144,15 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
         client.on(
           'keyboard-interactive',
           (_name, _instructions, _instrLang, _prompts, finish) => {
-            finish([config.password]);
+            finish([target.password]);
           },
         );
 
         client.connect({
-          host: config.host,
-          port: config.port || 22,
-          username: config.user,
-          password: config.password,
+          host: target.host,
+          port: target.port,
+          username: target.user,
+          password: target.password,
           tryKeyboard: true,
           readyTimeout: 15000,
         });

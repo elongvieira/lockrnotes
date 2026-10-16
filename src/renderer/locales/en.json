@@ -244,10 +244,12 @@
     "connected": "Connected",
     "disconnected": "Disconnected",
     "disconnect": "Disconnect",
-    "error": "Error"
+    "error": "Error",
+    "connectError": "Could not open the SSH connection"
   },
   "rdp": {
-    "connect": "Connect RDP"
+    "connect": "Connect RDP",
+    "connectError": "Could not open the RDP connection"
   },
   "webLogin": {
     "open": "Open and fill login",
