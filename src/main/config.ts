@@ -175,8 +175,6 @@ export async function updateConfigFile(updates: any): Promise<boolean> {
       const newConfig = { ...existingConfig, ...updates };
 
       await writeEncryptedConfig(newConfig);
-      // eslint-disable-next-line no-console
-      console.log('Updated config file successfully');
       return true;
     } catch (error) {
       // eslint-disable-next-line no-console

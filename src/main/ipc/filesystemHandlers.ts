@@ -103,7 +103,14 @@ export function setupFilesystemHandlers() {
         lastModified: stats.mtime,
       };
     } catch (error) {
-      console.error('Error getting item:', error);
+      const missing =
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === 'ENOENT';
+      if (!missing) {
+        console.error('Error getting item:', error);
+      }
       return null;
     }
   });

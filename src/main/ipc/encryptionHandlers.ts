@@ -1,6 +1,6 @@
 import { ipcMain, safeStorage } from 'electron';
 import { managedEncryptionService } from '../services/managedEncryptionService';
-import { isWeakOsEncryption } from '../services/osEncryption';
+import { readOsEncryptionStatus } from '../services/osEncryption';
 
 /**
  * Handlers IPC para criptografia gerenciada
@@ -69,8 +69,7 @@ export function setupEncryptionHandlers(): void {
   );
 
   ipcMain.handle('encryption:storage-status', () => {
-    const backend = safeStorage.getSelectedStorageBackend();
-    return { backend, weak: isWeakOsEncryption(backend) };
+    return readOsEncryptionStatus(safeStorage, process.platform);
   });
 
   // Reset do sistema de criptografia

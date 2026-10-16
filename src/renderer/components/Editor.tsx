@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -329,32 +329,48 @@ export default function Editor() {
     }
   }, [currentPendingFile, pendingEncryptedFiles, restoredTabs, setActiveTab]);
 
-  // Salvar abas sempre que mudarem (depois da restauração inicial)
-  useEffect(() => {
-    if (isRestoringTabs) return;
-
-    const saveTabs = async () => {
-      try {
-        const tabsToSave = tabs.map((tab) => ({
+  const persistedTabs = useMemo(
+    () =>
+      JSON.stringify({
+        activeTab,
+        tabs: tabs.map((tab) => ({
           id: tab.id,
           filename: tab.filename,
           filePath: tab.filePath,
           isEncrypted: tab.isEncrypted,
           originalExtension: tab.originalExtension,
-        }));
+        })),
+      }),
+    [tabs, activeTab],
+  );
 
-        await fileSystemService.updateConfig({
-          openTabs: tabsToSave,
-          activeTabId: activeTab,
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to save tabs:', error);
-      }
+  // Persist which tabs are open. Typing does not change this signature.
+  useEffect(() => {
+    if (isRestoringTabs) return undefined;
+
+    const parsed = JSON.parse(persistedTabs) as {
+      activeTab: string | null;
+      tabs: Array<{
+        id: string;
+        filename: string;
+        filePath: string;
+        isEncrypted: boolean;
+        originalExtension?: string;
+      }>;
     };
 
-    saveTabs();
-  }, [tabs, activeTab, isRestoringTabs]);
+    fileSystemService
+      .updateConfig({
+        openTabs: parsed.tabs,
+        activeTabId: parsed.activeTab,
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error('Failed to save tabs:', error);
+      });
+
+    return undefined;
+  }, [persistedTabs, isRestoringTabs]);
 
   // Função para abrir um novo arquivo em uma aba
   const openFile = useCallback(
