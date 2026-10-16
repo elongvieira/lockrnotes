@@ -7,7 +7,7 @@ module.exports = {
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
   },
   setupFiles: ['./.erb/scripts/check-build-exists.ts'],
-  setupFilesAfterEnv: ['./src/__tests__/setupCrypto.ts'],
+  setupFilesAfterEnv: ['./.erb/scripts/jest-setup-crypto.ts'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
     url: 'http://localhost/',
