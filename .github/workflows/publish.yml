@@ -9,6 +9,9 @@ name: Publish
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   publish:
     # Auto publish on pushes to main

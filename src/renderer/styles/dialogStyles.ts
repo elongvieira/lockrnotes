@@ -90,6 +90,28 @@ export const dialogStyles = {
   } as SxProps<Theme>,
 
   // Checkbox e radio buttons
+  externalTextLink: {
+    color: 'var(--primary-blue)',
+    fontWeight: 600,
+    textDecoration: 'underline',
+    textUnderlineOffset: '2px',
+    cursor: 'pointer',
+    verticalAlign: 'baseline',
+    display: 'inline',
+    minWidth: 0,
+    padding: 0,
+    fontSize: 'inherit',
+    lineHeight: 'inherit',
+    textTransform: 'none',
+    '&:hover': {
+      color: 'var(--primary-blue-dark)',
+    },
+    '&:focus-visible': {
+      outline: '2px solid var(--primary-blue)',
+      outlineOffset: 2,
+    },
+  } as SxProps<Theme>,
+
   checkboxRadio: {
     color: 'var(--primary-blue)',
     '&.Mui-checked': {

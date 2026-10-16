@@ -2,12 +2,28 @@
   "app": {
     "title": "Lockr Notes"
   },
+  "about": {
+    "title": "Sobre o Lockr Notes",
+    "version": "Versão {{version}}",
+    "description": "Aplicativo de anotações local, com criptografia opcional e código aberto.",
+    "authorLabel": "Autor:",
+    "licenseLabel": "Licença:",
+    "licenseLink": "MIT — ver LICENSE no GitHub",
+    "repositoryLabel": "Código-fonte:",
+    "issuesLabel": "Problemas e sugestões:",
+    "issuesLink": "Abrir uma issue",
+    "termsLabel": "Termos de uso:",
+    "termsLink": "Ler os termos",
+    "copyright": "© 2025 Elon Gomes Vieira",
+    "close": "Fechar"
+  },
   "menu": {
     "new": "Nova nota",
     "save": "Salvar",
     "delete": "Excluir",
     "export": "Exportar tudo",
     "import": "Importar arquivos",
+    "about": "Sobre",
     "exit": "Sair"
   },
   "editor": {
@@ -322,6 +338,21 @@
     "privacyNoServer": "✓ Sem servidores",
     "privacyNoTracking": "✓ Zero rastreamento",
     "privacyEncrypted": "✓ Criptografia forte"
+  },
+  "terms": {
+    "title": "Termos de Uso",
+    "summaryIntro": "Resumo do que você aceita ao continuar:",
+    "readFull": "Ler termos completos",
+    "acceptLabel": "Li e aceito os Termos de Uso do Lockr Notes",
+    "acceptRequired": "Você precisa aceitar os termos para continuar.",
+    "fullTitle": "Termos de Uso completos",
+    "fullIntro": "Leia atentamente antes de aceitar. Estes termos regem o uso do Lockr Notes neste dispositivo.",
+    "closeFull": "Fechar",
+    "reacceptTitle": "Atualização dos Termos de Uso",
+    "reacceptMessage": "Os Termos de Uso foram atualizados. Revise o resumo, leia o texto completo se desejar e aceite para continuar usando o Lockr Notes.",
+    "continue": "Continuar",
+    "licensePrefix": "Licença do software:",
+    "viewMitLicense": "MIT — ver LICENSE no GitHub"
   },
   "settings": {
     "title": "Configurações",

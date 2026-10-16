@@ -21,6 +21,8 @@ import { useTranslation } from 'react-i18next';
 import { dialogStyles } from '../styles/dialogStyles';
 import { fileSystemService } from '../services/fileSystemService';
 import LanguageSelector from './LanguageSelector';
+import TermsAcceptanceSection from './TermsAcceptanceSection';
+import { buildTermsAcceptanceRecord } from '../terms/termsDocument';
 
 interface WelcomeDialogProps {
   open: boolean;
@@ -36,6 +38,8 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
     'system',
   );
   const [language, setLanguage] = useState<string>('pt-BR');
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+  const [showTermsError, setShowTermsError] = useState<boolean>(false);
 
   const loadConfig = async () => {
     try {
@@ -87,13 +91,20 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
   };
 
   const handleConfirm = async () => {
+    if (!termsAccepted) {
+      setShowTermsError(true);
+      return;
+    }
+
     try {
+      const termsAcceptance = await buildTermsAcceptanceRecord(language);
       // Update config with the chosen path, key storage type, language and mark firstRun as false
       const success = await fileSystemService.updateConfig({
         defaultPath: defaultPath.trim(),
         keyStorageType,
         language,
         firstRun: false,
+        termsAcceptance,
       });
 
       if (success) {
@@ -423,13 +434,24 @@ export default function WelcomeDialog({ open, onClose }: WelcomeDialogProps) {
             </Box>
           </RadioGroup>
         </Box>
+
+        <TermsAcceptanceSection
+          accepted={termsAccepted}
+          onAcceptedChange={(value) => {
+            setTermsAccepted(value);
+            if (value) {
+              setShowTermsError(false);
+            }
+          }}
+          showError={showTermsError}
+        />
       </DialogContent>
 
       <DialogActions sx={dialogStyles.dialogActions}>
         <Button
           onClick={handleConfirm}
           variant="contained"
-          disabled={loading || !defaultPath.trim()}
+          disabled={loading || !defaultPath.trim() || !termsAccepted}
           sx={dialogStyles.confirmButton}
         >
           {t('welcome.getStarted') || 'Começar a Usar'}

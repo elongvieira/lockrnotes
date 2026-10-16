@@ -4,7 +4,6 @@
   "description": "Lockr Notes desktop app",
   "keywords": [
     "electron",
-    "boilerplate",
     "react",
     "typescript",
     "ts",
@@ -13,9 +12,9 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://lockrnotes.com",
+  "homepage": "https://github.com/elongvieira/lockrnotes",
   "bugs": {
-    "url": "https://lockrnotes.com"
+    "url": "https://github.com/elongvieira/lockrnotes/issues"
   },
   "repository": {
     "type": "git",
@@ -23,16 +22,9 @@
   },
   "license": "MIT",
   "author": {
-    "name": "Lockr Notes Team",
-    "url": "https://lockrnotes.com"
+    "name": "Elon Gomes Vieira",
+    "url": "https://github.com/elongvieira"
   },
-  "contributors": [
-    {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    }
-  ],
   "main": "./.erb/dll/main.bundle.dev.js",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -235,9 +227,6 @@
   "overrides": {
     "minimatch": "^9.0.7",
     "npm": "^11.14.1"
-  },
-  "collective": {
-    "url": "https://lockrnotes.com"
   },
   "devEngines": {
     "runtime": {

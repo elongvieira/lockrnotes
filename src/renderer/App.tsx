@@ -7,11 +7,14 @@ import './styles/scrollbar.css';
 import Main from './pages/Main';
 import theme from './theme';
 import WelcomeDialog from './components/WelcomeDialog';
+import TermsReacceptDialog from './components/TermsReacceptDialog';
 import { fileSystemService } from './services/fileSystemService';
+import { verifyTermsAcceptance } from './terms/termsDocument';
 import i18n from './i18n';
 
 export default function App() {
   const [welcomeOpen, setWelcomeOpen] = useState<boolean>(false);
+  const [termsReacceptOpen, setTermsReacceptOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   const checkFirstRun = async () => {
@@ -23,9 +26,13 @@ export default function App() {
         i18n.changeLanguage(config.language);
       }
 
+      const termsValid = await verifyTermsAcceptance(config?.termsAcceptance);
+
       // Show welcome dialog if firstRun is true or config doesn't exist
       if (!config || config.firstRun === true) {
         setWelcomeOpen(true);
+      } else if (!termsValid) {
+        setTermsReacceptOpen(true);
       }
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -58,6 +65,10 @@ export default function App() {
         </Router>
       </Suspense>
       <WelcomeDialog open={welcomeOpen} onClose={handleWelcomeClose} />
+      <TermsReacceptDialog
+        open={termsReacceptOpen}
+        onClose={() => setTermsReacceptOpen(false)}
+      />
     </ThemeProvider>
   );
 }

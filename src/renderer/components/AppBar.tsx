@@ -11,11 +11,13 @@ import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import logo from '../../../assets/logo_a.png';
 import SettingsDialog from './SettingsDialog';
 import HotCopyBar from './HotCopyBar';
 import HotCopyManageDialog from './HotCopyManageDialog';
 import ImportDialog from './ImportDialog';
+import AboutDialog from './AboutDialog';
 import { HotCopyItem } from '../types/hotcopy';
 import type { ImportFileInfo } from '../../main/preload/importApi';
 import { useAppContext } from '../contexts/AppContext';
@@ -25,6 +27,7 @@ export default function AppBar() {
   const { t, i18n } = useTranslation();
   const { refreshSidebar } = useAppContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [hotCopyManageOpen, setHotCopyManageOpen] = useState(false);
   const [hotCopyItems, setHotCopyItems] = useState<HotCopyItem[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -314,6 +317,18 @@ export default function AppBar() {
           </MenuItem>
           <MenuItem
             onClick={() => {
+              setAboutOpen(true);
+              handleMenuClose();
+            }}
+            className="app-menu-item"
+          >
+            <ListItemIcon className="app-menu-icon">
+              <InfoOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            {t('menu.about') || 'Sobre'}
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
               handleMenuClose();
               window.electron?.window?.close();
             }}
@@ -329,6 +344,7 @@ export default function AppBar() {
           open={settingsOpen}
           onClose={() => setSettingsOpen(false)}
         />
+        <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />
         <HotCopyManageDialog
           open={hotCopyManageOpen}
           onClose={() => setHotCopyManageOpen(false)}

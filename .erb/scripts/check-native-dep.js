@@ -42,7 +42,7 @@ ${chalk.whiteBright.bgGreen.bold(
   'cd ./release/app && npm install your-package',
 )}
  Read more about native dependencies at:
-${chalk.bold('https://lockrnotes.com')}
+${chalk.bold('https://github.com/elongvieira/lockrnotes')}
  `);
       process.exit(1);
     }
