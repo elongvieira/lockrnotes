@@ -38,6 +38,7 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import { useTranslation } from 'react-i18next';
 import { fileSystemService } from '../services/fileSystemService';
 import { joinPath } from '../utils/pathUtil';
+import { copyTextTemporarily } from '../utils/clipboard';
 import { useAppContext } from '../contexts/AppContext';
 import {
   JsonEntry,
@@ -289,8 +290,8 @@ export default function JsonEditor({
 
   const handleCopy = async (entryId: string, text: string, idx = 0) => {
     try {
-      if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
+      if (navigator.clipboard) {
+        await copyTextTemporarily(text);
       } else {
         // fallback
         const ta = document.createElement('textarea');

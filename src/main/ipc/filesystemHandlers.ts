@@ -163,7 +163,7 @@ export function setupFilesystemHandlers() {
     try {
       const stats = await fs.promises.stat(itemPath);
       if (stats.isDirectory()) {
-        await fs.promises.rmdir(itemPath, { recursive: true });
+        await fs.promises.rm(itemPath, { recursive: true });
       } else {
         await fs.promises.unlink(itemPath);
       }

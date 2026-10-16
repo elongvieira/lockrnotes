@@ -32,12 +32,8 @@ A IA deve priorizar seguir padrões existentes ao invés de criar novos.
 
 ## 🔗 API INTEGRATION
 
-- Usar como guia os arquivos:
-  - API_DOCUMENTATION.md
-  - BACKEND_ENDPOINTS.md
-- Não inventar endpoints
-- Garantir que DTOs estejam compatíveis com o backend
-- Seguir padrões existentes de integração com API
+- O app é local. Não há backend nem endpoints remotos para inventar.
+- Integrações (SSH, RDP, login web) passam pelos handlers IPC já existentes.
 
 ---
 
