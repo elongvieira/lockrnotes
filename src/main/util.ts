@@ -19,3 +19,37 @@ export function resolveHtmlPath(htmlFileName: string) {
 export function getPathSeparator(): string {
   return path.sep;
 }
+
+/**
+ * Navigation is limited to the app document: the dev server origin, or the
+ * packaged renderer directory. Dropped files and remote pages are rejected.
+ */
+export function isAllowedAppNavigation(
+  targetUrl: string,
+  appUrl: string,
+): boolean {
+  try {
+    const target = new URL(targetUrl);
+    const app = new URL(appUrl);
+    if (app.protocol === 'http:' || app.protocol === 'https:') {
+      return target.origin === app.origin;
+    }
+    if (app.protocol !== 'file:' || target.protocol !== 'file:') {
+      return false;
+    }
+    const appDir = app.pathname.slice(0, app.pathname.lastIndexOf('/') + 1);
+    return target.pathname.startsWith(appDir);
+  } catch {
+    return false;
+  }
+}
+
+/** External links opened from the app are limited to web URLs. */
+export function isAllowedExternalUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}

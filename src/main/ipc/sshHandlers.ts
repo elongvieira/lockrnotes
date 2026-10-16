@@ -2,6 +2,7 @@ import path from 'path';
 import { ipcMain, BrowserWindow, app, type WebContents } from 'electron';
 import { Client, ClientChannel } from 'ssh2';
 import { parseRemoteTarget } from '../services/remoteConnection';
+import { guardAppNavigation } from '../navigationGuard';
 import { resolveHtmlPath } from '../util';
 
 const sshConnections = new Map<
@@ -65,10 +66,13 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
           preload: preloadPath,
           nodeIntegration: false,
           contextIsolation: true,
+          sandbox: true,
+          webviewTag: false,
         },
       });
 
       const baseUrl = resolveHtmlPath('index.html');
+      guardAppNavigation(sshWindow.webContents, baseUrl);
       await sshWindow.loadURL(`${baseUrl}#ssh-terminal/${token}`);
       sshWindow.setMenu(null);
       sshWindow.show();

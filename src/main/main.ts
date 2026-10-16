@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import {
@@ -18,6 +18,7 @@ import {
   updateConfigFile,
 } from './config';
 import { resolveHtmlPath } from './util';
+import { guardAppNavigation } from './navigationGuard';
 import { setupIpcHandlers } from './ipc';
 
 class AppUpdater {
@@ -83,6 +84,8 @@ const createWindow = async () => {
     console.log('Using default window size');
   }
 
+  const appUrl = resolveHtmlPath('index.html');
+
   mainWindow = new BrowserWindow({
     show: false,
     width: windowWidth,
@@ -92,6 +95,10 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      webviewTag: false,
     },
     // Make the window frameless so we can render a custom title bar in the renderer
     // Keep traffic light/titlebar behaviour on macOS by using titleBarStyle
@@ -99,7 +106,8 @@ const createWindow = async () => {
     ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' } : {}),
   });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  guardAppNavigation(mainWindow.webContents, appUrl);
+  mainWindow.loadURL(appUrl);
 
   // Remove application menu (hide menu bar)
   try {
@@ -136,12 +144,6 @@ const createWindow = async () => {
 
   // Setup all IPC handlers
   setupIpcHandlers(mainWindow);
-
-  // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
-  });
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
