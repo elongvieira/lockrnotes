@@ -1,7 +1,7 @@
 <h1 align="center">Lockr Notes</h1>
 
 <p align="center">
-  Aplicativo de anotações local, com foco em privacidade, criptografia opcional e código aberto.
+  A local desktop app for notes, passwords, and logins. Optional encryption. Open source.
 </p>
 
 <br>
@@ -16,56 +16,76 @@
 
 <br>
 
-## O que é
+<p align="center">
+  <img src="docs/lockrnotes_screen.png" alt="Lockr Notes with a saved password entry" width="820">
+</p>
 
-**Lockr Notes** é um app desktop para guardar notas e dados estruturados no **seu próprio computador**. Você escolhe a pasta de armazenamento, organiza arquivos em árvore de pastas e pode proteger conteúdo com criptografia quando fizer sentido para você.
+<p align="center">
+  <img src="docs/lockrnotes.gif" alt="Creating and opening notes in Lockr Notes" width="820">
+</p>
 
-O projeto é **open source** ([MIT](LICENSE)) e o código está em [github.com/elongvieira/lockrnotes](https://github.com/elongvieira/lockrnotes).
+<br>
 
-## Recursos principais
+## What it is
 
-- **Armazenamento local** — por padrão, pasta `LockrNotes` em Documentos (caminho configurável).
-- **Notas em texto** (`.txt`) e **entradas JSON** (`.json`) para dados estruturados (logins, SSH, RDP, etc.).
-- **Criptografia gerenciada** — AES-256-GCM; chave mestra protegida no cofre do Windows ou, opcionalmente, na pasta do app.
-- **Criptografia manual** — arquivos protegidos com senha definida por você.
-- **Interface** — tema escuro, abas, auto-save, idiomas **pt-BR** e **en**.
-- **Integrações opcionais** — terminal SSH, RDP, login web in-app (só quando você usar esses recursos).
-- **Importar / exportar** — backup e migração da sua pasta de notas.
+**Lockr Notes** keeps your notes, passwords, and logins on your own computer, in a folder you choose. Write plain text. Store structured entries for sites, SSH, and remote desktops. Lock a file with encryption when it should stay private. When you need the site itself, open it in the built-in browser, right next to the password that gets you in.
 
-## Privacidade e segurança
+Organize everything in a folder tree, with tabs and autosave, in **English** or **pt-BR**. Nothing here asks you to create an account or upload your notes.
 
-Lockr Notes foi pensado para quem quer **controle local** sobre as próprias anotações:
+The project is **open source** ([MIT](LICENSE)). The code lives at [github.com/elongvieira/lockrnotes](https://github.com/elongvieira/lockrnotes).
 
-| Aspecto | Comportamento |
+**Lockr Notes** guarda suas notas, senhas e logins no seu próprio computador, na pasta que você escolher. Escreva texto livre. Guarde entradas estruturadas para sites, SSH e área de trabalho remota. Tranque um arquivo com criptografia quando ele precisar ficar privado. Quando precisar do site, abra-o no navegador interno, ao lado da senha que entra nele.
+
+Organize tudo em uma árvore de pastas, com abas e salvamento automático, em **inglês** ou **pt-BR**. O app não pede conta e não envia suas notas para um servidor.
+
+O projeto é **open source** ([MIT](LICENSE)). O código está em [github.com/elongvieira/lockrnotes](https://github.com/elongvieira/lockrnotes).
+
+## Main features
+
+- **Local storage** — a `LockrNotes` folder in Documents by default, or any path you set.
+- **Notes and structured entries** — plain text (`.txt`) and JSON (`.json`) for passwords, web logins, SSH, and RDP.
+- **Built-in browser** — open a site from a login entry, with a browser session isolated per entry.
+- **SSH terminal and RDP** — connect from the entry you already saved, only when you use those actions.
+- **Quick copy** — keep frequently copied fields one click away.
+- **Managed encryption** — AES-256-GCM. The master key stays in the operating system vault, or optionally in the app folder.
+- **Password encryption** — protect a file with a password you choose.
+- **Interface** — dark theme, tabs, autosave, **English** and **pt-BR**.
+- **Import and export** — back up or move your notes folder.
+
+## Privacy and security
+
+Lockr Notes is built for people who want their notes under local control:
+
+| Topic | Behavior |
 |--------|----------------|
-| **Onde ficam os dados** | Nas pastas que você define no disco; o app não hospeda suas notas em servidor próprio. |
-| **Configuração do app** | Arquivo `config.enc` criptografado na pasta de dados do usuário (Electron `userData`). |
-| **Criptografia de arquivos** | Opcional. AES-256-GCM. Arquivos novos usam HKDF (criptografia gerenciada) ou PBKDF2 com 600 mil iterações (senha). Arquivos antigos continuam abrindo. |
-| **Chave de criptografia** | Modo recomendado: cofre do sistema (`safeStorage`: DPAPI no Windows, Keychain no macOS). Guardar a chave na pasta não torna o cofre portátil: o arquivo continua cifrado pelo sistema, preso a este usuário e a este computador. |
-| **Sem recuperação da chave** | Reinstalar o sistema ou perder o cofre deixa a criptografia gerenciada ilegível. Não há senha de recuperação. Para notas que precisam sobreviver a isso, use criptografia manual com senha. |
-| **Exportação** | O ZIP de exportação contém as notas em claro. O app pede confirmação antes de gerá-lo. |
-| **Telemetria de conteúdo** | O app **não envia o texto das suas notas** para serviços do Lockr Notes. |
-| **Rede** | Conexões podem ocorrer quando **você** usa login web, SSH, RDP ou quando a **versão instalada** verifica atualizações no GitHub. |
-| **Backups** | **Sua responsabilidade.** Perda de disco, exclusão acidental ou perda da chave pode tornar dados irrecuperáveis. |
+| **Where data lives** | In the folders you choose on disk. The app does not host your notes on its own server. |
+| **App settings** | Encrypted `config.enc` in the Electron `userData` directory. |
+| **File encryption** | Optional. AES-256-GCM. New files use HKDF (managed encryption) or PBKDF2 with 600,000 iterations (password). Older files still open. |
+| **Encryption key** | Recommended mode: the system vault (`safeStorage`: DPAPI on Windows, Keychain on macOS). Storing the key in the folder does not make the vault portable: the file stays encrypted by the system, bound to this user and this computer. |
+| **No key recovery** | Reinstalling the system or losing the vault makes managed encryption unreadable. There is no recovery password. For notes that must survive that, use password encryption. |
+| **Export** | The export ZIP contains notes in clear text. The app asks for confirmation before creating it. |
+| **Content telemetry** | The app **does not send the text of your notes** to Lockr Notes services. |
+| **Network** | Connections happen when **you** use web login, SSH, or RDP, and when an **installed build** checks GitHub for updates. |
+| **Backups** | **Your responsibility.** Disk loss, accidental deletion, or a lost key can make data unrecoverable. |
 
-Leia também [TERMS.md](TERMS.md) (termos de uso) e [SECURITY.md](SECURITY.md) (como reportar vulnerabilidades em privado).
+Also read [TERMS.md](TERMS.md) (terms of use) and [SECURITY.md](SECURITY.md) (how to report vulnerabilities in private).
 
-> **Importante:** Criptografia e boas práticas reduzem riscos, mas nenhum software elimina todos os cenários de perda de dados ou uso indevido. Use por sua conta e risco.
+> **Important:** Encryption and careful use reduce risk. No software removes every chance of data loss or misuse. Use it at your own risk.
 
 ## Feedback
 
-- **Issues e ideias:** [github.com/elongvieira/lockrnotes/issues](https://github.com/elongvieira/lockrnotes/issues)
+- **Issues and ideas:** [github.com/elongvieira/lockrnotes/issues](https://github.com/elongvieira/lockrnotes/issues)
 - **Discord:** [discord.gg/Fjy3vfgy5q](https://discord.gg/Fjy3vfgy5q)
 
-Contribuições seguem [CONTRIBUTING.md](CONTRIBUTING.md) e o [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
-## Desenvolvimento
+## Development
 
 Stack: [Electron](https://electronjs.org/) + [React](https://react.dev/) + TypeScript.
 
-### Clonar e instalar
+### Clone and install
 
 ```bash
 git clone --depth 1 --branch main https://github.com/elongvieira/lockrnotes.git
@@ -73,21 +93,21 @@ cd lockrnotes
 npm install
 ```
 
-### Rodar em desenvolvimento
+### Run in development
 
 ```bash
 npm run dev
 ```
 
-Equivalente a `npm start` (webpack + Electron).
+Same as `npm start` (webpack + Electron).
 
-### Empacotar
+### Package
 
 ```bash
 npm run package
 ```
 
-### Testes e lint
+### Tests and lint
 
 ```bash
 npm test
@@ -96,7 +116,7 @@ npm run lint
 
 ### Semantic Release
 
-Commits na `main` seguem [Conventional Commits](https://www.conventionalcommits.org/) para versionamento automático via CI:
+Commits on `main` follow [Conventional Commits](https://www.conventionalcommits.org/) so CI can version the project:
 
 ```bash
 feat: add a new entry type
@@ -106,14 +126,14 @@ chore: update dependencies
 
 ---
 
-## Projeto base
+## Base project
 
-Este repositório evoluiu a partir do [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) (MIT).  
-Modificações e funcionalidades atuais: **Elon Gomes Vieira**.
+This repository grew from [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) (MIT).  
+Current changes and features: **Elon Gomes Vieira**.
 
-## Licença
+## License
 
-MIT © 2025 Elon Gomes Vieira — veja [LICENSE](https://github.com/elongvieira/lockrnotes/blob/main/LICENSE).
+MIT © 2025 Elon Gomes Vieira — see [LICENSE](https://github.com/elongvieira/lockrnotes/blob/main/LICENSE).
 
 [github-actions-status]: https://github.com/elongvieira/lockrnotes/workflows/Test/badge.svg
 [github-actions-url]: https://github.com/elongvieira/lockrnotes/actions
