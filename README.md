@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/lockrnotes.gif" alt="Creating and opening notes in Lockr Notes" width="820">
+  <img src="docs/lockrnotes-demo.gif" alt="Creating and opening notes in Lockr Notes" width="820">
 </p>
 
 <br>
