@@ -226,7 +226,16 @@
   },
   "overrides": {
     "minimatch": "^9.0.7",
-    "npm": "^11.14.1",
+    "npm": "^11.21.1",
+    "@actions/http-client": {
+      "undici": "6.29.1"
+    },
+    "@electron/get": {
+      "undici": "7.30.1"
+    },
+    "@semantic-release/github": {
+      "undici": "7.30.1"
+    },
     "proxy-addr": "2.0.8",
     "compression": "1.8.2",
     "source-map-js": "1.2.2",

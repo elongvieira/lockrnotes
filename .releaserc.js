@@ -21,6 +21,7 @@ module.exports = {
       {
         successComment: false,
         failComment: false,
+        failTitle: false,
         releasedLabels: false,
       },
     ],
