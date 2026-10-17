@@ -20,10 +20,6 @@
   <img src="docs/lockrnotes_screen.png" alt="Lockr Notes with a saved password entry" width="820">
 </p>
 
-<p align="center">
-  <img src="docs/lockrnotes-demo.gif" alt="Creating and opening notes in Lockr Notes" width="820">
-</p>
-
 <br>
 
 ## What it is
