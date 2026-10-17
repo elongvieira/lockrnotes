@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  code-quality: write
 
 jobs:
   test:
@@ -15,6 +16,8 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Install Node.js and NPM
         uses: actions/setup-node@v5
@@ -28,6 +31,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Stylelint
+        run: npm run stylelint
+
+      - name: Prettier
+        run: npm run format:check
+
       - name: Type check
         run: npm exec tsc
 
@@ -37,4 +46,12 @@ jobs:
         run: npm run build
 
       - name: Test
-        run: npm test
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: coverage/cobertura-coverage.xml
+          language: TypeScript
+          label: code-coverage/jest

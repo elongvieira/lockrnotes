@@ -19,6 +19,16 @@ module.exports = {
     '!src/**/*.test.{ts,tsx}',
     '!src/__tests__/**',
   ],
+  // Istanbul instrumentation breaks under the minimatch 9 override.
+  coverageProvider: 'v8',
+  coverageReporters: ['text-summary', 'cobertura'],
+  // Regression gate. Current line coverage is about 18%; GitHub Code Quality
+  // reports line coverage only, so the gate follows that metric.
+  coverageThreshold: {
+    global: {
+      lines: 15,
+    },
+  },
   transform: {
     '\\.(ts|tsx|js|jsx)$': 'ts-jest',
   },

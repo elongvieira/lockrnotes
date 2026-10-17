@@ -1,10 +1,12 @@
-name: 'CodeQL'
+name: CodeQL
 
-# CodeQL is disabled - requires code scanning to be enabled in GitHub repository settings
-# To re-enable: uncomment the 'on' block below and enable code scanning at:
-# https://github.com/elongvieira/lockrnotes/settings/security_analysis
 on:
-  workflow_dispatch: # manual trigger only
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
 
 jobs:
   analyze:
@@ -15,20 +17,15 @@ jobs:
       contents: read
       security-events: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ['javascript']
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: ${{ matrix.language }}
+          languages: javascript-typescript
+          queries: security-and-quality
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
