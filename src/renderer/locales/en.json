@@ -98,7 +98,7 @@
         "reservedName": "This is a reserved system name",
         "startsWithDot": "File name cannot start with a dot",
         "emptyPassword": "Password is required",
-        "weakPassword": "Password must be at least 6 characters",
+        "weakPassword": "Password must be at least 12 characters",
         "passwordMismatch": "Passwords do not match",
         "passwordTooLong": "Password is too long (maximum 128 characters)",
         "passwordSpecialChars": "Password must contain at least one special character",
@@ -244,10 +244,12 @@
     "connected": "Connected",
     "disconnected": "Disconnected",
     "disconnect": "Disconnect",
-    "error": "Error"
+    "error": "Error",
+    "connectError": "Could not open the SSH connection"
   },
   "rdp": {
-    "connect": "Connect RDP"
+    "connect": "Connect RDP",
+    "connectError": "Could not open the RDP connection"
   },
   "webLogin": {
     "open": "Open and fill login",
@@ -294,6 +296,7 @@
     "fileDeleteError": "Error deleting file",
     "fileDecrypted": "File decrypted successfully",
     "fileDecryptError": "Error decrypting file",
+    "weakOsEncryption": "The operating system is not protecting the encryption key. Managed notes can be read by anyone with access to this account.",
     "exportSuccess": "Export completed! {{count}} files exported to {{path}}",
     "exportError": "Error exporting files: {{error}}",
     "exportNoFolder": "No folder selected for export",

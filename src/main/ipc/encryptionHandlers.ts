@@ -1,5 +1,6 @@
-import { ipcMain } from 'electron';
+import { ipcMain, safeStorage } from 'electron';
 import { managedEncryptionService } from '../services/managedEncryptionService';
+import { readOsEncryptionStatus } from '../services/osEncryption';
 
 /**
  * Handlers IPC para criptografia gerenciada
@@ -67,6 +68,10 @@ export function setupEncryptionHandlers(): void {
     },
   );
 
+  ipcMain.handle('encryption:storage-status', () => {
+    return readOsEncryptionStatus(safeStorage, process.platform);
+  });
+
   // Reset do sistema de criptografia
   ipcMain.handle('encryption:reset', async () => {
     try {
@@ -81,9 +86,12 @@ export function setupEncryptionHandlers(): void {
   // Migrar chave de criptografia entre tipos de armazenamento
   ipcMain.handle(
     'encryption:migrateKeyStorage',
-    async (_, newStorageType: string) => {
+    async (_, newStorageType: string, defaultPath?: string) => {
       try {
-        await managedEncryptionService.migrateKeyStorage(newStorageType);
+        await managedEncryptionService.migrateKeyStorage(
+          newStorageType,
+          defaultPath,
+        );
         return { success: true };
       } catch (error: any) {
         console.error('IPC migrate key storage error:', error);

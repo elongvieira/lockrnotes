@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -329,32 +329,48 @@ export default function Editor() {
     }
   }, [currentPendingFile, pendingEncryptedFiles, restoredTabs, setActiveTab]);
 
-  // Salvar abas sempre que mudarem (depois da restauração inicial)
-  useEffect(() => {
-    if (isRestoringTabs) return;
-
-    const saveTabs = async () => {
-      try {
-        const tabsToSave = tabs.map((tab) => ({
+  const persistedTabs = useMemo(
+    () =>
+      JSON.stringify({
+        activeTab,
+        tabs: tabs.map((tab) => ({
           id: tab.id,
           filename: tab.filename,
           filePath: tab.filePath,
           isEncrypted: tab.isEncrypted,
           originalExtension: tab.originalExtension,
-        }));
+        })),
+      }),
+    [tabs, activeTab],
+  );
 
-        await fileSystemService.updateConfig({
-          openTabs: tabsToSave,
-          activeTabId: activeTab,
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to save tabs:', error);
-      }
+  // Persist which tabs are open. Typing does not change this signature.
+  useEffect(() => {
+    if (isRestoringTabs) return undefined;
+
+    const parsed = JSON.parse(persistedTabs) as {
+      activeTab: string | null;
+      tabs: Array<{
+        id: string;
+        filename: string;
+        filePath: string;
+        isEncrypted: boolean;
+        originalExtension?: string;
+      }>;
     };
 
-    saveTabs();
-  }, [tabs, activeTab, isRestoringTabs]);
+    fileSystemService
+      .updateConfig({
+        openTabs: parsed.tabs,
+        activeTabId: parsed.activeTab,
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error('Failed to save tabs:', error);
+      });
+
+    return undefined;
+  }, [persistedTabs, isRestoringTabs]);
 
   // Função para abrir um novo arquivo em uma aba
   const openFile = useCallback(
@@ -527,75 +543,36 @@ export default function Editor() {
 
         // Check if file has a password (manual encryption)
         if (targetTab.encryptedPassword) {
-          // eslint-disable-next-line no-console
-          console.log(
-            'Saving manually encrypted file:',
-            targetTab.filename,
-            'Password stored:',
-            !!targetTab.encryptedPassword,
-          );
-
-          // Decrypt the password from memory
           let password: string;
           try {
             password = await sessionKeyService.decryptPassword(
               targetTab.encryptedPassword,
             );
-            // eslint-disable-next-line no-console
-            console.log('Password decrypted successfully');
-          } catch (decryptErr) {
-            // eslint-disable-next-line no-console
-            console.error(
-              'Failed to decrypt password from memory:',
-              decryptErr,
-            );
+          } catch {
             throw new Error('Failed to retrieve stored password');
           }
 
-          // Get original extension
           const originalExt = targetTab.originalExtension || '.txt';
-          // eslint-disable-next-line no-console
-          console.log('Original extension:', originalExt);
-
-          // Encrypt content with password
           const encryptResult = await window.manualEncryptionAPI.encryptContent(
             targetTab.content,
             password,
             originalExt,
           );
 
-          // eslint-disable-next-line no-console
-          console.log('Encryption result:', encryptResult.success);
-
           if (encryptResult.success && encryptResult.data) {
-            // Save encrypted content
             const encryptedContent = JSON.stringify(
               encryptResult.data,
               null,
               2,
             );
-            // eslint-disable-next-line no-console
-            console.log(
-              'Saving to disk:',
-              targetTab.filePath,
-              'Content length:',
-              encryptedContent.length,
-            );
-
             success = await fileSystemService.saveFile(
               targetTab.filePath,
               encryptedContent,
             );
-            // eslint-disable-next-line no-console
-            console.log('File saved to disk:', targetTab.filename, success);
           } else {
             throw new Error(encryptResult.error || 'Encryption failed');
           }
         } else {
-          // eslint-disable-next-line no-console
-          console.log('Saving managed encrypted file:', targetTab.filename);
-
-          // Use standard save with managed encryption
           success = await fileSystemService.saveFileWithEncryption(
             targetTab.filePath,
             targetTab.content,

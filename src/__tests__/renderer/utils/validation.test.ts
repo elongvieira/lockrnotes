@@ -142,8 +142,9 @@ describe('validateFileName', () => {
 });
 
 describe('validatePassword', () => {
-  it('should accept a valid password with special char', () => {
-    expect(validatePassword('mypass!')).toEqual({ isValid: true });
+  it('should accept a password of at least 12 characters', () => {
+    expect(validatePassword('mypass!mypass')).toEqual({ isValid: true });
+    expect(validatePassword('abcdefghijkl')).toEqual({ isValid: true });
   });
 
   it('should reject empty password', () => {
@@ -152,8 +153,8 @@ describe('validatePassword', () => {
     expect(result.errorKey).toBe('dialog.file.errors.emptyPassword');
   });
 
-  it('should reject password shorter than 6 chars', () => {
-    const result = validatePassword('ab!');
+  it('should reject password shorter than 12 chars', () => {
+    const result = validatePassword('short!pass');
     expect(result.isValid).toBe(false);
     expect(result.errorKey).toBe('dialog.file.errors.weakPassword');
   });
@@ -164,16 +165,10 @@ describe('validatePassword', () => {
     expect(result.errorKey).toBe('dialog.file.errors.passwordTooLong');
   });
 
-  it('should reject password without special character', () => {
-    const result = validatePassword('abcdef');
-    expect(result.isValid).toBe(false);
-    expect(result.errorKey).toBe('dialog.file.errors.passwordSpecialChars');
-  });
-
-  it('should accept various special characters', () => {
+  it('should accept various characters once the password is long enough', () => {
     const specials = ['@', '#', '$', '%', '!', '^', '&', '*', '(', ')'];
     specials.forEach((char) => {
-      expect(validatePassword(`abcde${char}`)).toEqual({ isValid: true });
+      expect(validatePassword(`abcdefghijk${char}`)).toEqual({ isValid: true });
     });
   });
 });

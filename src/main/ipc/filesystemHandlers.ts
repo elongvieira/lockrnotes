@@ -103,7 +103,14 @@ export function setupFilesystemHandlers() {
         lastModified: stats.mtime,
       };
     } catch (error) {
-      console.error('Error getting item:', error);
+      const missing =
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === 'ENOENT';
+      if (!missing) {
+        console.error('Error getting item:', error);
+      }
       return null;
     }
   });
@@ -163,7 +170,7 @@ export function setupFilesystemHandlers() {
     try {
       const stats = await fs.promises.stat(itemPath);
       if (stats.isDirectory()) {
-        await fs.promises.rmdir(itemPath, { recursive: true });
+        await fs.promises.rm(itemPath, { recursive: true });
       } else {
         await fs.promises.unlink(itemPath);
       }

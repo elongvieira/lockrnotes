@@ -162,6 +162,7 @@ export function buildCustomLoginRecorderScript(): string {
         selector: pendingType.selector,
         value: pendingType.value,
         isPassword: pendingType.isPassword,
+        origin: location.origin,
       },
     });
     pendingType = null;
@@ -219,6 +220,7 @@ export function buildCustomLoginRecorderScript(): string {
         label: clickLabel(clickable),
         selector: buildSelector(clickable),
         text: clickLabel(clickable),
+        origin: location.origin,
       },
     });
   }

@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import AdmZip from 'adm-zip';
 import { readConfigFile } from '../config';
+import { exportEntryName } from './exportNames';
 import {
   managedEncryptionService,
   EncryptedFileData,
@@ -68,41 +69,34 @@ export async function exportAllFiles(
     const files = await getAllFiles(sourcePath);
 
     for (const filePath of files) {
-      // Skip the .lockrnotes folder (contains encryption key)
-      if (filePath.includes('.lockrnotes')) {
+      const relativePath = path.relative(sourcePath, filePath);
+      if (relativePath.split(path.sep).includes('.lockrnotes')) {
         continue;
       }
 
-      const relativePath = path.relative(sourcePath, filePath);
-      const fileContent = await fs.readFile(filePath, 'utf-8');
+      const bytes = await fs.readFile(filePath);
+      let archived = bytes;
+      let archivedName = relativePath;
 
       try {
-        // Check if file is encrypted
-        const parsed = JSON.parse(fileContent);
+        const parsed = JSON.parse(bytes.toString('utf8'));
         if (parsed.type === 'lockrnotes-encrypted') {
-          // Decrypt and add to ZIP
           const decrypted = await managedEncryptionService.decryptContent(
             parsed as EncryptedFileData,
             filePath,
           );
-
-          // Use original extension from encrypted data
-          const originalName = relativePath.replace(
-            path.extname(relativePath),
+          archived = Buffer.from(decrypted, 'utf8');
+          archivedName = exportEntryName(
+            relativePath,
             parsed.originalExtension || '.txt',
           );
-          zip.addFile(originalName, Buffer.from(decrypted, 'utf-8'));
-          filesExported++;
-        } else {
-          // Not encrypted, add as is
-          zip.addFile(relativePath, Buffer.from(fileContent, 'utf-8'));
-          filesExported++;
         }
       } catch {
-        // Not a JSON file or not encrypted, add as is
-        zip.addFile(relativePath, Buffer.from(fileContent, 'utf-8'));
-        filesExported++;
+        // Keep the original bytes, including files that are not UTF-8 JSON.
       }
+
+      zip.addFile(archivedName, archived);
+      filesExported++;
     }
 
     // Generate ZIP filename with timestamp

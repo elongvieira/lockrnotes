@@ -98,7 +98,7 @@
         "reservedName": "Este é um nome reservado do sistema",
         "startsWithDot": "Nome do arquivo não pode começar com ponto",
         "emptyPassword": "Senha é obrigatória",
-        "weakPassword": "Senha deve ter pelo menos 6 caracteres",
+        "weakPassword": "Senha deve ter pelo menos 12 caracteres",
         "passwordMismatch": "Senhas não coincidem",
         "passwordTooLong": "Senha é muito longa (máximo 128 caracteres)",
         "passwordSpecialChars": "Senha deve conter pelo menos um caractere especial",
@@ -244,10 +244,12 @@
     "connected": "Conectado",
     "disconnected": "Desconectado",
     "disconnect": "Desconectar",
-    "error": "Erro"
+    "error": "Erro",
+    "connectError": "Não foi possível abrir a conexão SSH"
   },
   "rdp": {
-    "connect": "Conectar RDP"
+    "connect": "Conectar RDP",
+    "connectError": "Não foi possível abrir a conexão RDP"
   },
   "webLogin": {
     "open": "Abrir e preencher login",
@@ -294,6 +296,7 @@
     "fileDeleteError": "Erro ao excluir arquivo",
     "fileDecrypted": "Arquivo descriptografado com sucesso",
     "fileDecryptError": "Erro ao descriptografar arquivo",
+    "weakOsEncryption": "O sistema não está protegendo a chave de criptografia. Notas com criptografia gerenciada podem ser lidas por quem tiver acesso a esta conta.",
     "exportSuccess": "Exportação concluída! {{count}} arquivos exportados para {{path}}",
     "exportError": "Erro ao exportar arquivos: {{error}}",
     "exportNoFolder": "Nenhuma pasta selecionada para exportação",

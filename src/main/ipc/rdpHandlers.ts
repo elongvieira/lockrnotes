@@ -1,12 +1,41 @@
 import { ipcMain } from 'electron';
-import { spawn, exec } from 'child_process';
+import { spawn, type ChildProcess } from 'child_process';
+import {
+  cmdkeyDeleteArgs,
+  cmdkeyStoreArgs,
+  formatEndpoint,
+  freeRdpArgs,
+  parseRemoteTarget,
+  windowsCredentialTarget,
+  windowsUsername,
+} from '../services/remoteConnection';
 
 // Delay before removing cmdkey credentials to give mstsc time to read them
 const CREDENTIAL_CLEANUP_DELAY_MS = 8000;
+const RDP_PORT = 3389;
 
-function getCredentialTarget(host: string, port: number) {
-  const portSuffix = port !== 3389 ? `:${port}` : '';
-  return `TERMSRV/${host}${portSuffix}`;
+function startDetached(
+  command: string,
+  args: string[],
+  stdin?: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child: ChildProcess = spawn(command, args, {
+      detached: true,
+      shell: false,
+      windowsHide: true,
+      stdio: stdin === undefined ? 'ignore' : ['pipe', 'ignore', 'ignore'],
+    });
+    child.once('error', reject);
+    child.once('spawn', () => {
+      if (stdin !== undefined && child.stdin) {
+        child.stdin.write(stdin);
+        child.stdin.end();
+      }
+      child.unref();
+      resolve();
+    });
+  });
 }
 
 export function setupRdpHandlers() {
@@ -22,83 +51,56 @@ export function setupRdpHandlers() {
         domain?: string;
       },
     ) => {
-      const port = config.port || 3389;
-      const target = getCredentialTarget(config.host, port);
-      const username = config.domain
-        ? `${config.domain}\\${config.user}`
-        : config.user;
+      const target = parseRemoteTarget(config, RDP_PORT);
+      if (!target) {
+        return { success: false, error: 'Invalid RDP target' };
+      }
 
-      return new Promise<{ success: boolean; error?: string }>((resolve) => {
+      const credentialTarget = windowsCredentialTarget(
+        target.host,
+        target.port,
+        RDP_PORT,
+      );
+      const username = windowsUsername(target.user, target.domain);
+
+      try {
         if (process.platform === 'win32') {
-          // Store credentials in Windows Credential Manager
-          const cmdkeyArgs = [
-            `/generic:${target}`,
-            `/user:${username}`,
-            `/pass:${config.password}`,
-          ];
-
-          const credProc = spawn('cmdkey.exe', cmdkeyArgs, { shell: false });
-          credProc.on('close', (code) => {
-            if (code !== 0) {
-              resolve({ success: false, error: 'Failed to store credentials' });
-              return;
-            }
-
-            // Launch mstsc.exe
-            const mstscArgs = [`/v:${config.host}:${port}`];
-            spawn('mstsc.exe', mstscArgs, {
-              detached: true,
-              stdio: 'ignore',
-              shell: false,
-            }).unref();
-
-            // Clean up credentials after a delay
-            setTimeout(() => {
-              exec(`cmdkey.exe /delete:${target}`, () => {});
-            }, CREDENTIAL_CLEANUP_DELAY_MS);
-
-            resolve({ success: true });
+          const stored = await new Promise<boolean>((resolve, reject) => {
+            const credProc = spawn(
+              'cmdkey.exe',
+              cmdkeyStoreArgs(credentialTarget, username, target.password),
+              { shell: false, windowsHide: true },
+            );
+            credProc.once('error', reject);
+            credProc.once('close', (code) => resolve(code === 0));
           });
-        } else if (process.platform === 'darwin') {
-          // macOS: open with Microsoft Remote Desktop if available, otherwise xfreerdp
-          const userArg = config.domain
-            ? `${config.domain}\\\\${config.user}`
-            : config.user;
-          const args = [
-            `-u`,
-            userArg,
-            `-p`,
-            config.password,
-            `/v:${config.host}:${port}`,
-            `/cert-ignore`,
-          ];
-          spawn('xfreerdp', args, {
-            detached: true,
-            stdio: 'ignore',
-            shell: false,
-          }).unref();
-          resolve({ success: true });
-        } else {
-          // Linux: use xfreerdp
-          const userArg = config.domain
-            ? `${config.domain}\\\\${config.user}`
-            : config.user;
-          const args = [
-            `-u`,
-            userArg,
-            `-p`,
-            config.password,
-            `/v:${config.host}:${port}`,
-            `/cert-ignore`,
-          ];
-          spawn('xfreerdp', args, {
-            detached: true,
-            stdio: 'ignore',
-            shell: false,
-          }).unref();
-          resolve({ success: true });
+          if (!stored) {
+            return { success: false, error: 'Failed to store credentials' };
+          }
+
+          await startDetached('mstsc.exe', [
+            `/v:${formatEndpoint(target.host, target.port)}`,
+          ]);
+
+          setTimeout(() => {
+            spawn('cmdkey.exe', cmdkeyDeleteArgs(credentialTarget), {
+              shell: false,
+              windowsHide: true,
+            }).on('error', () => {});
+          }, CREDENTIAL_CLEANUP_DELAY_MS);
+
+          return { success: true };
         }
-      });
+
+        await startDetached(
+          'xfreerdp',
+          freeRdpArgs(target),
+          `${target.password}\n`,
+        );
+        return { success: true };
+      } catch {
+        return { success: false, error: 'Failed to start the RDP client' };
+      }
     },
   );
 }

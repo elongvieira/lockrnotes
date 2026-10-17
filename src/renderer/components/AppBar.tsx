@@ -105,6 +105,10 @@ export default function AppBar() {
         folderResult.folderPath,
       );
 
+      if (exportResult.canceled) {
+        return;
+      }
+
       if (exportResult.success && exportResult.zipPath) {
         window.dispatchEvent(
           new CustomEvent('show-notification', {

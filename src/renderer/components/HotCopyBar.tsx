@@ -8,6 +8,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import AddIcon from '@mui/icons-material/Add';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { HotCopyItem } from '../types/hotcopy';
+import { copyTextTemporarily } from '../utils/clipboard';
 import './HotCopyBar.css';
 
 interface HotCopyBarProps {
@@ -67,7 +68,7 @@ export default function HotCopyBar({
       );
 
       if (value !== undefined && value !== null) {
-        await navigator.clipboard.writeText(String(value));
+        await copyTextTemporarily(String(value));
         window.dispatchEvent(
           new CustomEvent('show-notification', {
             detail: {

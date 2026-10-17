@@ -7,7 +7,7 @@ export const sshApi = {
     password: string;
     port?: number;
     title: string;
-  }): Promise<{ success: boolean }> {
+  }): Promise<{ success: boolean; error?: string }> {
     return ipcRenderer.invoke('ssh:open-window', config);
   },
 

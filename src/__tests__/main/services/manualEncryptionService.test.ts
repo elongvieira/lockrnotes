@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { manualEncryptionService } from '../../../main/services/manualEncryptionService';
 
 describe('manualEncryptionService', () => {
@@ -15,7 +16,7 @@ describe('manualEncryptionService', () => {
 
       expect(encrypted.type).toBe('lockrnotes-manual-encrypted');
       expect(encrypted.algorithm).toBe('aes-256-gcm');
-      expect(encrypted.version).toBe('1.0');
+      expect(encrypted.version).toBe('2.0');
       expect(encrypted.originalExtension).toBe(testExtension);
       expect(encrypted.encrypted).toBeTruthy();
       expect(encrypted.iv).toBeTruthy();
@@ -44,6 +45,33 @@ describe('manualEncryptionService', () => {
       expect(enc1.encrypted).not.toBe(enc2.encrypted);
       expect(enc1.iv).not.toBe(enc2.iv);
       expect(enc1.salt).not.toBe(enc2.salt);
+    });
+
+    it('should decrypt a version 1.0 file', async () => {
+      const salt = crypto.randomBytes(32);
+      const iv = crypto.randomBytes(16);
+      const key = crypto.pbkdf2Sync(testPassword, salt, 100000, 32, 'sha256');
+      const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+      const encrypted = Buffer.concat([
+        cipher.update('legacy secret', 'utf8'),
+        cipher.final(),
+      ]).toString('base64');
+
+      const decrypted = await manualEncryptionService.decryptContent(
+        {
+          type: 'lockrnotes-manual-encrypted',
+          algorithm: 'aes-256-gcm',
+          version: '1.0',
+          originalExtension: '.txt',
+          encrypted,
+          iv: iv.toString('base64'),
+          authTag: cipher.getAuthTag().toString('base64'),
+          salt: salt.toString('base64'),
+          created: new Date().toISOString(),
+        },
+        testPassword,
+      );
+      expect(decrypted).toBe('legacy secret');
     });
 
     it('should fail decryption with wrong password', async () => {

@@ -13,7 +13,10 @@ import {
   createLoginWindow,
   resolveLoginPartition,
 } from '../services/loginWindow';
-import { normalizeWebLoginUrl } from '../services/webLoginUrl';
+import {
+  isReplayOriginAllowed,
+  normalizeWebLoginUrl,
+} from '../services/webLoginUrl';
 
 function injectRecorder(contents: WebContents) {
   if (contents.isDestroyed()) return;
@@ -238,6 +241,13 @@ export function setupCustomLoginHandlers() {
               ? `Aguarde: clicando em “${step.label}”`
               : `Aguarde: preenchendo “${step.label}”`;
           refreshStatus();
+          if (!isReplayOriginAllowed(win.webContents.getURL(), step.origin)) {
+            playFinished = true;
+            return {
+              success: false,
+              error: 'Page origin does not match the recorded step',
+            };
+          }
           const result = (await win.webContents.executeJavaScript(
             buildCustomLoginReplayStepScript(step),
           )) as { ok?: boolean; error?: string };

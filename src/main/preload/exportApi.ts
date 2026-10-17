@@ -7,6 +7,7 @@ export const exportApi = {
 
   exportAll(destinationFolder: string): Promise<{
     success: boolean;
+    canceled?: boolean;
     zipPath?: string;
     error?: string;
     filesExported?: number;

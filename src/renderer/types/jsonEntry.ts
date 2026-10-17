@@ -114,6 +114,7 @@ export type CustomLoginClickStep = {
   label: string;
   selector: string;
   text?: string;
+  origin?: string;
 };
 
 export type CustomLoginTypeStep = {
@@ -123,6 +124,7 @@ export type CustomLoginTypeStep = {
   selector: string;
   value: string;
   isPassword?: boolean;
+  origin?: string;
 };
 
 export type CustomLoginStep = CustomLoginClickStep | CustomLoginTypeStep;

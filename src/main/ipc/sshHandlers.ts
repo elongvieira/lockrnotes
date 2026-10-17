@@ -1,6 +1,10 @@
+import crypto from 'crypto';
 import path from 'path';
 import { ipcMain, BrowserWindow, app, type WebContents } from 'electron';
 import { Client, ClientChannel } from 'ssh2';
+import { parseRemoteTarget } from '../services/remoteConnection';
+import { acceptHostKey } from '../services/sshKnownHosts';
+import { guardAppNavigation } from '../navigationGuard';
 import { resolveHtmlPath } from '../util';
 
 const sshConnections = new Map<
@@ -19,8 +23,6 @@ const pendingConfigs = new Map<
   }
 >();
 
-let sessionCounter = 0;
-
 export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
   // Open SSH terminal in a dedicated window
   ipcMain.handle(
@@ -35,8 +37,18 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
         title: string;
       },
     ) => {
-      const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      pendingConfigs.set(token, config);
+      const target = parseRemoteTarget(config, 22);
+      if (!target) {
+        return { success: false, error: 'Invalid SSH target' };
+      }
+      const token = `token_${crypto.randomUUID()}`;
+      pendingConfigs.set(token, {
+        ...config,
+        host: target.host,
+        user: target.user,
+        password: target.password,
+        port: target.port,
+      });
 
       const preloadPath = app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -54,10 +66,13 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
           preload: preloadPath,
           nodeIntegration: false,
           contextIsolation: true,
+          sandbox: true,
+          webviewTag: false,
         },
       });
 
       const baseUrl = resolveHtmlPath('index.html');
+      guardAppNavigation(sshWindow.webContents, baseUrl);
       await sshWindow.loadURL(`${baseUrl}#ssh-terminal/${token}`);
       sshWindow.setMenu(null);
       sshWindow.show();
@@ -81,7 +96,11 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
       event,
       config: { host: string; user: string; password: string; port?: number },
     ) => {
-      const sessionId = `ssh_${Date.now()}_${++sessionCounter}`;
+      const target = parseRemoteTarget(config, 22);
+      if (!target) {
+        return { success: false, error: 'Invalid SSH target' };
+      }
+      const sessionId = `ssh_${crypto.randomUUID()}`;
       const client = new Client();
       const { sender } = event;
 
@@ -129,15 +148,20 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
         client.on(
           'keyboard-interactive',
           (_name, _instructions, _instrLang, _prompts, finish) => {
-            finish([config.password]);
+            finish([target.password]);
           },
         );
 
         client.connect({
-          host: config.host,
-          port: config.port || 22,
-          username: config.user,
-          password: config.password,
+          host: target.host,
+          port: target.port,
+          username: target.user,
+          password: target.password,
+          hostVerifier: (key: Buffer, verify: (valid: boolean) => void) => {
+            acceptHostKey(target.host, target.port, key)
+              .then(verify)
+              .catch(() => verify(false));
+          },
           tryKeyboard: true,
           readyTimeout: 15000,
         });
@@ -145,21 +169,27 @@ export function setupSshHandlers(_mainWindow: BrowserWindow | null) {
     },
   );
 
-  ipcMain.on('ssh:input', (_event, sessionId: string, data: string) => {
+  function ownedSession(sender: WebContents, sessionId: string) {
     const conn = sshConnections.get(sessionId);
-    if (conn?.stream) conn.stream.write(data);
+    if (!conn || conn.sender !== sender) return null;
+    return conn;
+  }
+
+  ipcMain.on('ssh:input', (event, sessionId: string, data: string) => {
+    const conn = ownedSession(event.sender, sessionId);
+    if (conn?.stream && typeof data === 'string') conn.stream.write(data);
   });
 
   ipcMain.on(
     'ssh:resize',
-    (_event, sessionId: string, cols: number, rows: number) => {
-      const conn = sshConnections.get(sessionId);
+    (event, sessionId: string, cols: number, rows: number) => {
+      const conn = ownedSession(event.sender, sessionId);
       if (conn?.stream) conn.stream.setWindow(rows, cols, 0, 0);
     },
   );
 
-  ipcMain.handle('ssh:disconnect', (_event, sessionId: string) => {
-    const conn = sshConnections.get(sessionId);
+  ipcMain.handle('ssh:disconnect', (event, sessionId: string) => {
+    const conn = ownedSession(event.sender, sessionId);
     if (conn) {
       if (conn.stream) conn.stream.close();
       conn.client.end();
