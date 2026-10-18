@@ -226,7 +226,8 @@
     "publish": {
       "provider": "github",
       "owner": "elongvieira",
-      "repo": "lockrnotes"
+      "repo": "lockrnotes",
+      "releaseType": "release"
     }
   },
   "overrides": {

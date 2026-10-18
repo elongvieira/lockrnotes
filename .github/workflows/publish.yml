@@ -1,26 +1,31 @@
 name: Publish
 
-# Temporarily disabled automatic triggers. This workflow now runs only manually.
-# To re-enable on push to main later, replace the 'on:' block with:
-# on:
-#   push:
-#     branches:
-#       - main
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, tag, or branch to build
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
 
 permissions:
   contents: write
 
 jobs:
   publish:
-    # Auto publish on pushes to main
     if: ${{ github.repository_owner == 'elongvieira' }}
     runs-on: windows-latest
 
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Install Node and NPM
         uses: actions/setup-node@v5
@@ -36,13 +41,7 @@ jobs:
 
       - name: Publish releases
         env:
-          # The APPLE_* values are used for auto updates signing
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASS }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          # This is used for uploading release assets to github
+          # Unsigned build. A Windows code-signing certificate is optional.
+          CSC_IDENTITY_AUTO_DISCOVERY: false
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec electron-builder -- --publish always --win
+        run: npm exec electron-builder -- --publish always --win
