@@ -43,5 +43,6 @@ jobs:
         env:
           # Unsigned build. A Windows code-signing certificate is optional.
           CSC_IDENTITY_AUTO_DISCOVERY: false
+          EP_GH_IGNORE_TIME: true
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm exec electron-builder -- --publish always --win
