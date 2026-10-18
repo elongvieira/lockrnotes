@@ -55,3 +55,4 @@ jobs:
           file: coverage/cobertura-coverage.xml
           language: TypeScript
           label: code-coverage/jest
+          fail-on-error: false
